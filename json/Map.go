@@ -1044,38 +1044,40 @@ func (m Map) GetUInt64Value(s string) (uint64, []error) {
 
 func (m Map) GetInt(s string) (*int, []error) {
 	var errors []error
-	var result *int
+	var result int
 
 	if m[s] == nil {
 		return nil, nil
 	}
 
-	rep := fmt.Sprintf("%T", m[s])
-	switch rep {
-	case "int":
-		value := m[s].(int)
-		result = &value
-	case "*int":
-		value := *(m[s].(*int))
-		result = &value
-	case "*string":
-		bit_size := strconv.IntSize
-		value, value_error := strconv.ParseInt((*(m[s].(*string))), 10, bit_size)
-		if value_error != nil {
-			errors = append(errors, fmt.Errorf("error: Map.GetInt: cannot convert *string value to int"))
-		} else {
-			temp := int(value)
-			result = &temp
+	bit_size := strconv.IntSize
+	if bit_size == 32 {
+		temp_value, temp_value_errors := m.GetInt32(s)
+		if temp_value_errors != nil {
+			return nil, temp_value_errors
+		} else if temp_value == nil {
+			return nil, nil
 		}
-	default:
-		errors = append(errors, fmt.Errorf("error: Map.GetInt: type %s is not supported please implement", rep))
+
+		result = int(*temp_value)
+	} else if bit_size == 64 {
+		temp_value, temp_value_errors := m.GetInt64(s)
+		if temp_value_errors != nil {
+			return nil, temp_value_errors
+		} else if temp_value == nil {
+			return nil, nil
+		}
+
+		result = int(*temp_value)
+	} else {
+		errors = append(errors, fmt.Errorf("Mao.GetInt bit size is not supported: %d", bit_size))
 	}
 
 	if len(errors) > 0 {
 		return nil, errors
 	}
 
-	return result, nil
+	return &result, nil
 }
 
 func (m Map) GetIntValue(s string) (int, []error) {

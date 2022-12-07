@@ -651,6 +651,44 @@ func (m Map) GetInt64(s string) (*int64, []error) {
 		case "*int":
 			x := m[s].(*int)
 			temp_value = int64(*x)
+		case "*uint64":
+			x := m[s].(*uint64)
+			if *x > 9223372036854775807 {
+				errors = append(errors, fmt.Errorf("%d is greater than 9223372036854775807", *x))
+			} else {
+				temp_value = int64(*x)
+			}
+		case "uint64":
+			x := m[s].(uint64)
+			if x > 9223372036854775807 {
+				errors = append(errors, fmt.Errorf("%d is greater than 9223372036854775807", x))
+			} else {
+				temp_value = int64(x)
+			}
+		case "*uint32":
+			x := m[s].(*uint32)
+			temp_value = int64(*x)
+		case "uint32":
+			x := m[s].(uint32)
+			temp_value = int64(x)
+		case "*uint16":
+			x := m[s].(*uint16)
+			temp_value = int64(*x)
+		case "uint16":
+			x := m[s].(uint16)
+			temp_value = int64(x)
+		case "*uint8":
+			x := m[s].(*uint8)
+			temp_value = int64(*x)
+		case "uint8":
+			x := m[s].(uint8)
+			temp_value = int64(x)
+		case "*uint":
+			x := m[s].(*uint)
+			temp_value = int64(*x)
+		case "uint":
+			x := m[s].(uint)
+			temp_value = int64(x)
 		case "*string":
 			value, value_error := strconv.ParseInt((*(m[s].(*string))), 10, 64)
 			if value_error != nil {
@@ -1283,6 +1321,12 @@ func (m Map) GetUInt64(s string) (*uint64, []error) {
 		} else {
 			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
 		}
+	case "uint":
+		uint_value := (m[s].(uint))
+		uint64_value = uint64(uint_value)
+	case "*uint":
+		uint_value := *((m[s].(*uint)))
+		uint64_value = uint64(uint_value)
 	case "*uint64":
 		uint64_value = *(m[s].(*uint64))
 	case "uint64":

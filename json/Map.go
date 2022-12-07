@@ -1395,6 +1395,16 @@ func (m Map) GetTime(s string, decimal_places int) (*time.Time, []error) {
 		result = &value
 	case "*string":
 		value := *(m[s].(*string))
+
+		if value == "now" {
+			result = common.GetTimeNow()
+		} else if value == "zero" {
+			result = common.GetTimeZero()
+		}
+
+		if !common.IsNil(result) {
+			return result, nil
+		}
 		
 		if decimal_places < 0 || decimal_places > 9 {
 			errors = append(errors, fmt.Errorf("error: common.GetTime decimal places not supported [0,9] actual %d", decimal_places))
@@ -1478,15 +1488,20 @@ func (m Map) GetTime(s string, decimal_places int) (*time.Time, []error) {
 			return result, nil
 		}
 
+		errors = append(errors,  fmt.Errorf("error: common.GetTimeNow value not supported %s", value))
+	case "string":
+		value := (m[s].(string))
+
 		if value == "now" {
 			result = common.GetTimeNow()
 		} else if value == "zero" {
 			result = common.GetTimeZero()
-		} else {
-			errors = append(errors,  fmt.Errorf("error: common.GetTimeNow value not supported %s", value))
 		}
-	case "string":
-		value := (m[s].(string))
+
+		if !common.IsNil(result) {
+			return result, nil
+		}
+
 
 		if decimal_places < 0 || decimal_places > 9 {
 			errors = append(errors, fmt.Errorf("error: common.GetTime decimal places not supported [0,9] actual %d", decimal_places))
@@ -1570,13 +1585,7 @@ func (m Map) GetTime(s string, decimal_places int) (*time.Time, []error) {
 			return result, nil
 		}
 
-		if value == "now" {
-			result = common.GetTimeNow()
-		} else if value == "zero" {
-			result = common.GetTimeZero()
-		} else {
-			errors = append(errors,  fmt.Errorf("error: common.GetTimeNow value not supported %s", value))
-		}
+		errors = append(errors,  fmt.Errorf("error: common.GetTimeNow value not supported %s", value))
 	default:
 		errors = append(errors, fmt.Errorf("error: Map.GetTime: type %s is not supported please implement", rep))
 	}

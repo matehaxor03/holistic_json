@@ -236,6 +236,51 @@ func (m Map) SetErrors(s string, errors *[]error) {
 	m[s] = errors
 }
 
+
+func (m Map) GetErrors(s string) ([]error, []error) {
+	if m[s] == nil {
+		return nil, nil
+	}
+
+	var errors []error
+	var result []error
+	rep := fmt.Sprintf("%T", m[s])
+	switch rep {
+	case "*[]error":
+		result = *(m[s].(*[]error))
+	case "[]error":
+		result = m[s].([]error)
+	case "*[]string":
+		string_array := m[s].(*[]string)
+		for _, string_array_value := range *string_array {
+			result = append(result, fmt.Errorf(string_array_value))
+		}
+	case "[]string":
+		string_array := m[s].([]string)
+		for _, string_array_value := range string_array {
+			result = append(result, fmt.Errorf(string_array_value))
+		}
+	case "json.Array":
+		string_array := m[s].(Array)
+		for _, string_array_value := range string_array {
+			result = append(result, fmt.Errorf(fmt.Sprintf("%s",string_array_value)))
+		}
+	case "*json.Array":
+		string_array := m[s].(*Array)
+		for _, string_array_value := range *string_array {
+			result = append(result, fmt.Errorf(fmt.Sprintf("%s",string_array_value)))
+		}
+	default:
+		errors = append(errors, fmt.Errorf("error: Map.GetErrors: type %s is not supported please implement for field: %s", rep, s))
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	return result, nil
+}
+
 func (m Map) GetType(s string) string {
 	if m.IsNil(s) {
 		return "nil"

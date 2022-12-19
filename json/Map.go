@@ -253,22 +253,42 @@ func (m Map) GetErrors(s string) ([]error, []error) {
 	case "*[]string":
 		string_array := m[s].(*[]string)
 		for _, string_array_value := range *string_array {
-			result = append(result, fmt.Errorf(string_array_value))
+			converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
+			if converted_errors != nil {
+				errors = append(errors, converted_errors...)
+			} else {
+				result = append(result, fmt.Errorf("%s", *converted))
+			}
 		}
 	case "[]string":
 		string_array := m[s].([]string)
 		for _, string_array_value := range string_array {
-			result = append(result, fmt.Errorf(string_array_value))
+			converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
+			if converted_errors != nil {
+				errors = append(errors, converted_errors...)
+			} else {
+				result = append(result, fmt.Errorf("%s", *converted))
+			}
 		}
 	case "json.Array":
 		string_array := m[s].(Array)
 		for _, string_array_value := range string_array {
-			result = append(result, fmt.Errorf(fmt.Sprintf("%s",string_array_value)))
+			converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
+			if converted_errors != nil {
+				errors = append(errors, converted_errors...)
+			} else {
+				result = append(result, fmt.Errorf("%s", *converted))
+			}
 		}
 	case "*json.Array":
 		string_array := m[s].(*Array)
 		for _, string_array_value := range *string_array {
-			result = append(result, fmt.Errorf(fmt.Sprintf("%s",string_array_value)))
+			converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
+			if converted_errors != nil {
+				errors = append(errors, converted_errors...)
+			} else {
+				result = append(result, fmt.Errorf("%s", *converted))
+			}
 		}
 	default:
 		errors = append(errors, fmt.Errorf("error: Map.GetErrors: type %s is not supported please implement for field: %s", rep, s))

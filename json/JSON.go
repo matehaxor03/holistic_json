@@ -105,6 +105,7 @@ func ParseJSON(s string) (*Map, []error) {
 	}
 
 	if len(errors) > 0 {
+		fmt.Println(s)
 		return nil, errors
 	}
 

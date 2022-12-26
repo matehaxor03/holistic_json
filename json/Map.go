@@ -494,6 +494,20 @@ func (m Map) GetFloat64(s string) (*float64, []error) {
 	case "*float64":
 		value := *(m[s].(*float64))
 		result = &value
+	case "*string":
+		value, value_error := strconv.ParseFloat((*(m[s].(*string))),64)
+		if value_error != nil {
+			errors = append(errors, fmt.Errorf("error: Map.GetFloat64: cannot convert *string value to float64"))
+		} else {
+			result = &value
+		}
+	case "string":
+		value, value_error := strconv.ParseFloat((m[s].(string)), 64)
+		if value_error != nil {
+			errors = append(errors, fmt.Errorf("error: Map.GetFloat64: cannot convert *string value to float64"))
+		} else {
+			result = &value
+		}
 	case "float32":
 		value := float64(m[s].(float32))
 		result = &value

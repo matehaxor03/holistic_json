@@ -1457,3 +1457,13 @@ func (m Map) Values() Array {
 	}
 	return array
 }
+
+func (m Map) Clone() (*Map, []error) {
+	var json_payload_builder strings.Builder
+	request_payload_as_string_errors := m.ToJSONString(&json_payload_builder)
+	if request_payload_as_string_errors != nil {
+		return nil, request_payload_as_string_errors
+	}
+
+	return ParseJSON(json_payload_builder.String())
+}

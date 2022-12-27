@@ -339,17 +339,18 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 				temp_value += string(value)
 				parsing_string = true
 
-				opening_count, _ := metrics.GetInt("opening_quote")
-				*opening_count++
-				metrics.SetInt("opening_quote", opening_count)
+				opening_quote, _ := metrics.GetInt("opening_quote")
+				*opening_quote++
+				metrics.SetInt("opening_quote", opening_quote)
 
 			} else if parsing_string && string(value) == "\"" && string((*runes)[i-1]) != "\\" {
 				temp_value += string(value)
 				parsing_string = false
+				found_value = false
 
-				opening_count, _ := metrics.GetInt("closing_quote")
-				*opening_count++
-				metrics.SetInt("closing_quote", opening_count)
+				closing_quote, _ := metrics.GetInt("closing_quote")
+				*closing_quote++
+				metrics.SetInt("closing_quote", closing_quote)
 			} else {
 				temp_value += string(value)
 			}

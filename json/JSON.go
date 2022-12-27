@@ -415,6 +415,7 @@ func parseJSONValue(temp_key string, temp_value string, list *list.List) []error
 			errors = append(errors, fmt.Errorf("error: value has \" as prefix but not \" as suffix"))
 			return errors
 		} else {
+			data_type = "string"
 			dequoted_value := (*string_value)[1:(len(*string_value)-1)]
 			string_value = &dequoted_value	
 		}
@@ -424,6 +425,7 @@ func parseJSONValue(temp_key string, temp_value string, list *list.List) []error
 			errors = append(errors, fmt.Errorf("error: value has \" as suffix but not \" as prefix"))
 			return errors
 		} else {
+			data_type = "string"
 			dequoted_value := (*string_value)[1:(len(*string_value)-1)]
 			string_value = &dequoted_value	
 		}

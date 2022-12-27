@@ -94,6 +94,7 @@ func ParseJSON(s string) (*Map, []error) {
 	}
 
 	if len(errors) > 0 {
+		fmt.Println(s)
 		return nil, errors
 	}
 
@@ -129,7 +130,6 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 	if len(errors) > 0 {
 		return errors
 	}
-	
 	
 	mode_looking_for_keys := "looking_for_keys"
 	mode_looking_for_key_name := "looking_for_key_name"
@@ -680,35 +680,35 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 	case "*string":
 		json.WriteString("\"")
 		json.WriteString(strings.ReplaceAll(*(value.(*string)), "\"", "\\\""))
-		json.WriteString( "\"")
+		json.WriteString("\"")
 	case "error":
 		json.WriteString("\"")
 		json.WriteString(strings.ReplaceAll(value.(error).Error(), "\"", "\\\""))
-		json.WriteString( "\"")
+		json.WriteString("\"")
 	case "*error":
 		json.WriteString("\"")
 		json.WriteString(strings.ReplaceAll((*(value.(*error))).Error(), "\"", "\\\""))
-		json.WriteString( "\"")
+		json.WriteString("\"")
 	case "*url.Error":
 		json.WriteString("\"")
 		json.WriteString(strings.ReplaceAll((*(value.(*url.Error))).Error(), "\"", "\\\""))
-		json.WriteString( "\"")
+		json.WriteString("\"")
 	case "exec.ExitError":
 		json.WriteString("\"")
 		json.WriteString(strings.ReplaceAll(fmt.Sprintf("%s", value), "\"", "\\\""))
-		json.WriteString( "\"")
+		json.WriteString("\"")
 	case "*exec.ExitError":
 		json.WriteString("\"")
 		json.WriteString(strings.ReplaceAll(fmt.Sprintf("%s", value), "\"", "\\\""))
-		json.WriteString( "\"")
+		json.WriteString("\"")
 	case "errors.errorString":
 		json.WriteString("\"")
 		json.WriteString(strings.ReplaceAll(fmt.Sprintf("%s", value), "\"", "\\\""))
-		json.WriteString( "\"")
+		json.WriteString("\"")
 	case "*errors.errorString":
 		json.WriteString("\"")
 		json.WriteString(strings.ReplaceAll(fmt.Sprintf("%s", value), "\"", "\\\""))
-		json.WriteString( "\"")
+		json.WriteString("\"")
 	case "bool":
 		if value.(bool) {
 			json.WriteString("true")

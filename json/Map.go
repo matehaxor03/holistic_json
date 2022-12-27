@@ -183,12 +183,7 @@ func (m Map) ToJSONString(json *strings.Builder) ([]error) {
 		errors = append(errors, fmt.Errorf("error: *strings.Builder is nil"))
 		return errors
 	}
-	/*
-	var b strings.Builder
-	for i := 0; i < len(keys); i++ {
-	  b.WriteString(keys[i])
-	}
-	return b.String()*/
+	
 	length := len(m)
 	
 	if length == 0 {

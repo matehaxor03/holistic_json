@@ -265,6 +265,26 @@ func TestCanParseStringWithNewlineAfterValue(t *testing.T) {
 	}
 }
 
+func TestCanParseStringWithNewlineBeforeAndAfterValue(t *testing.T) {
+	json_obj := ParseJSONSuccessfully(t, "{\n\"key\":\"value\"\n}")
+
+	if !json_obj.HasKey("key") {
+		t.Errorf("key not found")
+	} else if json_obj.GetType("key") != "*string" {
+		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
+	} else {
+		value, value_errors := json_obj.GetString("key") 
+
+		if value_errors != nil {
+			t.Errorf("map GetString has errors")
+		} else if value == nil {
+			t.Errorf("GetString is nil")
+		} else if *value != "value" {
+			t.Errorf("expected: value actual: %s", *value)
+		}
+	}
+}
+
 func TestCanParseStringWithDosNewlineAfterValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"value\"\r\n}")
 

@@ -410,9 +410,23 @@ func parseJSONValue(temp_key string, temp_value string, list *list.List) []error
 		dequoted_value := (*string_value)[1:(len(*string_value)-1)]
 		string_value = &dequoted_value	
 	} else if strings.HasPrefix(*string_value, "\"") && !strings.HasSuffix(*string_value, "\"") {
-		errors = append(errors, fmt.Errorf("error: value has \" as prefix but not \" as suffix"))
+		*string_value = strings.TrimSpace(*string_value)
+		if !strings.HasPrefix(*string_value, "\"") && !strings.HasSuffix(*string_value, "\"") {
+			errors = append(errors, fmt.Errorf("error: value has \" as prefix but not \" as suffix"))
+			return errors
+		} else {
+			dequoted_value := (*string_value)[1:(len(*string_value)-1)]
+			string_value = &dequoted_value	
+		}
 	} else if !strings.HasPrefix(*string_value, "\"") && strings.HasSuffix(*string_value, "\"") {
-		errors = append(errors, fmt.Errorf("error: value has \" as suffix but not \" as prefix"))
+		*string_value = strings.TrimSpace(*string_value)
+		if !strings.HasPrefix(*string_value, "\"") && !strings.HasSuffix(*string_value, "\"") {
+			errors = append(errors, fmt.Errorf("error: value has \" as suffix but not \" as prefix"))
+			return errors
+		} else {
+			dequoted_value := (*string_value)[1:(len(*string_value)-1)]
+			string_value = &dequoted_value	
+		}
 	} else {
 		// when parsing emtpy array []
 		if *string_value == "" {

@@ -42,6 +42,11 @@ func ParseJSON(s string) (*Map, []error) {
 		return nil, errors
 	}
 
+	if s == "{}" {
+		empty_map := Map{}
+		return &empty_map, nil
+	}
+
 	runes := []rune(s)
 	metrics := Map{"{":0, "}":0, "[":0, "]":0, "opening_quote":0,"closing_quote":0}
 	mode := "looking_for_keys"

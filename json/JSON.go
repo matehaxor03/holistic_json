@@ -346,7 +346,6 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 			} else if parsing_string && string(value) == "\"" && string((*runes)[i-1]) != "\\" {
 				temp_value += string(value)
 				parsing_string = false
-				found_value = false
 
 				closing_quote, _ := metrics.GetInt("closing_quote")
 				*closing_quote++

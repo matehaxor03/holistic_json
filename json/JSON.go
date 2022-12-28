@@ -225,9 +225,6 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 			if !found_value && (string(value) == " " || string(value) == "\r" || string(value) == "\n" || string(value) == "\t") ||  string(value) == "\\" {
 				*index++
 				continue
-			} else if !found_value && i > 0 && string((*runes)[i-1]) == "\\" && string(value) == "n" {
-				*index++
-				continue
 			} else {
 				found_value = true
 			}
@@ -349,6 +346,21 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 			} else if parsing_string && string(value) == "\"" && string((*runes)[i-1]) != "\\" {
 				temp_value += string(value)
 				parsing_string = false
+				
+				parse_errors := parseJSONValue(temp_key, temp_value, list)
+				if parse_errors != nil {
+					errors = append(errors, parse_errors...)
+				}
+				
+				temp_key = ""
+				temp_value = ""
+
+				if fmt.Sprintf("%T", list.Front().Value) == "*json.Map" {
+					current_mode = mode_looking_for_keys
+				} else {
+					current_mode = mode_looking_for_value
+				}
+	
 				found_value = false
 
 				closing_quote, _ := metrics.GetInt("closing_quote")

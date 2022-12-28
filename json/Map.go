@@ -194,7 +194,7 @@ func (m Map) ToJSONString(json *strings.Builder) ([]error) {
 	keys := m.Keys()
 	
 
-	json.WriteString("{\n")
+	json.WriteString("{")
 	for i := 0; i < length; i++ {
 		key := keys[i]
 		json.WriteString("\"")
@@ -208,7 +208,6 @@ func (m Map) ToJSONString(json *strings.Builder) ([]error) {
 		if i < length - 1 {
 			json.WriteString(",")
 		}
-		json.WriteString("\n")
 	}
 	json.WriteString("}")
 

@@ -56,8 +56,6 @@ func (a Array) ToJSONString(json *strings.Builder) ([]error) {
 		if i < length - 1 {
 			json.WriteString(",")
 		}
-
-		json.WriteString("\n")
 	}
 	json.WriteString("]")
 

@@ -1419,6 +1419,50 @@ func (v Value) GetInt() (*int, []error) {
 	return &result, nil
 }
 
+func (v Value) GetIntFromMap(key string) (*int, []error) {
+	var errors []error
+	map_value, map_value_errors := v.GetMap()
+	if map_value_errors != nil {
+		errors = append(errors, map_value_errors...)
+	} else if common.IsNil(map_value) {
+		errors = append(errors, fmt.Errorf("Value.GetIntFromMap map is nil"))
+	}
+	if len(errors) > 0 {
+		return nil, errors
+	}
+	return map_value.GetInt(key)
+}
+
+func (v Value) SetIntToMap(key string, int_value *int) ([]error) {
+	var errors []error
+	map_value, map_value_errors := v.GetMap()
+	if map_value_errors != nil {
+		errors = append(errors, map_value_errors...)
+	} else if common.IsNil(map_value) {
+		errors = append(errors, fmt.Errorf("Value.SetIntToMap map is nil"))
+	}
+	if len(errors) > 0 {
+		return errors
+	}
+	map_value.SetInt(key, int_value)
+	return nil
+}
+
+func (v Value) SetIntValueToMap(key string, int_value int) ([]error) {
+	var errors []error
+	map_value, map_value_errors := v.GetMap()
+	if map_value_errors != nil {
+		errors = append(errors, map_value_errors...)
+	} else if common.IsNil(map_value) {
+		errors = append(errors, fmt.Errorf("Value.SetIntToMap map is nil"))
+	}
+	if len(errors) > 0 {
+		return errors
+	}
+	map_value.SetIntValue(key, int_value)
+	return nil
+}
+
 func (v Value) GetIntValue() (int, []error) {
 	var errors []error
 	int_value, int_value_errors := v.GetInt()
@@ -1438,3 +1482,24 @@ func (v Value) GetIntValue() (int, []error) {
 	return result, nil
 }
 
+func (v Value) AppendValue(add *Value) []error {
+	var errors []error
+	if v.IsArray() {
+		array, array_errors := v.GetArray()
+		if array_errors != nil {
+			errors = append(errors, array_errors...)
+		} else if common.IsNil(array) {
+			errors = append(errors, fmt.Errorf("Value.AppendValue array is nil"))
+		} else {
+			*array = append(*array, *add)
+		}
+	} else {
+		errors = append(errors, fmt.Errorf("Value.AppendValue not supported for type %s", v.GetType()))
+	}
+
+	if len(errors) > 0 {
+		return errors
+	}
+
+	return nil
+}

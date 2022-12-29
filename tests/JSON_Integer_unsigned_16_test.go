@@ -9,7 +9,7 @@ func TestCanParseUInt16LowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*uint16" {
+	} else if json_obj.GetType("key") != "uint16" {
 		t.Errorf("key is not a *uint16: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt16("key") 
@@ -29,7 +29,7 @@ func TestCanParseUInt16HighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*uint16" {
+	} else if json_obj.GetType("key") != "uint16" {
 		t.Errorf("key is not a *uint16: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt16("key") 

@@ -339,6 +339,10 @@ func (m Map) SetBool(s string, value *bool) {
 	m[s] = Value{"value":value}
 }
 
+func (m Map) SetBoolValue(s string, value bool) {
+	m[s] = Value{"value":value}
+}
+
 func (m Map) SetString(s string, value *string) {
 	m[s] = Value{"value":value}
 }

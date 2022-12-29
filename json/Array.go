@@ -48,7 +48,8 @@ func (a Array) AppendString(s *string) {
 }
 
 func (a Array) AppendStringValue(s string) {
-	a.AppendString(&s)
+	appended_value := Value{"value":s}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendUInt8(value *uint8) {
@@ -57,7 +58,8 @@ func (a Array) AppendUInt8(value *uint8) {
 }
 
 func (a Array) AppendUInt8Value(value uint8) {
-	a.AppendUInt8(&value)
+	appended_value := Value{"value":value}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendUInt16(value *uint16) {
@@ -66,7 +68,8 @@ func (a Array) AppendUInt16(value *uint16) {
 }
 
 func (a Array) AppendUInt16Value(value uint16) {
-	a.AppendUInt16(&value)
+	appended_value := Value{"value":value}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendUInt32(value *uint32) {
@@ -75,7 +78,8 @@ func (a Array) AppendUInt32(value *uint32) {
 }
 
 func (a Array) AppendUInt32Value(value uint32) {
-	a.AppendUInt32(&value)
+	appended_value := Value{"value":value}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendUInt64(value *uint64) {
@@ -84,7 +88,8 @@ func (a Array) AppendUInt64(value *uint64) {
 }
 
 func (a Array) AppendUInt64Value(value uint64) {
-	a.AppendUInt64(&value)
+	appended_value := Value{"value":value}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendInt(value *int) {
@@ -93,7 +98,8 @@ func (a Array) AppendInt(value *int) {
 }
 
 func (a Array) AppendIntValue(value int) {
-	a.AppendInt(&value)
+	appended_value := Value{"value":value}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendUInt(value *uint) {
@@ -102,7 +108,8 @@ func (a Array) AppendUInt(value *uint) {
 }
 
 func (a Array) AppendUIntValue(value uint) {
-	a.AppendUInt(&value)
+	appended_value := Value{"value":value}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendInt8(value *int8) {
@@ -111,7 +118,8 @@ func (a Array) AppendInt8(value *int8) {
 }
 
 func (a Array) AppendInt8Value(value int8) {
-	a.AppendInt8(&value)
+	appended_value := Value{"value":value}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendInt16(value *int16) {
@@ -120,7 +128,8 @@ func (a Array) AppendInt16(value *int16) {
 }
 
 func (a Array) AppendInt16Value(value int16) {
-	a.AppendInt16(&value)
+	appended_value := Value{"value":value}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendInt32(value *int32) {
@@ -129,7 +138,8 @@ func (a Array) AppendInt32(value *int32) {
 }
 
 func (a Array) AppendInt32Value(value int32) {
-	a.AppendInt32(&value)
+	appended_value := Value{"value":value}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendInt64(value *int64) {
@@ -138,7 +148,8 @@ func (a Array) AppendInt64(value *int64) {
 }
 
 func (a Array) AppendInt64Value(value int64) {
-	a.AppendInt64(&value)
+	appended_value := Value{"value":value}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendFloat32(value *float32) {
@@ -147,7 +158,8 @@ func (a Array) AppendFloat32(value *float32) {
 }
 
 func (a Array) AppendFloat32Value(value float32) {
-	a.AppendFloat32(&value)
+	appended_value := Value{"value":value}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendFloat64(value *float64) {
@@ -156,7 +168,8 @@ func (a Array) AppendFloat64(value *float64) {
 }
 
 func (a Array) AppendFloat64Value(value float64) {
-	a.AppendFloat64(&value)
+	appended_value := Value{"value":value}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendBool(b *bool) {
@@ -165,7 +178,8 @@ func (a Array) AppendBool(b *bool) {
 }
 
 func (a Array) AppendBoolValue(b bool) {
-	a.AppendBool(&b)
+	appended_value := Value{"value":b}
+	a = append(a, appended_value)
 }
 
 func (a Array) AppendNil() {

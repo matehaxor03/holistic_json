@@ -103,7 +103,6 @@ func Parse(s string) (*Map, []error) {
 	}
 
 	if len(errors) > 0 {
-		fmt.Println(s)
 		return nil, errors
 	}
 
@@ -169,6 +168,7 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 
 		if !parsing_string {
 			if string(value) == "{" {
+
 				opening_count, _ := metrics.GetInt("{")
 				*opening_count++
 				metrics.SetInt("{", opening_count)
@@ -276,14 +276,10 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 					if front_value.IsMap() {
 						front_value.SetValue(temp_key, &new_map_value)	
 					} else {
-						temp_array, temp_array_errors := front_value.GetArray()
-						if temp_array_errors != nil {
-							return temp_array_errors
-						} else if common.IsNil(temp_array) {
-							errors = append(errors, fmt.Errorf("json.ParseJSON array is nil"))
-							return errors
+						append_errors := front_value.AppendValue(&new_map_value)
+						if append_errors != nil {
+							return append_errors
 						}
-						*temp_array = append(*temp_array, new_map_value)
 					} 
 					list.PushFront(&new_map_value)
 
@@ -300,14 +296,10 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 					if front_value.IsMap() {
 						front_value.SetValue(temp_key, &new_array_value)	
 					} else {
-						temp_array, temp_array_errors := front_value.GetArray()
-						if temp_array_errors != nil {
-							return temp_array_errors
-						} else if common.IsNil(temp_array) {
-							errors = append(errors, fmt.Errorf("json.ParseJSON array is nil"))
-							return errors
+						append_errors := front_value.AppendValue(&new_array_value)
+						if append_errors != nil {
+							return append_errors
 						}
-						*temp_array = append(*temp_array, new_array_value)
 					} 
 
 					list.PushFront(&new_array_value)
@@ -665,31 +657,31 @@ func parseJSONValue(temp_key string, temp_value string, list *list.List) []error
 		}
 
 		if data_type == "string" {
-			value_as_array.AppendString(string_value)
+			value_as_array.AppendStringValue(*string_value)
 		} else if data_type == "bool" {
-			value_as_array.AppendBool(boolean_value)
+			value_as_array.AppendBoolValue(*boolean_value)
 		} else if data_type == "null" {
 			value_as_array.AppendNil()
 		} else if data_type == "float32" {
-			value_as_array.AppendFloat32(float32_value)
+			value_as_array.AppendFloat32Value(*float32_value)
 		} else if data_type == "float64" {
-			value_as_array.AppendFloat64(float64_value)
+			value_as_array.AppendFloat64Value(*float64_value)
 		} else if data_type == "int8" {
-			value_as_array.AppendInt8(int8_value)
+			value_as_array.AppendInt8Value(*int8_value)
 		} else if data_type == "int16" {
-			value_as_array.AppendInt16(int16_value)
+			value_as_array.AppendInt16Value(*int16_value)
 		} else if data_type == "int32" {
-			value_as_array.AppendInt32(int32_value)
+			value_as_array.AppendInt32Value(*int32_value)
 		}  else if data_type == "int64" {
-			value_as_array.AppendInt64(int64_value)
+			value_as_array.AppendInt64Value(*int64_value)
 		} else if data_type == "uint8" {
-			value_as_array.AppendUInt8(uint8_value)
+			value_as_array.AppendUInt8Value(*uint8_value)
 		} else if data_type == "uint16" {
-			value_as_array.AppendUInt16(uint16_value)
+			value_as_array.AppendUInt16Value(*uint16_value)
 		} else if data_type == "uint32" {
-			value_as_array.AppendUInt32(uint32_value)
+			value_as_array.AppendUInt32Value(*uint32_value)
 		} else if data_type == "uint64" {
-			value_as_array.AppendUInt64(uint64_value)
+			value_as_array.AppendUInt64Value(*uint64_value)
 		} else {
 			errors = append(errors, fmt.Errorf("json.PaseJSONValue type is not supported for Array %s", data_type))
 		}
@@ -706,31 +698,31 @@ func parseJSONValue(temp_key string, temp_value string, list *list.List) []error
 		}
 
 		if data_type == "string" {
-			value_as_map.SetString(temp_key, string_value)
+			value_as_map.SetStringValue(temp_key, *string_value)
 		} else if data_type == "bool" {
-			value_as_map.SetBool(temp_key, boolean_value)
+			value_as_map.SetBoolValue(temp_key, *boolean_value)
 		} else if data_type == "null" {
 			value_as_map.SetNil(temp_key)
 		} else if data_type == "float64" {
-			value_as_map.SetFloat64(temp_key, float64_value)
+			value_as_map.SetFloat64Value(temp_key, *float64_value)
 		} else if data_type == "float32" {
-			value_as_map.SetFloat32(temp_key, float32_value)
+			value_as_map.SetFloat32Value(temp_key, *float32_value)
 		} else if data_type == "int8" {
-			value_as_map.SetInt8(temp_key, int8_value)
+			value_as_map.SetInt8Value(temp_key, *int8_value)
 		} else if data_type == "int16" {
-			value_as_map.SetInt16(temp_key, int16_value)
+			value_as_map.SetInt16Value(temp_key, *int16_value)
 		} else if data_type == "int32" {
-			value_as_map.SetInt32(temp_key, int32_value)
+			value_as_map.SetInt32Value(temp_key, *int32_value)
 		} else if data_type == "int64" {
-			value_as_map.SetInt64(temp_key, int64_value)
+			value_as_map.SetInt64Value(temp_key, *int64_value)
 		} else if data_type == "uint8" {
-			value_as_map.SetUInt8(temp_key, uint8_value)
+			value_as_map.SetUInt8Value(temp_key, *uint8_value)
 		} else if data_type == "uint16" {
-			value_as_map.SetUInt16(temp_key, uint16_value)
+			value_as_map.SetUInt16Value(temp_key, *uint16_value)
 		} else if data_type == "uint32" {
-			value_as_map.SetUInt32(temp_key, uint32_value)
+			value_as_map.SetUInt32Value(temp_key, *uint32_value)
 		} else if data_type == "uint64" {
-			value_as_map.SetUInt64(temp_key, uint64_value)
+			value_as_map.SetUInt64Value(temp_key, *uint64_value)
 		} else {
 			errors = append(errors, fmt.Errorf("json.PaseJSONValue type is not supported for Map %s", data_type))
 		}

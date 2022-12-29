@@ -9,7 +9,7 @@ func TestCanParseNegativeInt16LowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*int16" {
+	} else if json_obj.GetType("key") != "int16" {
 		t.Errorf("key is not a *int16: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetInt16("key") 
@@ -29,7 +29,7 @@ func TestCanParseNegativeInt16HighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*int16" {
+	} else if json_obj.GetType("key") != "int16" {
 		t.Errorf("key is not a *int16: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetInt16("key") 

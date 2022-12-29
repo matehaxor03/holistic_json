@@ -9,7 +9,7 @@ func TestCanParseUInt8LowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*uint8" {
+	} else if json_obj.GetType("key") != "uint8" {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt8("key") 
@@ -29,7 +29,7 @@ func TestCanParseUInt8LowBoundaryWithSpaceBeforeValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*uint8" {
+	} else if json_obj.GetType("key") != "uint8" {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt8("key") 
@@ -49,7 +49,7 @@ func TestCanParseUInt8LowBoundaryWithSpaceAfterValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*uint8" {
+	} else if json_obj.GetType("key") != "uint8" {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt8("key") 
@@ -69,7 +69,7 @@ func TestCanParseUInt8LowBoundaryWithNewlineBeforeValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*uint8" {
+	} else if json_obj.GetType("key") != "uint8" {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt8("key") 
@@ -89,7 +89,7 @@ func TestCanParseUInt8LowBoundaryWithNewlineAfterValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*uint8" {
+	} else if json_obj.GetType("key") != "uint8" {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt8("key") 
@@ -109,7 +109,7 @@ func TestCanParseUInt8LowBoundaryWithDosNewlineBeforeValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*uint8" {
+	} else if json_obj.GetType("key") != "uint8" {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt8("key") 
@@ -129,7 +129,7 @@ func TestCanParseUInt8LowBoundaryWithDosNewlineAfterValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*uint8" {
+	} else if json_obj.GetType("key") != "uint8" {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt8("key") 
@@ -150,7 +150,7 @@ func TestCanParseUInt8HighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*uint8" {
+	} else if json_obj.GetType("key") != "uint8" {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt8("key") 

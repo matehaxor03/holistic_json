@@ -9,7 +9,7 @@ func TestCanParseNegativeInt32LowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*int32" {
+	} else if json_obj.GetType("key") != "int32" {
 		t.Errorf("key is not a *int32: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetInt32("key") 
@@ -29,7 +29,7 @@ func TestCanParseNegativeInt32HighBoundarfy(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*int32" {
+	} else if json_obj.GetType("key") != "int32" {
 		t.Errorf("key is not a *int32: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetInt32("key") 

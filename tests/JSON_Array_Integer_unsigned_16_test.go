@@ -13,7 +13,7 @@ func TestCanParseArrayContainingSingleUInt16LowBoundary(t *testing.T) {
 	} else if json_obj.GetType("key") != "*json.Array" {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key") 
+		value, value_errors := json_obj.GetArrayOfUInt16("key") 
 
 		if value_errors != nil {
 			t.Errorf("%s", value_errors)
@@ -21,8 +21,8 @@ func TestCanParseArrayContainingSingleUInt16LowBoundary(t *testing.T) {
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 1 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if *((*value)[0].(*uint16)) != 256 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0].(*uint16)))
+		} else if (*(*value)[0]) != 256 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[0]))
 		}
 	}
 }
@@ -35,7 +35,7 @@ func TestCanParseMultipleArraysContainingSingleUInt16LowBoundary(t *testing.T) {
 	} else if json_obj.GetType("key") != "*json.Array" {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key") 
+		value, value_errors := json_obj.GetArrayOfUInt16("key") 
 
 		if value_errors != nil {
 			t.Errorf("%s", value_errors)
@@ -43,8 +43,8 @@ func TestCanParseMultipleArraysContainingSingleUInt16LowBoundary(t *testing.T) {
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 1 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if *((*value)[0].(*uint16)) != 256 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0].(*uint16)))
+		} else if (*(*value)[0]) != 256 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[0]))
 		}
 	}
 
@@ -53,7 +53,7 @@ func TestCanParseMultipleArraysContainingSingleUInt16LowBoundary(t *testing.T) {
 	} else if json_obj.GetType("key2") != "*json.Array" {
 		t.Errorf("key2 is not a *json.Array: %s", json_obj.GetType("key2"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key2") 
+		value, value_errors := json_obj.GetArrayOfUInt16("key2") 
 
 		if value_errors != nil {
 			t.Errorf("%s", value_errors)
@@ -61,8 +61,8 @@ func TestCanParseMultipleArraysContainingSingleUInt16LowBoundary(t *testing.T) {
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 1 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if *((*value)[0].(*uint16)) != 257 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0].(*uint16)))
+		} else if (*(*value)[0]) != 257 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[0]))
 		}
 	}
 }
@@ -75,7 +75,7 @@ func TestCanParseMultipleArraysContainingMultipleUInt16LowBoundary(t *testing.T)
 	} else if json_obj.GetType("key") != "*json.Array" {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key") 
+		value, value_errors := json_obj.GetArrayOfUInt16("key") 
 
 		if value_errors != nil {
 			t.Errorf("%s", value_errors)
@@ -83,10 +83,10 @@ func TestCanParseMultipleArraysContainingMultipleUInt16LowBoundary(t *testing.T)
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 2 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if *((*value)[0].(*uint16)) != 256 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0].(*uint16)))
-		} else if *((*value)[1].(*uint16)) != 257 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[1].(*uint16)))
+		} else if (*(*value)[0]) != 256 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[0]))
+		} else if (*(*value)[1]) != 257 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[1]))
 		}
 	}
 
@@ -95,7 +95,7 @@ func TestCanParseMultipleArraysContainingMultipleUInt16LowBoundary(t *testing.T)
 	} else if json_obj.GetType("key2") != "*json.Array" {
 		t.Errorf("key2 is not a *json.Array: %s", json_obj.GetType("key2"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key2") 
+		value, value_errors := json_obj.GetArrayOfUInt16("key2") 
 
 		if value_errors != nil {
 			t.Errorf("%s", value_errors)
@@ -103,10 +103,10 @@ func TestCanParseMultipleArraysContainingMultipleUInt16LowBoundary(t *testing.T)
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 2 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if *((*value)[0].(*uint16)) != 258 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0].(*uint16)))
-		} else if *((*value)[1].(*uint16)) != 259 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[1].(*uint16)))
+		} else if (*(*value)[0]) != 258 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[0]))
+		} else if (*(*value)[1]) != 259 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[1]))
 		}
 	}
 }
@@ -119,7 +119,7 @@ func TestCanParseArrayContainingMultipleUInt16LowBoundary(t *testing.T) {
 	} else if json_obj.GetType("key") != "*json.Array" {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key") 
+		value, value_errors := json_obj.GetArrayOfUInt16("key") 
 
 		if value_errors != nil {
 			t.Errorf("%s", value_errors)
@@ -127,10 +127,10 @@ func TestCanParseArrayContainingMultipleUInt16LowBoundary(t *testing.T) {
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 2 {
 			t.Errorf("expected: length=2 actual: length=%d", len(*value))
-		} else if *((*value)[0].(*uint16)) != 256 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0].(*uint16)))
-		} else if *((*value)[1].(*uint16)) != 257 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[1].(*uint16)))
+		} else if (*(*value)[0]) != 256 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[0]))
+		} else if (*(*value)[1]) != 257 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[1]))
 		}
 	}
 }
@@ -144,7 +144,7 @@ func TestCanParseArrayContainingSingleUInt16HighBoundary(t *testing.T) {
 	} else if json_obj.GetType("key") != "*json.Array" {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key") 
+		value, value_errors := json_obj.GetArrayOfUInt16("key") 
 
 		if value_errors != nil {
 			t.Errorf("%s", value_errors)
@@ -152,8 +152,8 @@ func TestCanParseArrayContainingSingleUInt16HighBoundary(t *testing.T) {
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 1 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if *((*value)[0].(*uint16)) != 65535 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0].(*uint16)))
+		} else if (*(*value)[0]) != 65535 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[0]))
 		}
 	}
 }
@@ -166,7 +166,7 @@ func TestCanParseMultipleArraysContainingSingleUInt16HighBoundary(t *testing.T) 
 	} else if json_obj.GetType("key") != "*json.Array" {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key") 
+		value, value_errors := json_obj.GetArrayOfUInt16("key") 
 
 		if value_errors != nil {
 			t.Errorf("%s", value_errors)
@@ -174,8 +174,8 @@ func TestCanParseMultipleArraysContainingSingleUInt16HighBoundary(t *testing.T) 
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 1 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if *((*value)[0].(*uint16)) != 65534 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0].(*uint16)))
+		} else if (*(*value)[0]) != 65534 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[0]))
 		}
 	}
 
@@ -184,7 +184,7 @@ func TestCanParseMultipleArraysContainingSingleUInt16HighBoundary(t *testing.T) 
 	} else if json_obj.GetType("key2") != "*json.Array" {
 		t.Errorf("key2 is not a *json.Array: %s", json_obj.GetType("key2"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key2") 
+		value, value_errors := json_obj.GetArrayOfUInt16("key2") 
 
 		if value_errors != nil {
 			t.Errorf("%s", value_errors)
@@ -192,8 +192,8 @@ func TestCanParseMultipleArraysContainingSingleUInt16HighBoundary(t *testing.T) 
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 1 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if *((*value)[0].(*uint16)) != 65535 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0].(*uint16)))
+		} else if (*(*value)[0]) != 65535 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[0]))
 		}
 	}
 }
@@ -206,7 +206,7 @@ func TestCanParseMultipleArraysContainingMultipleUInt16HighBoundary(t *testing.T
 	} else if json_obj.GetType("key") != "*json.Array" {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key") 
+		value, value_errors := json_obj.GetArrayOfUInt16("key") 
 
 		if value_errors != nil {
 			t.Errorf("%s", value_errors)
@@ -214,10 +214,10 @@ func TestCanParseMultipleArraysContainingMultipleUInt16HighBoundary(t *testing.T
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 2 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if *((*value)[0].(*uint16)) != 65532 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0].(*uint16)))
-		} else if *((*value)[1].(*uint16)) != 65533 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[1].(*uint16)))
+		} else if (*(*value)[0]) != 65532 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[0]))
+		} else if (*(*value)[1]) != 65533 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[1]))
 		}
 	}
 
@@ -226,7 +226,7 @@ func TestCanParseMultipleArraysContainingMultipleUInt16HighBoundary(t *testing.T
 	} else if json_obj.GetType("key2") != "*json.Array" {
 		t.Errorf("key2 is not a *json.Array: %s", json_obj.GetType("key2"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key2") 
+		value, value_errors := json_obj.GetArrayOfUInt16("key2") 
 
 		if value_errors != nil {
 			t.Errorf("%s", value_errors)
@@ -234,10 +234,10 @@ func TestCanParseMultipleArraysContainingMultipleUInt16HighBoundary(t *testing.T
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 2 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if *((*value)[0].(*uint16)) != 65534 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0].(*uint16)))
-		} else if *((*value)[1].(*uint16)) != 65535 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[1].(*uint16)))
+		} else if (*(*value)[0]) != 65534 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[0]))
+		} else if (*(*value)[1]) != 65535 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[1]))
 		}
 	}
 }
@@ -250,7 +250,7 @@ func TestCanParseArrayContainingMultipleUInt16HighBoundary(t *testing.T) {
 	} else if json_obj.GetType("key") != "*json.Array" {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key") 
+		value, value_errors := json_obj.GetArrayOfUInt16("key") 
 
 		if value_errors != nil {
 			t.Errorf("%s", value_errors)
@@ -258,10 +258,10 @@ func TestCanParseArrayContainingMultipleUInt16HighBoundary(t *testing.T) {
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 2 {
 			t.Errorf("expected: length=2 actual: length=%d", len(*value))
-		} else if *((*value)[0].(*uint16)) != 65534 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0].(*uint16)))
-		} else if *((*value)[1].(*uint16)) != 65535 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[1].(*uint16)))
+		} else if (*(*value)[0]) != 65534 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[0]))
+		} else if (*(*value)[1]) != 65535 {
+			t.Errorf("expected \"value\" actual: %d", (*(*value)[1]))
 		}
 	}
 }

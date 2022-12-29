@@ -206,6 +206,38 @@ func (m Map) GetArrayOfInt64(s string) (*[]*int64, []error) {
 	return m[s].GetArrayOfInt64()
 }
 
+func (m Map) GetArrayOfUInt8(s string) (*[]*uint8, []error) {
+	if common.IsNil(m[s]){
+		return nil, nil
+	}
+
+	return m[s].GetArrayOfUInt8()
+}
+
+func (m Map) GetArrayOfUInt16(s string) (*[]*uint16, []error) {
+	if common.IsNil(m[s]){
+		return nil, nil
+	}
+
+	return m[s].GetArrayOfUInt16()
+}
+
+func (m Map) GetArrayOfUInt32(s string) (*[]*uint32, []error) {
+	if common.IsNil(m[s]){
+		return nil, nil
+	}
+
+	return m[s].GetArrayOfUInt32()
+}
+
+func (m Map) GetArrayOfUInt64(s string) (*[]*uint64, []error) {
+	if common.IsNil(m[s]){
+		return nil, nil
+	}
+
+	return m[s].GetArrayOfUInt64()
+}
+
 func (m Map) GetString(s string) (*string, []error) {
 	if common.IsNil(m[s]) {
 		return nil, nil

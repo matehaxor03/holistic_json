@@ -268,6 +268,111 @@ func (v Value) GetArrayOfInt64() (*[](*int64), []error) {
 	return &result, nil
 }
 
+///
+func (v Value) GetArrayOfUInt8() (*[](*uint8), []error) {
+	array, array_errors := v.GetArray()
+	if array_errors != nil {
+		return nil, array_errors
+	} else if common.IsNil(array) {
+		return nil, nil
+	}
+
+	var errors []error
+	var result ([](*uint8))
+	for _, array_value := range *array {
+		uint8_value, uint8_value_errors := array_value.GetUInt8()
+		if uint8_value_errors != nil {
+			errors = append(errors, uint8_value_errors...)
+		} else {
+			result = append(result, uint8_value)			 
+		}
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+	
+	return &result, nil
+}
+
+func (v Value) GetArrayOfUInt16() (*[](*uint16), []error) {
+	array, array_errors := v.GetArray()
+	if array_errors != nil {
+		return nil, array_errors
+	} else if common.IsNil(array) {
+		return nil, nil
+	}
+
+	var errors []error
+	var result ([](*uint16))
+	for _, array_value := range *array {
+		uint16_value, uint16_value_errors := array_value.GetUInt16()
+		if uint16_value_errors != nil {
+			errors = append(errors, uint16_value_errors...)
+		} else {
+			result = append(result, uint16_value)			 
+		}
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+	
+	return &result, nil
+}
+
+func (v Value) GetArrayOfUInt32() (*[](*uint32), []error) {
+	array, array_errors := v.GetArray()
+	if array_errors != nil {
+		return nil, array_errors
+	} else if common.IsNil(array) {
+		return nil, nil
+	}
+
+	var errors []error
+	var result ([](*uint32))
+	for _, array_value := range *array {
+		uint32_value, uint32_value_errors := array_value.GetUInt32()
+		if uint32_value_errors != nil {
+			errors = append(errors, uint32_value_errors...)
+		} else {
+			result = append(result, uint32_value)			 
+		}
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+	
+	return &result, nil
+}
+
+func (v Value) GetArrayOfUInt64() (*[](*uint64), []error) {
+	array, array_errors := v.GetArray()
+	if array_errors != nil {
+		return nil, array_errors
+	} else if common.IsNil(array) {
+		return nil, nil
+	}
+
+	var errors []error
+	var result ([](*uint64))
+	for _, array_value := range *array {
+		uint64_value, uint64_value_errors := array_value.GetUInt64()
+		if uint64_value_errors != nil {
+			errors = append(errors, uint64_value_errors...)
+		} else {
+			result = append(result, uint64_value)			 
+		}
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+	
+	return &result, nil
+}
+
 func (v Value) GetString() (*string, []error) {
 	if common.IsNil(v["value"]){
 		return nil, nil

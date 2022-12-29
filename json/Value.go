@@ -238,7 +238,7 @@ func (v Value) GetFloat64() (*float64, []error) {
 
 	var errors []error
 	var result *float64
-	rep := fmt.Sprintf("%T",v["value"])
+	rep := fmt.Sprintf("%T", v["value"])
 	switch rep {
 	case "float64":
 		value := v["value"].(float64)
@@ -275,6 +275,74 @@ func (v Value) GetFloat64() (*float64, []error) {
 	}
 
 	return result, nil
+}
+
+func (v Value) GetFloat32() (*float32, []error) {
+	if common.IsNil(v["value"]) {
+		return nil, nil
+	}
+
+	var errors []error
+	float64_value, float64_value_errors := v.GetFloat64()
+	if float64_value_errors != nil {
+		return nil, float64_value_errors
+	} else if float64_value == nil {
+		return nil, nil
+	}
+
+	value, value_error := strconv.ParseFloat(fmt.Sprintf("%f", *float64_value), 32)
+	if value_error != nil {
+		errors = append(errors, fmt.Errorf("error: strconv.ParseFloat returned error for converting to float32 number may be out of range"))
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	float_32_value := float32(value)
+	return &float_32_value, nil
+}
+
+func (v Value) GetFloat32Value() (float32, []error) {
+	var errors []error
+	float64_value, float64_value_errors := v.GetFloat64()
+	if float64_value_errors != nil {
+		return 0, float64_value_errors
+	} else if float64_value == nil {
+		errors = append(errors, fmt.Errorf("error: Map.GetFloat64 returned a nil value"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	value, value_error := strconv.ParseFloat(fmt.Sprintf("%f", *float64_value), 32)
+	if value_error != nil {
+		errors = append(errors, fmt.Errorf("error: strconv.ParseFloat returned error for converting to float32 number may be out of range"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	float_32_value := float32(value)
+	return float_32_value, nil
+}
+
+func (v Value) GetFloat64Value() (float64, []error) {
+	var errors []error
+	float64_value, float64_value_errors := v.GetFloat64()
+	if float64_value_errors != nil {
+		return 0, float64_value_errors
+	} else if float64_value == nil {
+		errors = append(errors, fmt.Errorf("error: Map.GetFloat64 returned a nil value"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	return *float64_value, nil
 }
 
 func (v Value) GetRunes() (*[]rune, []error) {
@@ -622,5 +690,13 @@ func (v Value) GetType() string {
 
 func (v Value) IsInteger() bool {
 	return common.IsInteger(v["value"])
+}
+
+func (v Value) IsBoolTrue() bool {
+	return common.IsBoolTrue(v["value"])
+}
+
+func (v Value) IsBoolFalse() bool {
+	return common.IsBoolFalse(v["value"])
 }
 

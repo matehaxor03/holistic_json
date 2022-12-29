@@ -82,26 +82,14 @@ func (m Map) IsBoolTrue(s string) bool {
 	if m.IsNil(s) {
 		return false
 	}
-
-	if !m.IsBool(s) {
-		return false
-	}
-
-	value, _ := m.GetBool(s)
-	return *value == true
+	return m[s].IsBoolTrue()
 }
 
 func (m Map) IsBoolFalse(s string) bool {
 	if m.IsNil(s) {
-		return true
+		return false
 	}
-
-	if !m.IsBool(s) {
-		return true
-	}
-
-	value, _ := m.GetBool(s)
-	return *value == false
+	return m[s].IsBoolFalse()
 }
 
 func (m Map) ToJSONString(json *strings.Builder) ([]error) {
@@ -213,67 +201,28 @@ func (m Map) GetStringValue(s string) (string, []error) {
 }
 
 func (m Map) GetFloat32(s string) (*float32, []error) {
-	var errors []error
-	float64_value, float64_value_errors := m.GetFloat64(s)
-	if float64_value_errors != nil {
-		return nil, float64_value_errors
-	} else if float64_value == nil {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
-
-	value, value_error := strconv.ParseFloat(fmt.Sprintf("%f", *float64_value), 32)
-	if value_error != nil {
-		errors = append(errors, fmt.Errorf("error: strconv.ParseFloat returned error for converting to float32 number may be out of range"))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	float_32_value := float32(value)
-	return &float_32_value, nil
+	return m[s].GetFloat32()
 }
 
 func (m Map) GetFloat32Value(s string) (float32, []error) {
 	var errors []error
-	float64_value, float64_value_errors := m.GetFloat64(s)
-	if float64_value_errors != nil {
-		return 0, float64_value_errors
-	} else if float64_value == nil {
-		errors = append(errors, fmt.Errorf("error: Map.GetFloat64 returned a nil value"))
-	}
-
-	if len(errors) > 0 {
+	if common.IsNil(m[s]) {
+		errors = append(errors, fmt.Errorf("error: Map.GetFloat32Value returned a nil value"))
 		return 0, errors
 	}
-
-	value, value_error := strconv.ParseFloat(fmt.Sprintf("%f", *float64_value), 32)
-	if value_error != nil {
-		errors = append(errors, fmt.Errorf("error: strconv.ParseFloat returned error for converting to float32 number may be out of range"))
-	}
-
-	if len(errors) > 0 {
-		return 0, errors
-	}
-
-	float_32_value := float32(value)
-	return float_32_value, nil
+	return m[s].GetFloat32Value()
 }
 
 func (m Map) GetFloat64Value(s string) (float64, []error) {
 	var errors []error
-	float64_value, float64_value_errors := m.GetFloat64(s)
-	if float64_value_errors != nil {
-		return 0, float64_value_errors
-	} else if float64_value == nil {
-		errors = append(errors, fmt.Errorf("error: Map.GetFloat64 returned a nil value"))
-	}
-
-	if len(errors) > 0 {
+	if common.IsNil(m[s]) {
+		errors = append(errors, fmt.Errorf("error: Map.GetFloat64Value returned a nil value"))
 		return 0, errors
 	}
-
-	return *float64_value, nil
+	return m[s].GetFloat64Value()
 }
 
 func (m Map) GetFloat64(s string) (*float64, []error) {

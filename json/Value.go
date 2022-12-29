@@ -164,6 +164,110 @@ func (v Value) GetArray() (*Array, []error) {
 	return result, nil
 }
 
+func (v Value) GetArrayOfInt8() (*[](*int8), []error) {
+	array, array_errors := v.GetArray()
+	if array_errors != nil {
+		return nil, array_errors
+	} else if common.IsNil(array) {
+		return nil, nil
+	}
+
+	var errors []error
+	var result ([](*int8))
+	for _, array_value := range *array {
+		int8_value, int8_value_errors := array_value.GetInt8()
+		if int8_value_errors != nil {
+			errors = append(errors, int8_value_errors...)
+		} else {
+			result = append(result, int8_value)			 
+		}
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+	
+	return &result, nil
+}
+
+func (v Value) GetArrayOfInt16() (*[](*int16), []error) {
+	array, array_errors := v.GetArray()
+	if array_errors != nil {
+		return nil, array_errors
+	} else if common.IsNil(array) {
+		return nil, nil
+	}
+
+	var errors []error
+	var result ([](*int16))
+	for _, array_value := range *array {
+		int16_value, int16_value_errors := array_value.GetInt16()
+		if int16_value_errors != nil {
+			errors = append(errors, int16_value_errors...)
+		} else {
+			result = append(result, int16_value)			 
+		}
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+	
+	return &result, nil
+}
+
+func (v Value) GetArrayOfInt32() (*[](*int32), []error) {
+	array, array_errors := v.GetArray()
+	if array_errors != nil {
+		return nil, array_errors
+	} else if common.IsNil(array) {
+		return nil, nil
+	}
+
+	var errors []error
+	var result ([](*int32))
+	for _, array_value := range *array {
+		int32_value, int32_value_errors := array_value.GetInt32()
+		if int32_value_errors != nil {
+			errors = append(errors, int32_value_errors...)
+		} else {
+			result = append(result, int32_value)			 
+		}
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+	
+	return &result, nil
+}
+
+func (v Value) GetArrayOfInt64() (*[](*int64), []error) {
+	array, array_errors := v.GetArray()
+	if array_errors != nil {
+		return nil, array_errors
+	} else if common.IsNil(array) {
+		return nil, nil
+	}
+
+	var errors []error
+	var result ([](*int64))
+	for _, array_value := range *array {
+		int64_value, int64_value_errors := array_value.GetInt64()
+		if int64_value_errors != nil {
+			errors = append(errors, int64_value_errors...)
+		} else {
+			result = append(result, int64_value)			 
+		}
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+	
+	return &result, nil
+}
+
 func (v Value) GetString() (*string, []error) {
 	if common.IsNil(v["value"]){
 		return nil, nil
@@ -380,7 +484,6 @@ func (v Value) GetRunes() (*[]rune, []error) {
 
 	return &runes, nil
 }
-
 
 func (v Value) GetBool() (*bool, []error) {
 	if common.IsNil(v["value"]){
@@ -698,5 +801,436 @@ func (v Value) IsBoolTrue() bool {
 
 func (v Value) IsBoolFalse() bool {
 	return common.IsBoolFalse(v["value"])
+}
+
+func (v Value) GetInt8() (*int8, []error) {
+	if common.IsNil(v["value"]) {
+		return nil, nil
+	}
+	
+	var errors []error
+	int64_value, int64_value_errors := v.GetInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		return nil, nil
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	if *int64_value < -128 || *int64_value > 127 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [-128, 127]"))
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	int8_conv := int8(*int64_value)
+	result := &int8_conv
+
+	return result, nil
+}
+
+func (v Value) GetInt8Value() (int8, []error) {
+	var errors []error
+	int64_value, int64_value_errors := v.GetInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		errors = append(errors, fmt.Errorf("error: m.GetInt64(s) returned nil"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	if *int64_value < -128 || *int64_value > 127 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [-128, 127]"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	int8_conv := int8(*int64_value)
+	result := int8_conv
+
+	return result, nil
+}
+
+func (v Value) GetUInt8() (*uint8, []error) {
+	var errors []error
+	int64_value, int64_value_errors := v.GetUInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		return nil, nil
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	if *int64_value < 0 || *int64_value > 255 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [0, 255]"))
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	int8_conv := uint8(*int64_value)
+	result := &int8_conv
+
+	return result, nil
+}
+
+func (v Value) GetUInt8Value() (uint8, []error) {
+	var errors []error
+	int64_value, int64_value_errors := v.GetUInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		errors = append(errors, fmt.Errorf("error: Value.GetUInt64(s) returned nil"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	if *int64_value < 0 || *int64_value > 255 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [0, 255]"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	int8_conv := uint8(*int64_value)
+	result := int8_conv
+
+	return result, nil
+}
+
+func (v Value) GetInt16() (*int16, []error) {
+	var errors []error
+	int64_value, int64_value_errors := v.GetInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		return nil, nil
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	if *int64_value < -32768 || *int64_value > 32767 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [-32768, 32767]"))
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	int16_conv := int16(*int64_value)
+	result := &int16_conv
+
+	return result, nil
+}
+
+func (v Value) GetInt16Value() (int16, []error) {
+	var errors []error
+	int64_value, int64_value_errors := v.GetInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		errors = append(errors, fmt.Errorf("error:  m.GetInt64(s) returned nil"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	if *int64_value < -32768 || *int64_value > 32767 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [-32768, 32767]"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	int16_conv := int16(*int64_value)
+	result := int16_conv
+
+	return result, nil
+}
+
+func (v Value) GetUInt16() (*uint16, []error) {
+	var errors []error
+	int64_value, int64_value_errors := v.GetUInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		return nil, nil
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	if *int64_value < 0 || *int64_value > 65535 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [0, 65535]"))
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	int16_conv := uint16(*int64_value)
+	result := &int16_conv
+
+	return result, nil
+}
+
+func (v Value) GetUInt16Value() (uint16, []error) {
+	var errors []error
+	int64_value, int64_value_errors := v.GetUInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		errors = append(errors, fmt.Errorf("error: field: Value.GetUInt64(s) returned nil"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	if *int64_value < 0 || *int64_value > 65535 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [0, 65535]"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	int16_conv := uint16(*int64_value)
+	result := int16_conv
+
+	return result, nil
+}
+
+
+func (v Value) GetInt32() (*int32, []error) {
+	if common.IsNil(v["value"]) {
+		return nil, nil
+	}
+	
+	var errors []error
+	int64_value, int64_value_errors := v.GetInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		return nil, nil
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	if *int64_value < -2147483648 || *int64_value > 2147483647 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [-2147483648, 2147483647]"))
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	int32_conv := int32(*int64_value)
+	result := &int32_conv
+
+	return result, nil
+}
+
+func (v Value) GetInt32Value() (int32, []error) {
+	var errors []error
+	int64_value, int64_value_errors := v.GetInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		errors = append(errors, fmt.Errorf("error:  m.GetInt64(s) returned nil"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	if *int64_value < -2147483648 || *int64_value > 2147483647 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [-2147483648, 2147483647]"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	int32_conv := int32(*int64_value)
+	result := int32_conv
+
+	return result, nil
+}
+
+func (v Value) GetInt64Value() (int64, []error) {
+	var errors []error
+	int64_value, int64_value_errors := v.GetInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		errors = append(errors, fmt.Errorf("error:  m.GetInt64(s) returned nil"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	int64_conv := int64(*int64_value)
+	result := int64_conv
+
+	return result, nil
+}
+
+func (v Value) GetUInt32() (*uint32, []error) {
+	var errors []error
+	int64_value, int64_value_errors := v.GetUInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		return nil, nil
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	if *int64_value < 0 || *int64_value > 4294967295 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [0, 4294967295]"))
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	int32_conv := uint32(*int64_value)
+	result := &int32_conv
+
+	return result, nil
+}
+
+func (v Value) GetUInt32Value() (uint32, []error) {
+	var errors []error
+	int64_value, int64_value_errors := v.GetUInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		errors = append(errors, fmt.Errorf("error: Value.GetUInt64(s) returned nil"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	if *int64_value < 0 || *int64_value > 4294967295 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [0, 4294967295]"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	int32_conv := uint32(*int64_value)
+	result := int32_conv
+
+	return result, nil
+}
+
+func (v Value) GetUInt64Value() (uint64, []error) {
+	var errors []error
+	int64_value, int64_value_errors := v.GetUInt64()
+	if int64_value_errors != nil {
+		errors = append(errors, int64_value_errors...)
+	} else if int64_value == nil {
+		errors = append(errors, fmt.Errorf("error: Value.GetUInt64(s) returned nil"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	if *int64_value < 0 {
+		errors = append(errors, fmt.Errorf("error: value is not in range [0, 18446744073709551615]"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	int64_conv := uint64(*int64_value)
+	result := int64_conv
+
+	return result, nil
+}
+
+func (v Value) GetInt() (*int, []error) {
+	var errors []error
+	var result int
+	bit_size := strconv.IntSize
+	if bit_size == 32 {
+		temp_value, temp_value_errors := v.GetInt32()
+		if temp_value_errors != nil {
+			return nil, temp_value_errors
+		} else if temp_value == nil {
+			return nil, nil
+		}
+
+		result = int(*temp_value)
+	} else if bit_size == 64 {
+		temp_value, temp_value_errors := v.GetInt64()
+		if temp_value_errors != nil {
+			return nil, temp_value_errors
+		} else if temp_value == nil {
+			return nil, nil
+		}
+
+		result = int(*temp_value)
+	} else {
+		errors = append(errors, fmt.Errorf("Mao.GetInt bit size is not supported: %d", bit_size))
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	return &result, nil
+}
+
+func (v Value) GetIntValue() (int, []error) {
+	var errors []error
+	int_value, int_value_errors := v.GetInt()
+	if int_value_errors != nil {
+		errors = append(errors, int_value_errors...)
+	} else if int_value == nil {
+		errors = append(errors, fmt.Errorf("error:  m.GetInt(s) returned nil"))
+	}
+
+	if len(errors) > 0 {
+		return 0, errors
+	}
+
+	int_conv := int(*int_value)
+	result := int_conv
+
+	return result, nil
 }
 

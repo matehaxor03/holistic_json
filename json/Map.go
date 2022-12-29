@@ -2,7 +2,6 @@ package json
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"time"
 	common "github.com/matehaxor03/holistic_common/common"
@@ -175,6 +174,38 @@ func (m Map) GetArray(s string) (*Array, []error) {
 	return m[s].GetArray()
 }
 
+func (m Map) GetArrayOfInt8(s string) (*[]*int8, []error) {
+	if common.IsNil(m[s]){
+		return nil, nil
+	}
+
+	return m[s].GetArrayOfInt8()
+}
+
+func (m Map) GetArrayOfInt16(s string) (*[]*int16, []error) {
+	if common.IsNil(m[s]){
+		return nil, nil
+	}
+
+	return m[s].GetArrayOfInt16()
+}
+
+func (m Map) GetArrayOfInt32(s string) (*[]*int32, []error) {
+	if common.IsNil(m[s]){
+		return nil, nil
+	}
+
+	return m[s].GetArrayOfInt32()
+}
+
+func (m Map) GetArrayOfInt64(s string) (*[]*int64, []error) {
+	if common.IsNil(m[s]){
+		return nil, nil
+	}
+
+	return m[s].GetArrayOfInt64()
+}
+
 func (m Map) GetString(s string) (*string, []error) {
 	if common.IsNil(m[s]) {
 		return nil, nil
@@ -319,431 +350,134 @@ func (m Map) GetInt64(s string) (*int64, []error) {
 }
 
 func (m Map) GetInt8(s string) (*int8, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	if *int64_value < -128 || *int64_value > 127 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [-128, 127]"))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	int8_conv := int8(*int64_value)
-	result := &int8_conv
-
-	return result, nil
+	return m[s].GetInt8()
 }
 
 func (m Map) GetInt8Value(s string) (int8, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
-		errors = append(errors, fmt.Errorf("error: m.GetInt64(s) returned nil"))
-	}
-
-	if len(errors) > 0 {
+	if common.IsNil(m[s]) {
+		var errors []error
+		errors = append(errors, fmt.Errorf("Map.GetInt8Value was nil"))
 		return 0, errors
 	}
-
-	if *int64_value < -128 || *int64_value > 127 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [-128, 127]"))
-	}
-
-	if len(errors) > 0 {
-		return 0, errors
-	}
-
-	int8_conv := int8(*int64_value)
-	result := int8_conv
-
-	return result, nil
+	return m[s].GetInt8Value()
 }
 
 func (m Map) GetUInt8(s string) (*uint8, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetUInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	if *int64_value < 0 || *int64_value > 255 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [0, 255]"))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	int8_conv := uint8(*int64_value)
-	result := &int8_conv
-
-	return result, nil
+	return m[s].GetUInt8()
 }
 
 func (m Map) GetUInt8Value(s string) (uint8, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetUInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
-		errors = append(errors, fmt.Errorf("error: field: %s m.GetUInt64(s) returned nil", s))
-	}
-
-	if len(errors) > 0 {
+	if common.IsNil(m[s]) {
+		var errors []error
+		errors = append(errors, fmt.Errorf("Map.GetUInt8Value was nil"))
 		return 0, errors
 	}
-
-	if *int64_value < 0 || *int64_value > 255 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [0, 255]"))
-	}
-
-	if len(errors) > 0 {
-		return 0, errors
-	}
-
-	int8_conv := uint8(*int64_value)
-	result := int8_conv
-
-	return result, nil
+	return m[s].GetUInt8Value()
 }
 
 func (m Map) GetInt16(s string) (*int16, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	if *int64_value < -32768 || *int64_value > 32767 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [-32768, 32767]"))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	int16_conv := int16(*int64_value)
-	result := &int16_conv
-
-	return result, nil
+	return m[s].GetInt16()
 }
 
 func (m Map) GetInt16Value(s string) (int16, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
-		errors = append(errors, fmt.Errorf("error:  m.GetInt64(s) returned nil"))
-	}
-
-	if len(errors) > 0 {
+	if common.IsNil(m[s]) {
+		var errors []error
+		errors = append(errors, fmt.Errorf("Map.GetInt16Value was nil"))
 		return 0, errors
 	}
-
-	if *int64_value < -32768 || *int64_value > 32767 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [-32768, 32767]"))
-	}
-
-	if len(errors) > 0 {
-		return 0, errors
-	}
-
-	int16_conv := int16(*int64_value)
-	result := int16_conv
-
-	return result, nil
+	return m[s].GetInt16Value()
 }
 
 func (m Map) GetUInt16(s string) (*uint16, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetUInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	if *int64_value < 0 || *int64_value > 65535 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [0, 65535]"))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	int16_conv := uint16(*int64_value)
-	result := &int16_conv
-
-	return result, nil
+	return m[s].GetUInt16()
 }
 
 func (m Map) GetUInt16Value(s string) (uint16, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetUInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
-		errors = append(errors, fmt.Errorf("error: field: %s m.GetUInt64(s) returned nil", s))
-	}
-
-	if len(errors) > 0 {
+	if common.IsNil(m[s]) {
+		var errors []error
+		errors = append(errors, fmt.Errorf("Map.GetUInt16Value was nil"))
 		return 0, errors
 	}
-
-	if *int64_value < 0 || *int64_value > 65535 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [0, 65535]"))
-	}
-
-	if len(errors) > 0 {
-		return 0, errors
-	}
-
-	int16_conv := uint16(*int64_value)
-	result := int16_conv
-
-	return result, nil
+	return m[s].GetUInt16Value()
 }
 
 
 func (m Map) GetInt32(s string) (*int32, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	if *int64_value < -2147483648 || *int64_value > 2147483647 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [-2147483648, 2147483647]"))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	int32_conv := int32(*int64_value)
-	result := &int32_conv
-
-	return result, nil
+	return m[s].GetInt32()
 }
 
 func (m Map) GetInt32Value(s string) (int32, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
-		errors = append(errors, fmt.Errorf("error:  m.GetInt64(s) returned nil"))
-	}
-
-	if len(errors) > 0 {
+	if common.IsNil(m[s]) {
+		var errors []error
+		errors = append(errors, fmt.Errorf("Map.GetInt32Value was nil"))
 		return 0, errors
 	}
-
-	if *int64_value < -2147483648 || *int64_value > 2147483647 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [-2147483648, 2147483647]"))
-	}
-
-	if len(errors) > 0 {
-		return 0, errors
-	}
-
-	int32_conv := int32(*int64_value)
-	result := int32_conv
-
-	return result, nil
+	return m[s].GetInt32Value()
 }
 
 func (m Map) GetInt64Value(s string) (int64, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
-		errors = append(errors, fmt.Errorf("error:  m.GetInt64(s) returned nil"))
-	}
-
-	if len(errors) > 0 {
+	if common.IsNil(m[s]) {
+		var errors []error
+		errors = append(errors, fmt.Errorf("Map.GetInt64Value was nil"))
 		return 0, errors
 	}
-
-	int64_conv := int64(*int64_value)
-	result := int64_conv
-
-	return result, nil
+	return m[s].GetInt64Value()
 }
 
 func (m Map) GetUInt32(s string) (*uint32, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetUInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	if *int64_value < 0 || *int64_value > 4294967295 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [0, 4294967295]"))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	int32_conv := uint32(*int64_value)
-	result := &int32_conv
-
-	return result, nil
+	return m[s].GetUInt32()
 }
 
 func (m Map) GetUInt32Value(s string) (uint32, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetUInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
-		errors = append(errors, fmt.Errorf("error: field: %s m.GetUInt64(s) returned nil", s))
-	}
-
-	if len(errors) > 0 {
+	if common.IsNil(m[s]) {
+		var errors []error
+		errors = append(errors, fmt.Errorf("Map.GetUInt32Value was nil"))
 		return 0, errors
 	}
-
-	if *int64_value < 0 || *int64_value > 4294967295 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [0, 4294967295]"))
-	}
-
-	if len(errors) > 0 {
-		return 0, errors
-	}
-
-	int32_conv := uint32(*int64_value)
-	result := int32_conv
-
-	return result, nil
+	return m[s].GetUInt32Value()
 }
 
 func (m Map) GetUInt64Value(s string) (uint64, []error) {
-	var errors []error
-	int64_value, int64_value_errors := m.GetUInt64(s)
-	if int64_value_errors != nil {
-		errors = append(errors, int64_value_errors...)
-	} else if int64_value == nil {
-		errors = append(errors, fmt.Errorf("error: field: %s m.GetUInt64(s) returned nil", s))
-	}
-
-	if len(errors) > 0 {
+	if common.IsNil(m[s]) {
+		var errors []error
+		errors = append(errors, fmt.Errorf("Map.GetUInt64Value was nil"))
 		return 0, errors
 	}
-
-	if *int64_value < 0 {
-		errors = append(errors, fmt.Errorf("error: value is not in range [0, 18446744073709551615]"))
-	}
-
-	if len(errors) > 0 {
-		return 0, errors
-	}
-
-	int64_conv := uint64(*int64_value)
-	result := int64_conv
-
-	return result, nil
+	return m[s].GetUInt64Value()
 }
 
 func (m Map) GetInt(s string) (*int, []error) {
-	var errors []error
-	var result int
-
-	if m[s] == nil {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
-
-	bit_size := strconv.IntSize
-	if bit_size == 32 {
-		temp_value, temp_value_errors := m.GetInt32(s)
-		if temp_value_errors != nil {
-			return nil, temp_value_errors
-		} else if temp_value == nil {
-			return nil, nil
-		}
-
-		result = int(*temp_value)
-	} else if bit_size == 64 {
-		temp_value, temp_value_errors := m.GetInt64(s)
-		if temp_value_errors != nil {
-			return nil, temp_value_errors
-		} else if temp_value == nil {
-			return nil, nil
-		}
-
-		result = int(*temp_value)
-	} else {
-		errors = append(errors, fmt.Errorf("Mao.GetInt bit size is not supported: %d", bit_size))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	return &result, nil
+	return m[s].GetInt()
 }
 
 func (m Map) GetIntValue(s string) (int, []error) {
-	var errors []error
-	int_value, int_value_errors := m.GetInt(s)
-	if int_value_errors != nil {
-		errors = append(errors, int_value_errors...)
-	} else if int_value == nil {
-		errors = append(errors, fmt.Errorf("error:  m.GetInt(s) returned nil"))
-	}
-
-	if len(errors) > 0 {
+	if common.IsNil(m[s]) {
+		var errors []error
+		errors = append(errors, fmt.Errorf("Map.GetIntValue was nil"))
 		return 0, errors
 	}
-
-	int_conv := int(*int_value)
-	result := int_conv
-
-	return result, nil
+	return m[s].GetIntValue()
 }
 
 func (m Map) SetInt(s string, v *int) {

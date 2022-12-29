@@ -10,7 +10,7 @@ import (
 
 type Value map[string](interface{})
 
-func (v Value) GetMap() (*Map, []error) {
+func (v *Value) GetMap() (*Map, []error) {
 	if v.IsNil() {
 		return nil, nil
 	}
@@ -19,7 +19,7 @@ func (v Value) GetMap() (*Map, []error) {
 	var result Map
 	type_of := v.GetType()
 	if type_of == "*json.Map" {
-		result = *((v["value"]).(*Map))
+		result = *(((*v)["value"]).(*Map))
 	} else {
 		errors = append(errors, fmt.Errorf("%s failed to unbox to json.Map", type_of))
 		return nil, errors
@@ -28,7 +28,7 @@ func (v Value) GetMap() (*Map, []error) {
 	return &result, nil
 }
 
-func (v Value) SetMap(s string, value *Map) []error {
+func (v *Value) SetMap(s string, value *Map) []error {
 	var errors []error
 	if v.IsMap() {
 		temp_map, temp_map_errors := v.GetMap()
@@ -51,7 +51,7 @@ func (v Value) SetMap(s string, value *Map) []error {
 	return nil
 }
 
-func (v Value) SetValue(s string, value *Value) []error {
+func (v *Value) SetValue(s string, value *Value) []error {
 	var errors []error
 	if v.IsMap() {
 		temp_map, temp_map_errors := v.GetMap()
@@ -74,7 +74,7 @@ func (v Value) SetValue(s string, value *Value) []error {
 	return nil
 }
 
-func (v Value) SetArray(s string, value *Array) []error {
+func (v *Value) SetArray(s string, value *Array) []error {
 	var errors []error
 	if v.IsMap() {
 		temp_map, temp_map_errors := v.GetMap()
@@ -97,16 +97,16 @@ func (v Value) SetArray(s string, value *Array) []error {
 	return nil
 }
 
-func (v Value) SetArrayValue(s string, a Array) []error {
+func (v *Value) SetArrayValue(s string, a Array) []error {
 	return v.SetArray(s, &a)
 }
 
-func (v Value) IsMap() (bool) {
-	return common.IsMap(v["value"])
+func (v *Value) IsMap() (bool) {
+	return common.IsMap((*v)["value"])
 }
 
-func (v Value) IsEmptyString() bool {
-	if !common.IsString(v["value"]) {
+func (v *Value) IsEmptyString() bool {
+	if !common.IsString((*v)["value"]) {
 		return false
 	}
 
@@ -120,8 +120,8 @@ func (v Value) IsEmptyString() bool {
 	return *string_value == ""
 }
 
-func (v Value) GetFunc() (func(Map) []error, []error) {
-	if common.IsNil(v["value"]) {
+func (v *Value) GetFunc() (func(Map) []error, []error) {
+	if common.IsNil((*v)["value"]) {
 		return nil, nil
 	}
 
@@ -130,9 +130,9 @@ func (v Value) GetFunc() (func(Map) []error, []error) {
 	rep := v.GetType()
 	switch rep {
 	case "func(json.Map) []error":
-		result = v["value"].(func(Map) []error)
+		result = (*v)["value"].(func(Map) []error)
 	case "*func(json.Map) []error":
-		result = *(v["value"].(*func(Map) []error))
+		result = *((*v)["value"].(*func(Map) []error))
 	default:
 		errors = append(errors, fmt.Errorf("error: Map.Func: type %s is not supported please implement", rep))
 	}
@@ -144,7 +144,7 @@ func (v Value) GetFunc() (func(Map) []error, []error) {
 	return result, nil
 }
 
-func (v Value) GetErrors() ([]error, []error) {
+func (v *Value) GetErrors() ([]error, []error) {
 	if v.IsNil() {
 		return nil, nil
 	}
@@ -155,11 +155,11 @@ func (v Value) GetErrors() ([]error, []error) {
 	rep := v.GetType()
 	switch rep {
 	case "*[]error":
-		result = *(v["value"].(*[]error))
+		result = *((*v)["value"].(*[]error))
 	case "[]error":
-		result = v["value"].([]error)
+		result = (*v)["value"].([]error)
 	case "*[]string":
-		string_array := v["value"].(*[]string)
+		string_array := (*v)["value"].(*[]string)
 		for _, string_array_value := range *string_array {
 			converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
 			if converted_errors != nil {
@@ -169,7 +169,7 @@ func (v Value) GetErrors() ([]error, []error) {
 			}
 		}
 	case "[]string":
-		string_array := v["value"].([]string)
+		string_array := (*v)["value"].([]string)
 		for _, string_array_value := range string_array {
 			converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
 			if converted_errors != nil {
@@ -179,7 +179,7 @@ func (v Value) GetErrors() ([]error, []error) {
 			}
 		}
 	case "json.Array":
-		string_array := v["value"].(Array)
+		string_array := (*v)["value"].(Array)
 		for _, string_array_value := range string_array {
 			converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
 			if converted_errors != nil {
@@ -189,7 +189,7 @@ func (v Value) GetErrors() ([]error, []error) {
 			}
 		}
 	case "*json.Array":
-		string_array := v["value"].(*Array)
+		string_array := (*v)["value"].(*Array)
 		for _, string_array_value := range *string_array {
 			converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
 			if converted_errors != nil {
@@ -209,7 +209,7 @@ func (v Value) GetErrors() ([]error, []error) {
 	return result, nil
 }
 
-func (v Value) GetArray() (*Array, []error) {
+func (v *Value) GetArray() (*Array, []error) {
 	if v.IsNil() {
 		return nil, nil
 	}
@@ -220,7 +220,7 @@ func (v Value) GetArray() (*Array, []error) {
 	rep := v.GetType()
 	switch rep {
 	case "*json.Array":
-		result = v["value"].(*Array)
+		result = (*v)["value"].(*Array)
 	default:
 		errors = append(errors, fmt.Errorf("error: Value.GetArray: type %s is not supported please implement", rep))
 	}
@@ -232,7 +232,7 @@ func (v Value) GetArray() (*Array, []error) {
 	return result, nil
 }
 
-func (v Value) GetArrayOfInt8() (*[](*int8), []error) {
+func (v *Value) GetArrayOfInt8() (*[](*int8), []error) {
 	array, array_errors := v.GetArray()
 	if array_errors != nil {
 		return nil, array_errors
@@ -258,7 +258,7 @@ func (v Value) GetArrayOfInt8() (*[](*int8), []error) {
 	return &result, nil
 }
 
-func (v Value) GetArrayOfInt16() (*[](*int16), []error) {
+func (v *Value) GetArrayOfInt16() (*[](*int16), []error) {
 	array, array_errors := v.GetArray()
 	if array_errors != nil {
 		return nil, array_errors
@@ -284,7 +284,7 @@ func (v Value) GetArrayOfInt16() (*[](*int16), []error) {
 	return &result, nil
 }
 
-func (v Value) GetArrayOfInt32() (*[](*int32), []error) {
+func (v *Value) GetArrayOfInt32() (*[](*int32), []error) {
 	array, array_errors := v.GetArray()
 	if array_errors != nil {
 		return nil, array_errors
@@ -310,7 +310,7 @@ func (v Value) GetArrayOfInt32() (*[](*int32), []error) {
 	return &result, nil
 }
 
-func (v Value) GetArrayOfInt64() (*[](*int64), []error) {
+func (v *Value) GetArrayOfInt64() (*[](*int64), []error) {
 	array, array_errors := v.GetArray()
 	if array_errors != nil {
 		return nil, array_errors
@@ -337,7 +337,7 @@ func (v Value) GetArrayOfInt64() (*[](*int64), []error) {
 }
 
 ///
-func (v Value) GetArrayOfUInt8() (*[](*uint8), []error) {
+func (v *Value) GetArrayOfUInt8() (*[](*uint8), []error) {
 	array, array_errors := v.GetArray()
 	if array_errors != nil {
 		return nil, array_errors
@@ -363,7 +363,7 @@ func (v Value) GetArrayOfUInt8() (*[](*uint8), []error) {
 	return &result, nil
 }
 
-func (v Value) GetArrayOfUInt16() (*[](*uint16), []error) {
+func (v *Value) GetArrayOfUInt16() (*[](*uint16), []error) {
 	array, array_errors := v.GetArray()
 	if array_errors != nil {
 		return nil, array_errors
@@ -389,7 +389,7 @@ func (v Value) GetArrayOfUInt16() (*[](*uint16), []error) {
 	return &result, nil
 }
 
-func (v Value) GetArrayOfUInt32() (*[](*uint32), []error) {
+func (v *Value) GetArrayOfUInt32() (*[](*uint32), []error) {
 	array, array_errors := v.GetArray()
 	if array_errors != nil {
 		return nil, array_errors
@@ -415,7 +415,7 @@ func (v Value) GetArrayOfUInt32() (*[](*uint32), []error) {
 	return &result, nil
 }
 
-func (v Value) GetArrayOfUInt64() (*[](*uint64), []error) {
+func (v *Value) GetArrayOfUInt64() (*[](*uint64), []error) {
 	array, array_errors := v.GetArray()
 	if array_errors != nil {
 		return nil, array_errors
@@ -441,7 +441,7 @@ func (v Value) GetArrayOfUInt64() (*[](*uint64), []error) {
 	return &result, nil
 }
 
-func (v Value) GetArrayOfString() (*[](*string), []error) {
+func (v *Value) GetArrayOfString() (*[](*string), []error) {
 	array, array_errors := v.GetArray()
 	if array_errors != nil {
 		return nil, array_errors
@@ -467,20 +467,20 @@ func (v Value) GetArrayOfString() (*[](*string), []error) {
 	return &result, nil
 }
 
-func (v Value) GetString() (*string, []error) {
-	if common.IsNil(v["value"]){
+func (v *Value) GetString() (*string, []error) {
+	if common.IsNil((*v)["value"]){
 		return nil, nil
 	}
 
 	var errors []error
 	var result *string
-	rep := fmt.Sprintf("%T", v["value"])
+	rep := fmt.Sprintf("%T", (*v)["value"])
 	switch rep {
 	case "string":
-		value := v["value"].(string)
+		value := (*v)["value"].(string)
 		result = &value
 	case "*string":
-		result = v["value"].(*string)
+		result = (*v)["value"].(*string)
 	default:
 		errors = append(errors, fmt.Errorf("error: Map.GetString: type %s is not supported please implement for attribute: %s", rep))
 	}
@@ -492,12 +492,12 @@ func (v Value) GetString() (*string, []error) {
 	return result, nil
 }
 
-func (v Value) IsFloat() (bool) {
-	if common.IsNil(v["value"]) {
+func (v *Value) IsFloat() (bool) {
+	if common.IsNil((*v)["value"]) {
 		return false
 	}
 
-	type_of := common.GetType(v["value"])
+	type_of := common.GetType((*v)["value"])
 	if type_of == "float32" || 
 	   type_of == "*float32" || 
 	   type_of == "float64" || 
@@ -508,60 +508,60 @@ func (v Value) IsFloat() (bool) {
 	return false
 }
 
-func (v Value) IsString() (bool) {
-	if common.IsNil(v["value"]) {
+func (v *Value) IsString() (bool) {
+	if common.IsNil((*v)["value"]) {
 		return false
 	}
 
-	return common.IsString(v["value"])
+	return common.IsString((*v)["value"])
 }
 
-func (v Value) IsNil() bool {
-	return common.IsNil(v["value"])
+func (v *Value) IsNil() bool {
+	return common.IsNil((*v)["value"])
 }
 
-func (v Value) IsBool() bool {
-	return common.IsBool(v["value"])
+func (v *Value) IsBool() bool {
+	return common.IsBool((*v)["value"])
 }
 
-func (v Value) IsArray() bool {
-	return common.IsArray(v["value"])
+func (v *Value) IsArray() bool {
+	return common.IsArray((*v)["value"])
 }
 
-func (v Value) GetFloat64() (*float64, []error) {
+func (v *Value) GetFloat64() (*float64, []error) {
 	if v.IsNil() {
 		return nil, nil
 	}
 
 	var errors []error
 	var result *float64
-	rep := fmt.Sprintf("%T", v["value"])
+	rep := fmt.Sprintf("%T", (*v)["value"])
 	switch rep {
 	case "float64":
-		value := v["value"].(float64)
+		value := (*v)["value"].(float64)
 		result = &value
 	case "*float64":
-		value := *(v["value"].(*float64))
+		value := *((*v)["value"].(*float64))
 		result = &value
 	case "*string":
-		value, value_error := strconv.ParseFloat((*(v["value"].(*string))),64)
+		value, value_error := strconv.ParseFloat((*((*v)["value"].(*string))),64)
 		if value_error != nil {
 			errors = append(errors, fmt.Errorf("error: Value.GetFloat64: cannot convert *string value to float64"))
 		} else {
 			result = &value
 		}
 	case "string":
-		value, value_error := strconv.ParseFloat((v["value"].(string)), 64)
+		value, value_error := strconv.ParseFloat(((*v)["value"].(string)), 64)
 		if value_error != nil {
 			errors = append(errors, fmt.Errorf("error: Value.GetFloat64: cannot convert *string value to float64"))
 		} else {
 			result = &value
 		}
 	case "float32":
-		value := float64(v["value"].(float32))
+		value := float64((*v)["value"].(float32))
 		result = &value
 	case "*float32":
-		value := float64(*(v["value"].(*float32)))
+		value := float64(*((*v)["value"].(*float32)))
 		result = &value
 	default:
 		errors = append(errors, fmt.Errorf("error: Value.GetFloat64: type %s is not supported please implement for attribute: %s", rep))
@@ -574,7 +574,7 @@ func (v Value) GetFloat64() (*float64, []error) {
 	return result, nil
 }
 
-func (v Value) GetFloat32() (*float32, []error) {
+func (v *Value) GetFloat32() (*float32, []error) {
 	if v.IsNil() {
 		return nil, nil
 	}
@@ -600,7 +600,7 @@ func (v Value) GetFloat32() (*float32, []error) {
 	return &float_32_value, nil
 }
 
-func (v Value) GetFloat32Value() (float32, []error) {
+func (v *Value) GetFloat32Value() (float32, []error) {
 	var errors []error
 	float64_value, float64_value_errors := v.GetFloat64()
 	if float64_value_errors != nil {
@@ -626,7 +626,7 @@ func (v Value) GetFloat32Value() (float32, []error) {
 	return float_32_value, nil
 }
 
-func (v Value) GetFloat64Value() (float64, []error) {
+func (v *Value) GetFloat64Value() (float64, []error) {
 	var errors []error
 	float64_value, float64_value_errors := v.GetFloat64()
 	if float64_value_errors != nil {
@@ -642,22 +642,22 @@ func (v Value) GetFloat64Value() (float64, []error) {
 	return *float64_value, nil
 }
 
-func (v Value) GetRunes() (*[]rune, []error) {
+func (v *Value) GetRunes() (*[]rune, []error) {
 	if v.IsNil() {
 		return nil, nil
 	}
 
 	var errors []error
 	var result *string
-	rep := fmt.Sprintf("%T", v["value"])
+	rep := fmt.Sprintf("%T", (*v)["value"])
 	switch rep {
 	case "string":
-		value := v["value"].(string)
+		value := (*v)["value"].(string)
 		newValue := strings.Clone(value)
 		result = &newValue
 	case "*string":
-		if fmt.Sprintf("%s", v["value"]) != "%!s(*string=<nil>)" {
-			s := strings.Clone(*((v["value"]).(*string)))
+		if fmt.Sprintf("%s", (*v)["value"]) != "%!s(*string=<nil>)" {
+			s := strings.Clone(*(((*v)["value"]).(*string)))
 			result = &s
 		} else {
 			errors = append(errors, fmt.Errorf("error: Value.GetString: *string value is null for attribute: %s", rep))
@@ -678,7 +678,7 @@ func (v Value) GetRunes() (*[]rune, []error) {
 	return &runes, nil
 }
 
-func (v Value) GetBool() (*bool, []error) {
+func (v *Value) GetBool() (*bool, []error) {
 	if v.IsNil() {
 		return nil, nil
 	}
@@ -686,23 +686,23 @@ func (v Value) GetBool() (*bool, []error) {
 	var result *bool
 	var errors []error
 
-	rep := fmt.Sprintf("%T", v["value"])
+	rep := fmt.Sprintf("%T", (*v)["value"])
 	switch rep {
 	case "bool":
-		value := v["value"].(bool)
+		value := (*v)["value"].(bool)
 		result = &value
 		break
 	case "*bool":
-		if fmt.Sprintf("%s", v["value"]) != "%!s(*bool=<nil>)" {
-			value := *((v["value"]).(*bool))
+		if fmt.Sprintf("%s", (*v)["value"]) != "%!s(*bool=<nil>)" {
+			value := *(((*v)["value"]).(*bool))
 			result = &value
 		} else {
 			return nil, nil
 		}
 		break
 	case "*string":
-		if fmt.Sprintf("%s", v["value"]) != "%!s(*string=<nil>)" {
-			value := *((v["value"]).(*string))
+		if fmt.Sprintf("%s", (*v)["value"]) != "%!s(*string=<nil>)" {
+			value := *(((*v)["value"]).(*string))
 			if value == "1" {
 				boolean_result := true
 				result = &boolean_result
@@ -718,7 +718,7 @@ func (v Value) GetBool() (*bool, []error) {
 		}
 		break
 	case "string":
-		value := ((v["value"]).(string))
+		value := (((*v)["value"]).(string))
 		if value == "1" {
 			boolean_result := true
 			result = &boolean_result
@@ -740,7 +740,7 @@ func (v Value) GetBool() (*bool, []error) {
 	return result, nil
 }
 
-func (v Value) GetInt64() (*int64, []error) {
+func (v *Value) GetInt64() (*int64, []error) {
 	var errors []error
 	var temp_value int64
 
@@ -748,78 +748,78 @@ func (v Value) GetInt64() (*int64, []error) {
 		return nil, nil
 	}
 
-	rep := fmt.Sprintf("%T", v["value"])
+	rep := fmt.Sprintf("%T", (*v)["value"])
 	switch rep {
 		case "*int64":
-			x := v["value"].(*int64)
+			x := (*v)["value"].(*int64)
 			temp_value = int64(*x)
 		case "int64":
-			x := v["value"].(int64)
+			x := (*v)["value"].(int64)
 			temp_value = x
 		case "*int32":
-			x :=v["value"].(*int32)
+			x :=(*v)["value"].(*int32)
 			temp_value = int64(*x)
 		case "int32":
-			x := v["value"].(int32)
+			x := (*v)["value"].(int32)
 			temp_value = int64(x)
 		case "*int16":
-			x := v["value"].(*int16)
+			x := (*v)["value"].(*int16)
 			temp_value = int64(*x)
 		case "int16":
-			x := v["value"].(int16)
+			x := (*v)["value"].(int16)
 			temp_value = int64(x)
 		case "*int8":
-			x := v["value"].(*int8)
+			x := (*v)["value"].(*int8)
 			temp_value = int64(*x)
 		case "int8":
-			x := v["value"].(int8)
+			x := (*v)["value"].(int8)
 			temp_value = int64(x)
 		case "int":
-			x := v["value"].(int)
+			x := (*v)["value"].(int)
 			temp_value = int64(x)
 		case "*int":
-			x := v["value"].(*int)
+			x := (*v)["value"].(*int)
 			temp_value = int64(*x)
 		case "*uint64":
-			x := v["value"].(*uint64)
+			x := (*v)["value"].(*uint64)
 			if *x > 9223372036854775807 {
 				errors = append(errors, fmt.Errorf("%d is greater than 9223372036854775807", *x))
 			} else {
 				temp_value = int64(*x)
 			}
 		case "uint64":
-			x := v["value"].(uint64)
+			x := (*v)["value"].(uint64)
 			if x > 9223372036854775807 {
 				errors = append(errors, fmt.Errorf("%d is greater than 9223372036854775807", x))
 			} else {
 				temp_value = int64(x)
 			}
 		case "*uint32":
-			x := v["value"].(*uint32)
+			x := (*v)["value"].(*uint32)
 			temp_value = int64(*x)
 		case "uint32":
-			x := v["value"].(uint32)
+			x := (*v)["value"].(uint32)
 			temp_value = int64(x)
 		case "*uint16":
-			x := v["value"].(*uint16)
+			x := (*v)["value"].(*uint16)
 			temp_value = int64(*x)
 		case "uint16":
-			x := v["value"].(uint16)
+			x := (*v)["value"].(uint16)
 			temp_value = int64(x)
 		case "*uint8":
-			x := v["value"].(*uint8)
+			x := (*v)["value"].(*uint8)
 			temp_value = int64(*x)
 		case "uint8":
-			x := v["value"].(uint8)
+			x := (*v)["value"].(uint8)
 			temp_value = int64(x)
 		case "*uint":
-			x := v["value"].(*uint)
+			x := (*v)["value"].(*uint)
 			temp_value = int64(*x)
 		case "uint":
-			x := v["value"].(uint)
+			x := (*v)["value"].(uint)
 			temp_value = int64(x)
 		case "*string":
-			value, value_error := strconv.ParseInt((*(v["value"].(*string))), 10, 64)
+			value, value_error := strconv.ParseInt((*((*v)["value"].(*string))), 10, 64)
 			if value_error != nil {
 				errors = append(errors, fmt.Errorf("error: Map.GetInt64: cannot convert *string value to int64"))
 			} else {
@@ -838,115 +838,115 @@ func (v Value) GetInt64() (*int64, []error) {
 	return result, nil
 }
 
-func (v Value) GetUInt64() (*uint64, []error) {
+func (v *Value) GetUInt64() (*uint64, []error) {
 	var errors []error
-	if common.IsNil(v["value"]){
+	if common.IsNil((*v)["value"]){
 		return nil, nil
 	}
 
 	var uint64_value uint64
-	rep := fmt.Sprintf("%T",v["value"])
+	rep := fmt.Sprintf("%T",(*v)["value"])
 	switch rep {
 	case "*int64":
-		x := *(v["value"].(*int64))
+		x := *((*v)["value"].(*int64))
 		if x >= 0 {
 			uint64_value = uint64(x)
 		} else {
 			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
 		}
 	case "int64":
-		x := v["value"].(int64)
+		x := (*v)["value"].(int64)
 		if x >= 0 {
 			uint64_value = uint64(x)
 		} else {
 			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
 		}
 	case "*int32":
-		x := *(v["value"].(*int32))
+		x := *((*v)["value"].(*int32))
 		if x >= 0 {
 			uint64_value = uint64(x)
 		} else {
 			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
 		}
 	case "int32":
-		x := v["value"].(int32)
+		x := (*v)["value"].(int32)
 		if x >= 0 {
 			uint64_value = uint64(x)
 		} else {
 			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
 		}
 	case "*int16":
-		x := *(v["value"].(*int16))
+		x := *((*v)["value"].(*int16))
 		if x >= 0 {
 			uint64_value = uint64(x)
 		} else {
 			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
 		}
 	case "int16":
-		x := v["value"].(int16)
+		x := (*v)["value"].(int16)
 		if x >= 0 {
 			uint64_value = uint64(x)
 		} else {
 			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
 		}
 	case "*int8":
-		x := *(v["value"].(*int8))
+		x := *((*v)["value"].(*int8))
 		if x >= 0 {
 			uint64_value = uint64(x)
 		} else {
 			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
 		}
 	case "int8":
-		x := v["value"].(int8)
+		x := (*v)["value"].(int8)
 		if x >= 0 {
 			uint64_value = uint64(x)
 		} else {
 			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
 		}
 	case "int":
-		x := (v["value"].(int))
+		x := ((*v)["value"].(int))
 		if x >= 0 {
 			uint64_value = uint64(x)
 		} else {
 			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
 		}
 	case "*int":
-		x := *(v["value"].(*int))
+		x := *((*v)["value"].(*int))
 		if x >= 0 {
 			uint64_value = uint64(x)
 		} else {
 			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
 		}
 	case "uint":
-		uint_value := (v["value"].(uint))
+		uint_value := ((*v)["value"].(uint))
 		uint64_value = uint64(uint_value)
 	case "*uint":
-		uint_value := *((v["value"].(*uint)))
+		uint_value := *(((*v)["value"].(*uint)))
 		uint64_value = uint64(uint_value)
 	case "*uint64":
-		uint64_value = *(v["value"].(*uint64))
+		uint64_value = *((*v)["value"].(*uint64))
 	case "uint64":
-		uint64_value = (v["value"].(uint64))
+		uint64_value = ((*v)["value"].(uint64))
 	case "*uint32":
-		x := *(v["value"].(*uint32))
+		x := *((*v)["value"].(*uint32))
 		uint64_value = uint64(x)
 	case "uint32":
-		x := (v["value"].(uint32))
+		x := ((*v)["value"].(uint32))
 		uint64_value = uint64(x)
 	case "*uint16":
-		x := *(v["value"].(*uint16))
+		x := *((*v)["value"].(*uint16))
 		uint64_value = uint64(x)
 	case "uint16":
-		x := (v["value"].(uint16))
+		x := ((*v)["value"].(uint16))
 		uint64_value = uint64(x)
 	case "*uint8":
-		x := *(v["value"].(*uint8))
+		x := *((*v)["value"].(*uint8))
 		uint64_value = uint64(x)
 	case "uint8":
-		x := (v["value"].(uint8))
+		x := ((*v)["value"].(uint8))
 		uint64_value = uint64(x)
 	case "*string":
-		string_value := (v["value"].(*string))
+		string_value := ((*v)["value"].(*string))
 		if *string_value == "NULL" {
 			return nil, nil
 		} else {
@@ -968,32 +968,32 @@ func (v Value) GetUInt64() (*uint64, []error) {
 	return &uint64_value, nil
 }
 
-func (v Value) GetTime(decimal_places int) (*time.Time, []error) {
+func (v *Value) GetTime(decimal_places int) (*time.Time, []error) {
 	if v.IsNil() {
 		return nil, nil
 	}
 
-	return common.GetTime(v["value"], decimal_places)
+	return common.GetTime((*v)["value"], decimal_places)
 }
 
-func (v Value) GetType() string {
-	return common.GetType(v["value"])
+func (v *Value) GetType() string {
+	return common.GetType((*v)["value"])
 }
 
-func (v Value) IsInteger() bool {
-	return common.IsInteger(v["value"])
+func (v *Value) IsInteger() bool {
+	return common.IsInteger((*v)["value"])
 }
 
-func (v Value) IsBoolTrue() bool {
-	return common.IsBoolTrue(v["value"])
+func (v *Value) IsBoolTrue() bool {
+	return common.IsBoolTrue((*v)["value"])
 }
 
-func (v Value) IsBoolFalse() bool {
-	return common.IsBoolFalse(v["value"])
+func (v *Value) IsBoolFalse() bool {
+	return common.IsBoolFalse((*v)["value"])
 }
 
-func (v Value) GetInt8() (*int8, []error) {
-	if common.IsNil(v["value"]) {
+func (v *Value) GetInt8() (*int8, []error) {
+	if common.IsNil((*v)["value"]) {
 		return nil, nil
 	}
 	
@@ -1023,7 +1023,7 @@ func (v Value) GetInt8() (*int8, []error) {
 	return result, nil
 }
 
-func (v Value) GetInt8Value() (int8, []error) {
+func (v *Value) GetInt8Value() (int8, []error) {
 	var errors []error
 	int64_value, int64_value_errors := v.GetInt64()
 	if int64_value_errors != nil {
@@ -1050,7 +1050,7 @@ func (v Value) GetInt8Value() (int8, []error) {
 	return result, nil
 }
 
-func (v Value) GetUInt8() (*uint8, []error) {
+func (v *Value) GetUInt8() (*uint8, []error) {
 	var errors []error
 	int64_value, int64_value_errors := v.GetUInt64()
 	if int64_value_errors != nil {
@@ -1077,7 +1077,7 @@ func (v Value) GetUInt8() (*uint8, []error) {
 	return result, nil
 }
 
-func (v Value) GetUInt8Value() (uint8, []error) {
+func (v *Value) GetUInt8Value() (uint8, []error) {
 	var errors []error
 	int64_value, int64_value_errors := v.GetUInt64()
 	if int64_value_errors != nil {
@@ -1104,7 +1104,7 @@ func (v Value) GetUInt8Value() (uint8, []error) {
 	return result, nil
 }
 
-func (v Value) GetInt16() (*int16, []error) {
+func (v *Value) GetInt16() (*int16, []error) {
 	var errors []error
 	int64_value, int64_value_errors := v.GetInt64()
 	if int64_value_errors != nil {
@@ -1131,7 +1131,7 @@ func (v Value) GetInt16() (*int16, []error) {
 	return result, nil
 }
 
-func (v Value) GetInt16Value() (int16, []error) {
+func (v *Value) GetInt16Value() (int16, []error) {
 	var errors []error
 	int64_value, int64_value_errors := v.GetInt64()
 	if int64_value_errors != nil {
@@ -1158,7 +1158,7 @@ func (v Value) GetInt16Value() (int16, []error) {
 	return result, nil
 }
 
-func (v Value) GetUInt16() (*uint16, []error) {
+func (v *Value) GetUInt16() (*uint16, []error) {
 	var errors []error
 	int64_value, int64_value_errors := v.GetUInt64()
 	if int64_value_errors != nil {
@@ -1185,7 +1185,7 @@ func (v Value) GetUInt16() (*uint16, []error) {
 	return result, nil
 }
 
-func (v Value) GetUInt16Value() (uint16, []error) {
+func (v *Value) GetUInt16Value() (uint16, []error) {
 	var errors []error
 	int64_value, int64_value_errors := v.GetUInt64()
 	if int64_value_errors != nil {
@@ -1213,7 +1213,7 @@ func (v Value) GetUInt16Value() (uint16, []error) {
 }
 
 
-func (v Value) GetInt32() (*int32, []error) {
+func (v *Value) GetInt32() (*int32, []error) {
 	if v.IsNil() {
 		return nil, nil
 	}
@@ -1244,7 +1244,7 @@ func (v Value) GetInt32() (*int32, []error) {
 	return result, nil
 }
 
-func (v Value) GetInt32Value() (int32, []error) {
+func (v *Value) GetInt32Value() (int32, []error) {
 	var errors []error
 	int64_value, int64_value_errors := v.GetInt64()
 	if int64_value_errors != nil {
@@ -1271,7 +1271,7 @@ func (v Value) GetInt32Value() (int32, []error) {
 	return result, nil
 }
 
-func (v Value) GetInt64Value() (int64, []error) {
+func (v *Value) GetInt64Value() (int64, []error) {
 	var errors []error
 	int64_value, int64_value_errors := v.GetInt64()
 	if int64_value_errors != nil {
@@ -1290,7 +1290,7 @@ func (v Value) GetInt64Value() (int64, []error) {
 	return result, nil
 }
 
-func (v Value) GetUInt32() (*uint32, []error) {
+func (v *Value) GetUInt32() (*uint32, []error) {
 	var errors []error
 	int64_value, int64_value_errors := v.GetUInt64()
 	if int64_value_errors != nil {
@@ -1317,7 +1317,7 @@ func (v Value) GetUInt32() (*uint32, []error) {
 	return result, nil
 }
 
-func (v Value) GetUInt32Value() (uint32, []error) {
+func (v *Value) GetUInt32Value() (uint32, []error) {
 	var errors []error
 	int64_value, int64_value_errors := v.GetUInt64()
 	if int64_value_errors != nil {
@@ -1344,7 +1344,7 @@ func (v Value) GetUInt32Value() (uint32, []error) {
 	return result, nil
 }
 
-func (v Value) GetUInt64Value() (uint64, []error) {
+func (v *Value) GetUInt64Value() (uint64, []error) {
 	var errors []error
 	int64_value, int64_value_errors := v.GetUInt64()
 	if int64_value_errors != nil {
@@ -1371,7 +1371,7 @@ func (v Value) GetUInt64Value() (uint64, []error) {
 	return result, nil
 }
 
-func (v Value) GetInt() (*int, []error) {
+func (v *Value) GetInt() (*int, []error) {
 	var errors []error
 	var result int
 	bit_size := strconv.IntSize
@@ -1404,7 +1404,7 @@ func (v Value) GetInt() (*int, []error) {
 	return &result, nil
 }
 
-func (v Value) GetIntFromMap(key string) (*int, []error) {
+func (v *Value) GetIntFromMap(key string) (*int, []error) {
 	var errors []error
 	map_value, map_value_errors := v.GetMap()
 	if map_value_errors != nil {
@@ -1418,7 +1418,7 @@ func (v Value) GetIntFromMap(key string) (*int, []error) {
 	return map_value.GetInt(key)
 }
 
-func (v Value) SetIntToMap(key string, int_value *int) ([]error) {
+func (v *Value) SetIntToMap(key string, int_value *int) ([]error) {
 	var errors []error
 	map_value, map_value_errors := v.GetMap()
 	if map_value_errors != nil {
@@ -1433,7 +1433,7 @@ func (v Value) SetIntToMap(key string, int_value *int) ([]error) {
 	return nil
 }
 
-func (v Value) SetIntValueToMap(key string, int_value int) ([]error) {
+func (v *Value) SetIntValueToMap(key string, int_value int) ([]error) {
 	var errors []error
 	map_value, map_value_errors := v.GetMap()
 	if map_value_errors != nil {
@@ -1448,7 +1448,7 @@ func (v Value) SetIntValueToMap(key string, int_value int) ([]error) {
 	return nil
 }
 
-func (v Value) GetIntValue() (int, []error) {
+func (v *Value) GetIntValue() (int, []error) {
 	var errors []error
 	int_value, int_value_errors := v.GetInt()
 	if int_value_errors != nil {
@@ -1467,7 +1467,7 @@ func (v Value) GetIntValue() (int, []error) {
 	return result, nil
 }
 
-func (v Value) AppendValue(add *Value) []error {
+func (v *Value) AppendValue(add *Value) []error {
 	var errors []error
 	if v.IsArray() {
 		array, array_errors := v.GetArray()
@@ -1490,7 +1490,7 @@ func (v Value) AppendValue(add *Value) []error {
 	return nil
 }
 
-func (v Value) AppendValueValue(add Value) []error {
+func (v *Value) AppendValueValue(add Value) []error {
 	var errors []error
 	if v.IsArray() {
 		array, array_errors := v.GetArray()

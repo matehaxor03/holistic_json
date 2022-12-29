@@ -22,6 +22,11 @@ func (m *Map) SetMap(s string, zap *Map) {
 	((*m)[s]) = &set_map_value
 }
 
+func (m *Map) SetMapValue(s string, zap Map) {
+	set_map_value := Value{"value":&zap}
+	((*m)[s]) = &set_map_value
+}
+
 func (m *Map) IsNil(s string) bool {
 	if common.IsNil(((*m)[s])) {
 		return true
@@ -130,6 +135,11 @@ func (m *Map) ToJSONString(json *strings.Builder) ([]error) {
 
 func (m *Map) SetArray(s string, array *Array) {
 	set_map_value := Value{"value":array}
+	((*m)[s]) = &set_map_value
+}
+
+func (m *Map) SetArrayValue(s string, array Array) {
+	set_map_value := Value{"value":&array}
 	((*m)[s]) = &set_map_value
 }
 

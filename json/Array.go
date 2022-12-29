@@ -5,31 +5,7 @@ import (
 	"strings"
 )
 
-type Array []interface{}
-
-func ToArray(a interface{}) (*Array, []error) {
-	if a == nil {
-		return nil, nil
-	}
-
-	var errors []error
-	array := Array{}
-	rep := fmt.Sprintf("%T", a)
-	switch rep {
-	case "*[]string": 
-		for _, value := range *(a.(*[]string)) {
-			array = append(array, value)
-		}
-	default:
-		errors = append(errors, fmt.Errorf("error: Array.ToArray: type is not supported please implement: %s", rep))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-	
-	return &array, nil
-}
+type Array [](Value)
 
 func (a Array) ToJSONString(json *strings.Builder) ([]error) {
 	var errors []error
@@ -46,7 +22,7 @@ func (a Array) ToJSONString(json *strings.Builder) ([]error) {
 		return nil
 	}
 
-	json.WriteString("[\n")
+	json.WriteString("[")
 	for i, value := range a {
 		string_conversion_error := ConvertInterfaceValueToJSONStringValue(json, value)
 		if string_conversion_error != nil {

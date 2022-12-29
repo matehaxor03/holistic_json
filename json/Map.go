@@ -8,121 +8,58 @@ import (
 	common "github.com/matehaxor03/holistic_common/common"
 )
 
-type Map map[string]interface{}
+type Map map[string](Value)
 
 func (m Map) GetMap(s string) (*Map, []error) {
-	var errors []error
 	if m.IsNil(s) {
 		return nil, nil
 	}
 
-	var result *Map
-	rep := fmt.Sprintf("%T", m[s])
-	switch rep {
-	case "json.Map":
-		value := m[s].(Map)
-		result = &value
-	case "*json.Map":
-		value := *(m[s].(*Map))
-		result = &value
-	default:
-		errors = append(errors, fmt.Errorf("error: Map.M: type %s is not supported please implement for key %s", rep, s))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	return result, nil
+	return m[s].GetMap()
 }
 
 func (m Map) SetMap(s string, zap *Map) {
-	m[s] = zap
+	m[s] = Value{"value":zap}
 }
 
 func (m Map) SetMapValue(s string, zap Map) {
-	m[s] = &zap
+	m[s] = Value{"value":zap}
 }
 
 func (m Map) IsNil(s string) bool {
-	if m[s] == nil {
+	if common.IsNil(m[s]) {
 		return true
 	}
 
-	string_value := fmt.Sprintf("%s", m[s])
-
-	if string_value == "<nil>" {
-		return true
-	}
-
-	rep := fmt.Sprintf("%T", m[s])
-
-	if string_value == "%!s("+rep+"=<nil>)" {
-		return true
-	}
-
-	return false
+	return m[s].IsNil()
 }
 
 func (m Map) IsBool(s string) bool {
-	type_of := m.GetType(s)
-	if type_of == "bool" || type_of == "*bool" {
-		return true
+	if common.IsNil(s) {
+		return false
 	}
-
-	return false
+	return m[s].IsBool()
 }
 
 func (m Map) IsArray(s string) bool {
-	type_of := m.GetType(s)
-	if type_of == "json.Array" || type_of == "*json.Array" {
-		return true
+	if common.IsNil(s) {
+		return false
 	}
-
-	return false
+	return m[s].IsArray()
 }
 
 func (m Map) IsEmptyString(s string) bool {
 	if m.IsNil(s) {
 		return false
 	}
-
-	type_of := m.GetType(s)
-	if type_of == "string" || type_of == "*string" {
-		string_value, _ := m.GetString(s)
-		return *string_value == ""
-	}
-
-	return false
+	return m[s].IsEmptyString()
 }
 
-func (m Map) IsNumber(s string) bool {
-	type_of := m.GetType(s)
-	switch type_of {
-	case "*int", 
-		  "int",
-		  "*uint", 
-		  "uint",
-		  "*int64",
-		  "int64",
-		  "*uint64",
-		  "uint64",
-		  "*int32",
-		  "int32",
-		  "*uint32",
-		  "uint32",
-		  "*int16",
-		  "int16",
-		  "*uint16",
-		  "uint16",
-		  "*int8",
-		  "int8",
-		  "*uint8",
-		  "uint8":
-		return true
-	default: 
+func (m Map) IsInteger(s string) bool {
+	if common.IsNil(m[s]) {
 		return false
 	}
+	return m[s].IsInteger()
 }
 
 func (m Map) IsString(s string) bool {
@@ -130,12 +67,7 @@ func (m Map) IsString(s string) bool {
 		return false
 	}
 
-	type_of := m.GetType(s)
-	if type_of == "string" || type_of == "*string" {
-		return true
-	}
-
-	return false
+	return m[s].IsString()
 }
 
 func (m Map) IsMap(s string) bool {
@@ -143,12 +75,7 @@ func (m Map) IsMap(s string) bool {
 		return false
 	}
 
-	type_of := m.GetType(s)
-	if type_of == "*json.Map" || type_of == "json.Map" {
-		return true
-	}
-
-	return false
+	return m[s].IsMap()
 }
 
 func (m Map) IsBoolTrue(s string) bool {
@@ -218,185 +145,61 @@ func (m Map) ToJSONString(json *strings.Builder) ([]error) {
 }
 
 func (m Map) SetArray(s string, array *Array) {
-	m[s] = array
+	m[s] = Value{"value":array}
 }
 
-func (m Map) SetErrors(s string, errors *[]error) {
-	if errors == nil {
-		m[s] = nil
-		return
-	}
-
-	m[s] = errors
+func (m Map) SetErrors(s string, errors []error) {
+	m[s] = Value{"value":errors}
 }
 
 
 func (m Map) GetErrors(s string) ([]error, []error) {
-	if m[s] == nil {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
-
-	var errors []error
-	var result []error
-	rep := fmt.Sprintf("%T", m[s])
-	switch rep {
-	case "*[]error":
-		result = *(m[s].(*[]error))
-	case "[]error":
-		result = m[s].([]error)
-	case "*[]string":
-		string_array := m[s].(*[]string)
-		for _, string_array_value := range *string_array {
-			converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
-			if converted_errors != nil {
-				errors = append(errors, converted_errors...)
-			} else {
-				result = append(result, fmt.Errorf("%s", *converted))
-			}
-		}
-	case "[]string":
-		string_array := m[s].([]string)
-		for _, string_array_value := range string_array {
-			converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
-			if converted_errors != nil {
-				errors = append(errors, converted_errors...)
-			} else {
-				result = append(result, fmt.Errorf("%s", *converted))
-			}
-		}
-	case "json.Array":
-		string_array := m[s].(Array)
-		for _, string_array_value := range string_array {
-			converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
-			if converted_errors != nil {
-				errors = append(errors, converted_errors...)
-			} else {
-				result = append(result, fmt.Errorf("%s", *converted))
-			}
-		}
-	case "*json.Array":
-		string_array := m[s].(*Array)
-		for _, string_array_value := range *string_array {
-			converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
-			if converted_errors != nil {
-				errors = append(errors, converted_errors...)
-			} else {
-				result = append(result, fmt.Errorf("%s", *converted))
-			}
-		}
-	default:
-		errors = append(errors, fmt.Errorf("error: Map.GetErrors: type %s is not supported please implement for field: %s", rep, s))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	return result, nil
+	return m[s].GetErrors()
 }
 
 func (m Map) GetType(s string) string {
-	if m.IsNil(s) {
+	if common.IsNil(m[s]) {
 		return "nil"
 	}
 	
-	return fmt.Sprintf("%T", m[s])
+	return m[s].GetType()
 }
 
-func (m Map) Func(s string) func(Map) []error {
-	if m[s] == nil {
-		return nil
+func (m Map) Func(s string) (func(Map) []error, []error) {
+	if common.IsNil(m[s]) {
+		return nil, nil
 	}
-
-	rep := fmt.Sprintf("%T", m[s])
-	switch rep {
-	case "func(json.Map) []error":
-		return m[s].(func(Map) []error)
-	case "*func(json.Map) []error":
-		value := m[s].(*func(Map) []error)
-		return *value
-	default:
-		panic(fmt.Errorf("error: Map.Func: type %s is not supported please implement for field: %s", rep, s))
-	}
-
-	return nil
+	return m[s].GetFunc()
 }
 
 func (m Map) SetFunc(s string, function func(Map) []error) {
-	m[s] = function
+	m[s] = Value{"value":function}
 }
 
 func (m Map) GetArray(s string) (*Array, []error) {
-	if m[s] == nil || m.IsNil(s) {
+	if common.IsNil(m[s]){
 		return nil, nil
 	}
 
-	var errors []error
-	var result *Array
-
-	rep := fmt.Sprintf("%T", m[s])
-	switch rep {
-	case "*json.Array":
-		result = m[s].(*Array)
-	case "json.Array":
-		temp := m[s].(Array)
-		result = &temp
-	default:
-		errors = append(errors, fmt.Errorf("error: Map.GetArray: type %s is not supported please implement for field: %s", rep, s))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	return result, nil
+	return m[s].GetArray()
 }
 
 func (m Map) GetString(s string) (*string, []error) {
-	if m[s] == nil {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
-
-	var errors []error
-	var result *string
-	rep := fmt.Sprintf("%T", m[s])
-	switch rep {
-	case "string":
-		value := m[s].(string)
-		newValue := strings.Clone(value)
-		result = &newValue
-	case "*string":
-		if fmt.Sprintf("%s", m[s]) != "%!s(*string=<nil>)" {
-			s := strings.Clone(*((m[s]).(*string)))
-			result = &s
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetString: *string value is null for attribute: %s", rep, s))
-		}
-	default:
-		errors = append(errors, fmt.Errorf("error: Map.GetString: type %s is not supported please implement for attribute: %s", rep, s))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	return result, nil
+	return m[s].GetString()
 }
 
 func (m Map) IsFloat(s string) (bool) {
-	if m.IsNil(s) {
+	if common.IsNil(m[s]) {
 		return false
 	}
 
-	type_of := m.GetType(s)
-	if type_of == "float32" || 
-	   type_of == "*float32" || 
-	   type_of == "float64" || 
-	   type_of == "*float64" {
-		return true
-	}
-
-	return false
+	return m[s].IsFloat()
 }
 
 func (m Map) GetStringValue(s string) (string, []error) {
@@ -478,45 +281,7 @@ func (m Map) GetFloat64(s string) (*float64, []error) {
 		return nil, nil
 	}
 
-	var errors []error
-	var result *float64
-	rep := fmt.Sprintf("%T", m[s])
-	switch rep {
-	case "float64":
-		value := m[s].(float64)
-		result = &value
-	case "*float64":
-		value := *(m[s].(*float64))
-		result = &value
-	case "*string":
-		value, value_error := strconv.ParseFloat((*(m[s].(*string))),64)
-		if value_error != nil {
-			errors = append(errors, fmt.Errorf("error: Map.GetFloat64: cannot convert *string value to float64"))
-		} else {
-			result = &value
-		}
-	case "string":
-		value, value_error := strconv.ParseFloat((m[s].(string)), 64)
-		if value_error != nil {
-			errors = append(errors, fmt.Errorf("error: Map.GetFloat64: cannot convert *string value to float64"))
-		} else {
-			result = &value
-		}
-	case "float32":
-		value := float64(m[s].(float32))
-		result = &value
-	case "*float32":
-		value := float64(*(m[s].(*float32)))
-		result = &value
-	default:
-		errors = append(errors, fmt.Errorf("error: Map.GetFloat64: type %s is not supported please implement for attribute: %s", rep, s))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	return result, nil
+	return m[s].GetFloat64()
 }
 
 func (m Map) GetRunes(s string) (*[]rune, []error) {
@@ -524,35 +289,7 @@ func (m Map) GetRunes(s string) (*[]rune, []error) {
 		return nil, nil
 	}
 
-	var errors []error
-	var result *string
-	rep := fmt.Sprintf("%T", m[s])
-	switch rep {
-	case "string":
-		value := m[s].(string)
-		newValue := strings.Clone(value)
-		result = &newValue
-	case "*string":
-		if fmt.Sprintf("%s", m[s]) != "%!s(*string=<nil>)" {
-			s := strings.Clone(*((m[s]).(*string)))
-			result = &s
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetString: *string value is null for attribute: %s", rep, s))
-		}
-	default:
-		errors = append(errors, fmt.Errorf("error: Map.GetString: type %s is not supported please implement for attribute: %s", rep, s))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	var runes []rune
-	for _, runeValue := range *result {
-		runes = append(runes, runeValue)
-	}
-
-	return &runes, nil
+	return m[s].GetRunes()
 }
 
 func (m Map) GetObject(s string) interface{} {
@@ -567,92 +304,31 @@ func (m Map) GetObject(s string) interface{} {
 }
 
 func (m Map) SetObject(s string, object interface{}) {
-	m[s] = object
+	m[s] = Value{"value":object}
 }
 
 func (m Map) GetBool(s string) (*bool, []error) {
-	if m[s] == nil {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
 
-	var result *bool
-	var errors []error
-
-	rep := fmt.Sprintf("%T", m[s])
-	switch rep {
-	case "bool":
-		value := m[s].(bool)
-		result = &value
-		break
-	case "*bool":
-		if fmt.Sprintf("%s", m[s]) != "%!s(*bool=<nil>)" {
-			value := *((m[s]).(*bool))
-			result = &value
-		} else {
-			return nil, nil
-		}
-		break
-	case "*string":
-		if fmt.Sprintf("%s", m[s]) != "%!s(*string=<nil>)" {
-			value := *((m[s]).(*string))
-			if value == "1" {
-				boolean_result := true
-				result = &boolean_result
-			} else if value == "0" {
-				boolean_result := false
-				result = &boolean_result
-			} else {
-				errors = append(errors, fmt.Errorf("error: Map.GetBool: unknown value for *string: %s", value))
-				result = nil
-			}
-		} else {
-			return nil, nil
-		}
-		break
-	case "string":
-		value := ((m[s]).(string))
-		if value == "1" {
-			boolean_result := true
-			result = &boolean_result
-		} else if value == "0" {
-			boolean_result := false
-			result = &boolean_result
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetBool: unknown value for string: %s", value))
-			result = nil
-		}
-	default:
-		errors = append(errors, fmt.Errorf("error: Map.GetBool: type %s is not supported please implement", rep))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	return result, nil
+	return m[s].GetBool()
 }
 
 func (m Map) SetBool(s string, value *bool) {
-	m[s] = value
+	m[s] = Value{"value":value}
 }
 
 func (m Map) SetString(s string, value *string) {
-	if value == nil {
-		m[s] = nil
-		return 
-	}
-
-	clone_string := cloneString(value)
-	m[s] = clone_string
+	m[s] = Value{"value":value}
 }
 
 func (m Map) SetStringValue(s string, value string) {
-	clone_string := cloneString(&value)
-	m[s] = clone_string
+	m[s] = Value{"value":value}
 }
 
 func (m Map) SetNil(s string) {
-	m[s] = nil
+	m[s] = Value{"value":nil}
 }
 
 func (m Map) Keys() []string {
@@ -686,101 +362,11 @@ func (m Map) RemoveKey(key string) (*bool, []error) {
 }
 
 func (m Map) GetInt64(s string) (*int64, []error) {
-	var errors []error
-	var temp_value int64
-
-	if m[s] == nil || m.IsNil(s) {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
 
-	rep := fmt.Sprintf("%T", m[s])
-	switch rep {
-		case "*int64":
-			x := m[s].(*int64)
-			temp_value = int64(*x)
-		case "int64":
-			x := m[s].(int64)
-			temp_value = x
-		case "*int32":
-			x := m[s].(*int32)
-			temp_value = int64(*x)
-		case "int32":
-			x := m[s].(int32)
-			temp_value = int64(x)
-		case "*int16":
-			x := m[s].(*int16)
-			temp_value = int64(*x)
-		case "int16":
-			x := m[s].(int16)
-			temp_value = int64(x)
-		case "*int8":
-			x := m[s].(*int8)
-			temp_value = int64(*x)
-		case "int8":
-			x := m[s].(int8)
-			temp_value = int64(x)
-		case "int":
-			x := m[s].(int)
-			temp_value = int64(x)
-		case "*int":
-			x := m[s].(*int)
-			temp_value = int64(*x)
-		case "*uint64":
-			x := m[s].(*uint64)
-			if *x > 9223372036854775807 {
-				errors = append(errors, fmt.Errorf("%d is greater than 9223372036854775807", *x))
-			} else {
-				temp_value = int64(*x)
-			}
-		case "uint64":
-			x := m[s].(uint64)
-			if x > 9223372036854775807 {
-				errors = append(errors, fmt.Errorf("%d is greater than 9223372036854775807", x))
-			} else {
-				temp_value = int64(x)
-			}
-		case "*uint32":
-			x := m[s].(*uint32)
-			temp_value = int64(*x)
-		case "uint32":
-			x := m[s].(uint32)
-			temp_value = int64(x)
-		case "*uint16":
-			x := m[s].(*uint16)
-			temp_value = int64(*x)
-		case "uint16":
-			x := m[s].(uint16)
-			temp_value = int64(x)
-		case "*uint8":
-			x := m[s].(*uint8)
-			temp_value = int64(*x)
-		case "uint8":
-			x := m[s].(uint8)
-			temp_value = int64(x)
-		case "*uint":
-			x := m[s].(*uint)
-			temp_value = int64(*x)
-		case "uint":
-			x := m[s].(uint)
-			temp_value = int64(x)
-		case "*string":
-			value, value_error := strconv.ParseInt((*(m[s].(*string))), 10, 64)
-			if value_error != nil {
-				errors = append(errors, fmt.Errorf("error: Map.GetInt64: cannot convert *string value to int64"))
-			} else {
-				temp_value = value
-			}
-		default:
-			errors = append(errors, fmt.Errorf("error: Map.GetInt64: type %s is not supported please implement", rep))
-	}
-	
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	result := &temp_value
-
-	return result, nil
+	return m[s].GetInt64()
 }
 
 func (m Map) GetInt8(s string) (*int8, []error) {
@@ -1212,250 +798,121 @@ func (m Map) GetIntValue(s string) (int, []error) {
 }
 
 func (m Map) SetInt(s string, v *int) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetInt64(s string, v *int64) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetInt32(s string, v *int32) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetInt16(s string, v *int16) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetInt8(s string, v *int8) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
-///
-
 func (m Map) SetIntValue(s string, v int) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetInt64Value(s string, v int64) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetInt32Value(s string, v int32) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetInt16Value(s string, v int16) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetInt8Value(s string, v int8) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 ///
 
 func (m Map) SetUInt(s string, v *uint) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetUInt64(s string, v *uint64) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetUInt32(s string, v *uint32) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetUInt16(s string, v *uint16) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetUInt8(s string, v *uint8) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
-///
-
 func (m Map) SetUIntValue(s string, v uint) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetUInt64Value(s string, v uint64) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetUInt32Value(s string, v uint32) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetUInt16Value(s string, v uint16) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetUInt8Value(s string, v uint8) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
-///
-
-
 func (m Map) SetFloat64(s string, v *float64) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetFloat64Value(s string, v float64) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetFloat32(s string, v *float32) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) SetFloat32Value(s string, v float32) {
-	m[s] = v
+	m[s] = Value{"value":v}
 }
 
 func (m Map) GetUInt64(s string) (*uint64, []error) {
-	var errors []error
-	if m[s] == nil || m.IsNil(s) {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
 
-	var uint64_value uint64
-	rep := fmt.Sprintf("%T", m[s])
-	switch rep {
-	case "*int64":
-		x := *(m[s].(*int64))
-		if x >= 0 {
-			uint64_value = uint64(x)
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
-		}
-	case "int64":
-		x := m[s].(int64)
-		if x >= 0 {
-			uint64_value = uint64(x)
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
-		}
-	case "*int32":
-		x := *(m[s].(*int32))
-		if x >= 0 {
-			uint64_value = uint64(x)
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
-		}
-	case "int32":
-		x := m[s].(int32)
-		if x >= 0 {
-			uint64_value = uint64(x)
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
-		}
-	case "*int16":
-		x := *(m[s].(*int16))
-		if x >= 0 {
-			uint64_value = uint64(x)
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
-		}
-	case "int16":
-		x := m[s].(int16)
-		if x >= 0 {
-			uint64_value = uint64(x)
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
-		}
-	case "*int8":
-		x := *(m[s].(*int8))
-		if x >= 0 {
-			uint64_value = uint64(x)
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
-		}
-	case "int8":
-		x := m[s].(int8)
-		if x >= 0 {
-			uint64_value = uint64(x)
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
-		}
-	case "int":
-		x := (m[s].(int))
-		if x >= 0 {
-			uint64_value = uint64(x)
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
-		}
-	case "*int":
-		x := *(m[s].(*int))
-		if x >= 0 {
-			uint64_value = uint64(x)
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert negative numbers for uint64"))
-		}
-	case "uint":
-		uint_value := (m[s].(uint))
-		uint64_value = uint64(uint_value)
-	case "*uint":
-		uint_value := *((m[s].(*uint)))
-		uint64_value = uint64(uint_value)
-	case "*uint64":
-		uint64_value = *(m[s].(*uint64))
-	case "uint64":
-		uint64_value = (m[s].(uint64))
-	case "*uint32":
-		x := *(m[s].(*uint32))
-		uint64_value = uint64(x)
-	case "uint32":
-		x := (m[s].(uint32))
-		uint64_value = uint64(x)
-	case "*uint16":
-		x := *(m[s].(*uint16))
-		uint64_value = uint64(x)
-	case "uint16":
-		x := (m[s].(uint16))
-		uint64_value = uint64(x)
-	case "*uint8":
-		x := *(m[s].(*uint8))
-		uint64_value = uint64(x)
-	case "uint8":
-		x := (m[s].(uint8))
-		uint64_value = uint64(x)
-	case "*string":
-		string_value := (m[s].(*string))
-		if *string_value == "NULL" {
-			return nil, nil
-		} else {
-			value, value_error := strconv.ParseUint(*string_value, 10, 64)
-			if value_error != nil {
-				errors = append(errors, fmt.Errorf("error: Map.GetUInt64: cannot convert *string value to uint64"))
-			} else {
-				uint64_value = value
-			}
-		}
-	default:
-		errors = append(errors, fmt.Errorf("error: Map.GetUInt64: type %s is not supported please implement", rep))
-	}
-
-	if len(errors) > 0 {
-		return nil, errors
-	}
-
-	return &uint64_value, nil
+	return m[s].GetUInt64()
 }
-
+	
 func (m Map) SetTime(s string, value *time.Time) {
-	m[s] = value
+	m[s] = Value{"value":value}
 }
 
 func (m Map) GetTime(s string, decimal_places int) (*time.Time, []error) {
-	if m[s] == nil {
+	if common.IsNil(m[s]) {
 		return nil, nil
 	}
 
-	return common.GetTime(m[s], decimal_places)
+	return m[s].GetTime(decimal_places)
 }
 
 func (m Map) Values() Array {

@@ -8,6 +8,7 @@ import (
 	"net/url"
 	"time"
 	"os/exec"
+	common "github.com/matehaxor03/holistic_common/common"
 )
 
 func cloneString(value *string) *string {
@@ -48,7 +49,7 @@ func ParseJSON(s string) (*Map, []error) {
 	}
 
 	runes := []rune(s)
-	metrics := Map{"{":0, "}":0, "[":0, "]":0, "opening_quote":0,"closing_quote":0}
+	metrics := Map{"{":Value{"value":0}, "}":Value{"value":0}, "[":Value{"value":0}, "]":Value{"value":0}, "opening_quote":Value{"value":0},"closing_quote":Value{"value":0}}
 	mode := "looking_for_keys"
 	parent_map := Map{}
 	list := list.New()
@@ -254,7 +255,7 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 						list.Front().Value.(*Map).SetMap(temp_key, &new_map)	
 					} else {
 						temp_array := list.Front().Value.(*Array)
-						*temp_array = append(*temp_array, &new_map)
+						*temp_array = append(*temp_array, Value{"value":&new_map})
 					} 
 					list.PushFront(&new_map)
 
@@ -270,7 +271,7 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 						list.Front().Value.(*Map).SetArray(temp_key, &new_array)	
 					} else {
 						temp_array := list.Front().Value.(*Array)
-						*temp_array = append(*temp_array, &new_array)
+						*temp_array = append(*temp_array, Value{"value":&new_array})
 					} 
 					list.PushFront(&new_array)
 
@@ -604,69 +605,106 @@ func parseJSONValue(temp_key string, temp_value string, list *list.List) []error
 		errors = append(errors, fmt.Errorf("error: data_type is unknown please implement"))
 	}
 
+	if len(errors) > 0 {
+		return errors
+	}
+
+	front_value := list.Front().Value
+	type_of_front := fmt.Sprintf("%T", front_value) 
+	
+	var value_obj Value
+	if type_of_front == "json.Value" {
+		value_obj = front_value.(Value)
+	} else if type_of_front == "*json.Value" {
+		value_obj = (*front_value.(*Value))
+	} else {
+		errors = append(errors, fmt.Errorf("error: front of list was not of type json.Value"))
+	}
 
 	if len(errors) > 0 {
 		return errors
 	}
 
-	if fmt.Sprintf("%T", list.Front().Value) == "*json.Array" {
-		data_array := list.Front().Value.(*Array)
+	if value_obj.IsArray() {
+		value_as_array, value_as_array_errors := value_obj.GetArray()
+		if value_as_array_errors != nil {
+			errors = append(errors, value_as_array_errors...)
+		} else if common.IsNil(value_as_array) {
+			errors = append(errors, fmt.Errorf("json.parseJSONValue array is nil"))
+		}
+
+		if len(errors) > 0 {
+			return errors
+		}
+
 		if data_type == "string" {
-			*data_array = append(*data_array, string_value)
+			*value_as_array = append(*value_as_array, Value{"value":string_value})
 		} else if data_type == "bool" {
-			*data_array = append(*data_array, boolean_value)
+			*value_as_array = append(*value_as_array, Value{"value":boolean_value})
 		} else if data_type == "null" {
-			*data_array = append(*data_array, nil)
+			*value_as_array = append(*value_as_array, Value{"value":nil})
 		} else if data_type == "float64" {
-			*data_array = append(*data_array, float64_value)
+			*value_as_array = append(*value_as_array, Value{"value":float64_value})
 		} else if data_type == "float32" {
-			*data_array = append(*data_array, float32_value)
+			*value_as_array = append(*value_as_array, Value{"value":float32_value})
 		} else if data_type == "int8" {
-			*data_array = append(*data_array, int8_value)
+			*value_as_array = append(*value_as_array, Value{"value":int8_value})
 		} else if data_type == "int16" {
-			*data_array = append(*data_array, int16_value)
+			*value_as_array = append(*value_as_array, Value{"value":int16_value})
 		} else if data_type == "int32" {
-			*data_array = append(*data_array, int32_value)
+			*value_as_array = append(*value_as_array, Value{"value":int32_value})
 		}  else if data_type == "int64" {
-			*data_array = append(*data_array, int64_value)
+			*value_as_array = append(*value_as_array, Value{"value":int64_value})
 		} else if data_type == "uint8" {
-			*data_array = append(*data_array, uint8_value)
+			*value_as_array = append(*value_as_array, Value{"value":uint8_value})
 		} else if data_type == "uint16" {
-			*data_array = append(*data_array, uint16_value)
+			*value_as_array = append(*value_as_array, Value{"value":uint16_value})
 		} else if data_type == "uint32" {
-			*data_array = append(*data_array, uint32_value)
+			*value_as_array = append(*value_as_array, Value{"value":uint32_value})
 		} else if data_type == "uint64" {
-			*data_array = append(*data_array, uint64_value)
+			*value_as_array = append(*value_as_array,  Value{"value":uint64_value})
 		}
 	}
 
-	if fmt.Sprintf("%T", list.Front().Value) == "*json.Map" {
+	
+	if value_obj.IsMap() {
+		value_as_map, value_as_map_errors := value_obj.GetMap()
+		if value_as_map_errors != nil {
+			errors = append(errors, value_as_map_errors...)
+		} else if common.IsNil(value_as_map) {
+			errors = append(errors, fmt.Errorf("json.parseJSONValue map is nil"))
+		}
+
+		if len(errors) > 0 {
+			return errors
+		}
+
 		if data_type == "string" {
-			list.Front().Value.(*Map).SetString(temp_key, string_value)
+			value_as_map.SetString(temp_key, string_value)
 		} else if data_type == "bool" {
-			list.Front().Value.(*Map).SetBool(temp_key, boolean_value)
+			value_as_map.SetBool(temp_key, boolean_value)
 		} else if data_type == "null" {
-			list.Front().Value.(*Map).SetNil(temp_key)
+			value_as_map.SetNil(temp_key)
 		} else if data_type == "float64" {
-			list.Front().Value.(*Map).SetFloat64(temp_key, float64_value)
+			value_as_map.SetFloat64(temp_key, float64_value)
 		} else if data_type == "float32" {
-			list.Front().Value.(*Map).SetFloat32(temp_key, float32_value)
+			value_as_map.SetFloat32(temp_key, float32_value)
 		} else if data_type == "int8" {
-			list.Front().Value.(*Map).SetInt8(temp_key, int8_value)
+			value_as_map.SetInt8(temp_key, int8_value)
 		} else if data_type == "int16" {
-			list.Front().Value.(*Map).SetInt16(temp_key, int16_value)
+			value_as_map.SetInt16(temp_key, int16_value)
 		} else if data_type == "int32" {
-			list.Front().Value.(*Map).SetInt32(temp_key, int32_value)
+			value_as_map.SetInt32(temp_key, int32_value)
 		} else if data_type == "int64" {
-			list.Front().Value.(*Map).SetInt64(temp_key, int64_value)
+			value_as_map.SetInt64(temp_key, int64_value)
 		} else if data_type == "uint8" {
-			list.Front().Value.(*Map).SetUInt8(temp_key, uint8_value)
+			value_as_map.SetUInt8(temp_key, uint8_value)
 		} else if data_type == "uint16" {
-			list.Front().Value.(*Map).SetUInt16(temp_key, uint16_value)
+			value_as_map.SetUInt16(temp_key, uint16_value)
 		} else if data_type == "uint32" {
-			list.Front().Value.(*Map).SetUInt32(temp_key, uint32_value)
+			value_as_map.SetUInt32(temp_key, uint32_value)
 		} else if data_type == "uint64" {
-			list.Front().Value.(*Map).SetUInt64(temp_key, uint64_value)
+			value_as_map.SetUInt64(temp_key, uint64_value)
 		}
 	}
 

@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-type Value map[string]interface{}
+type Value map[string](interface{})
 
 func (v Value) GetMap() (*Map, []error) {
 	if v.IsNil() {
@@ -18,9 +18,7 @@ func (v Value) GetMap() (*Map, []error) {
 	var errors []error
 	var result Map
 	type_of := v.GetType()
-	if type_of == "json.Map" {
-		result = (v["value"]).(Map)
-	} else if type_of == "*json.Map" {
+	if type_of == "*json.Map" {
 		result = *((v["value"]).(*Map))
 	} else {
 		errors = append(errors, fmt.Errorf("%s failed to unbox to json.Map", type_of))
@@ -30,7 +28,7 @@ func (v Value) GetMap() (*Map, []error) {
 	return &result, nil
 }
 
-func (v Value) SetMap(s string, m *Map) []error {
+func (v Value) SetMap(s string, value *Map) []error {
 	var errors []error
 	if v.IsMap() {
 		temp_map, temp_map_errors := v.GetMap()
@@ -39,7 +37,8 @@ func (v Value) SetMap(s string, m *Map) []error {
 		} else if common.IsNil(temp_map) {
 			errors = append(errors, fmt.Errorf("Value.SetMap map is nil"))
 		} else {
-			(*temp_map)[s] = Value{"value": m}
+			set_map_value := Value{"value":value}
+			(*temp_map)[s] = &set_map_value
 		}
 	} else {
 		errors = append(errors, fmt.Errorf("Value.SetMap cannot set map on type %s", v.GetType()))
@@ -52,7 +51,7 @@ func (v Value) SetMap(s string, m *Map) []error {
 	return nil
 }
 
-func (v Value) SetValue(s string, m *Value) []error {
+func (v Value) SetValue(s string, value *Value) []error {
 	var errors []error
 	if v.IsMap() {
 		temp_map, temp_map_errors := v.GetMap()
@@ -61,7 +60,8 @@ func (v Value) SetValue(s string, m *Value) []error {
 		} else if common.IsNil(temp_map) {
 			errors = append(errors, fmt.Errorf("Value.SetMap map is nil"))
 		} else {
-			(*temp_map)[s] = *m
+			set_map_value := value
+			(*temp_map)[s] = set_map_value
 		}
 	} else {
 		errors = append(errors, fmt.Errorf("Value.SetMap cannot set map on type %s", v.GetType()))
@@ -74,15 +74,7 @@ func (v Value) SetValue(s string, m *Value) []error {
 	return nil
 }
 
-func (v Value) SetValueValue(s string, m Value) []error {
-	return v.SetValue(s, &m)
-}
-
-func (v Value) SetMapValue(s string, m Map) []error {
-	return v.SetMap(s, &m)
-}
-
-func (v Value) SetArray(s string, a *Array) []error {
+func (v Value) SetArray(s string, value *Array) []error {
 	var errors []error
 	if v.IsMap() {
 		temp_map, temp_map_errors := v.GetMap()
@@ -91,7 +83,8 @@ func (v Value) SetArray(s string, a *Array) []error {
 		} else if common.IsNil(temp_map) {
 			errors = append(errors, fmt.Errorf("Value.SetMap map is nil"))
 		} else {
-			(*temp_map)[s] = Value{"value": a}
+			set_value := Value{"value":value}
+			(*temp_map)[s] = &set_value
 		}
 	} else {
 		errors = append(errors, fmt.Errorf("Value.SetArray cannot set arrary on type %s", v.GetType()))
@@ -222,14 +215,12 @@ func (v Value) GetArray() (*Array, []error) {
 	}
 
 	var errors []error
-	var result Array
+	var result *Array
 
 	rep := v.GetType()
 	switch rep {
 	case "*json.Array":
-		result = *(v["value"].(*Array))
-	case "json.Array":
-		result = v["value"].(Array)
+		result = v["value"].(*Array)
 	default:
 		errors = append(errors, fmt.Errorf("error: Value.GetArray: type %s is not supported please implement", rep))
 	}
@@ -238,7 +229,7 @@ func (v Value) GetArray() (*Array, []error) {
 		return nil, errors
 	}
 
-	return &result, nil
+	return result, nil
 }
 
 func (v Value) GetArrayOfInt8() (*[](*int8), []error) {
@@ -487,15 +478,9 @@ func (v Value) GetString() (*string, []error) {
 	switch rep {
 	case "string":
 		value := v["value"].(string)
-		newValue := strings.Clone(value)
-		result = &newValue
+		result = &value
 	case "*string":
-		if fmt.Sprintf("%s", v["value"]) != "%!s(*string=<nil>)" {
-			s := strings.Clone(*((v["value"]).(*string)))
-			result = &s
-		} else {
-			errors = append(errors, fmt.Errorf("error: Map.GetString: *string value is null for attribute: %s", rep))
-		}
+		result = v["value"].(*string)
 	default:
 		errors = append(errors, fmt.Errorf("error: Map.GetString: type %s is not supported please implement for attribute: %s", rep))
 	}
@@ -1491,7 +1476,8 @@ func (v Value) AppendValue(add *Value) []error {
 		} else if common.IsNil(array) {
 			errors = append(errors, fmt.Errorf("Value.AppendValue array is nil"))
 		} else {
-			*array = append(*array, *add)
+			add_value := add
+			*array = append(*array, add_value)
 		}
 	} else {
 		errors = append(errors, fmt.Errorf("Value.AppendValue not supported for type %s", v.GetType()))
@@ -1503,3 +1489,27 @@ func (v Value) AppendValue(add *Value) []error {
 
 	return nil
 }
+
+func (v Value) AppendValueValue(add Value) []error {
+	var errors []error
+	if v.IsArray() {
+		array, array_errors := v.GetArray()
+		if array_errors != nil {
+			errors = append(errors, array_errors...)
+		} else if common.IsNil(array) {
+			errors = append(errors, fmt.Errorf("Value.AppendValue array is nil"))
+		} else {
+			add_value := add
+			*array = append(*array, &add_value)
+		}
+	} else {
+		errors = append(errors, fmt.Errorf("Value.AppendValue not supported for type %s", v.GetType()))
+	}
+
+	if len(errors) > 0 {
+		return errors
+	}
+
+	return nil
+}
+

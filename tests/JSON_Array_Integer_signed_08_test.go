@@ -10,7 +10,7 @@ func TestCanParseArrayContainingSingleInt8LowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Array" {
+	} else if !json_obj.IsArray("key") {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfInt8("key") 
@@ -32,7 +32,7 @@ func TestCanParseMultipleArraysContainingSingleInt8LowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Array" {
+	} else if !json_obj.IsArray("key") {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfInt8("key") 
@@ -50,7 +50,7 @@ func TestCanParseMultipleArraysContainingSingleInt8LowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key2") != "*json.Array" {
+	} else if !json_obj.IsArray("key2") {
 		t.Errorf("key2 is not a *json.Array: %s", json_obj.GetType("key2"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfInt8("key2") 
@@ -72,7 +72,7 @@ func TestCanParseMultipleArraysContainingMultipleInt8LowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Array" {
+	} else if !json_obj.IsArray("key") {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfInt8("key") 
@@ -92,7 +92,7 @@ func TestCanParseMultipleArraysContainingMultipleInt8LowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key2") != "*json.Array" {
+	} else if !json_obj.IsArray("key2") {
 		t.Errorf("key2 is not a *json.Array: %s", json_obj.GetType("key2"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfInt8("key2") 
@@ -116,7 +116,7 @@ func TestCanParseArrayContainingMultipleInt8LowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Array" {
+	} else if !json_obj.IsArray("key") {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfInt8("key") 
@@ -141,7 +141,7 @@ func TestCanParseArrayContainingSingleInt8HighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Array" {
+	} else if !json_obj.IsArray("key") {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfInt8("key") 
@@ -163,7 +163,7 @@ func TestCanParseMultipleArraysContainingSingleHighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Array" {
+	} else if !json_obj.IsArray("key") {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfInt8("key") 
@@ -181,7 +181,7 @@ func TestCanParseMultipleArraysContainingSingleHighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key2") != "*json.Array" {
+	} else if !json_obj.IsArray("key2") {
 		t.Errorf("key2 is not a *json.Array: %s", json_obj.GetType("key2"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfInt8("key2") 
@@ -203,7 +203,7 @@ func TestCanParseMultipleArraysContainingMultipleHighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Array" {
+	} else if !json_obj.IsArray("key") {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfInt8("key") 
@@ -223,7 +223,7 @@ func TestCanParseMultipleArraysContainingMultipleHighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key2") != "*json.Array" {
+	} else if !json_obj.IsArray("key2") {
 		t.Errorf("key2 is not a *json.Array: %s", json_obj.GetType("key2"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfInt8("key2") 
@@ -236,8 +236,8 @@ func TestCanParseMultipleArraysContainingMultipleHighBoundary(t *testing.T) {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
 		} else if *((*value)[0]) != -126 {
 			t.Errorf("expected \"value\" actual: %d", *((*value)[0]))
-		} else if *((*value)[0]) != -125 {
-			t.Errorf("expected \"value\" actual: %d", *((*value)[0]))
+		} else if *((*value)[1]) != -125 {
+			t.Errorf("expected \"value\" actual: %d", *((*value)[1]))
 		}
 	}
 }
@@ -247,7 +247,7 @@ func TestCanParseArrayContainingMultipleInt8HighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Array" {
+	} else if !json_obj.IsArray("key") {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfInt8("key") 

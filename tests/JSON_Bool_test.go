@@ -65,7 +65,7 @@ func TestCanParseMultipleBools(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key2") != "*bool" {
+	} else if json_obj.GetType("key2") != "bool" {
 		t.Errorf("key2 is not a *bool: %s", json_obj.GetType("key2"))
 	} else {
 		value, value_errors := json_obj.GetBool("key2") 

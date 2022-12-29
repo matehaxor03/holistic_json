@@ -9,7 +9,7 @@ func TestCanParseEmptyArray(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Array" {
+	} else if !json_obj.IsArray("key") {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfString("key") 
@@ -29,7 +29,7 @@ func TestCanParseArrayContainingSingleString(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Array" {
+	} else if !json_obj.IsArray("key") {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfString("key") 
@@ -51,7 +51,7 @@ func TestCanParseMultipleArraysContainingSingleString(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Array" {
+	} else if !json_obj.IsArray("key") {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfString("key") 
@@ -69,7 +69,7 @@ func TestCanParseMultipleArraysContainingSingleString(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key2") != "*json.Array" {
+	} else if !json_obj.IsArray("key2") {
 		t.Errorf("key2 is not a *json.Array: %s", json_obj.GetType("key2"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfString("key2") 
@@ -91,7 +91,7 @@ func TestCanParseArrayContainingMultipleStrings(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Array" {
+	} else if !json_obj.IsArray("key") {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetArrayOfString("key") 

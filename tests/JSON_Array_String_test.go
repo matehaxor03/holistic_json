@@ -12,7 +12,7 @@ func TestCanParseEmptyArray(t *testing.T) {
 	} else if json_obj.GetType("key") != "*json.Array" {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key") 
+		value, value_errors := json_obj.GetArrayOfString("key") 
 
 		if value_errors != nil {
 			t.Errorf("map GetArray has errors")
@@ -32,7 +32,7 @@ func TestCanParseArrayContainingSingleString(t *testing.T) {
 	} else if json_obj.GetType("key") != "*json.Array" {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key") 
+		value, value_errors := json_obj.GetArrayOfString("key") 
 
 		if value_errors != nil {
 			t.Errorf("map GetArray has errors")
@@ -40,8 +40,8 @@ func TestCanParseArrayContainingSingleString(t *testing.T) {
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 1 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if (*(*value)[0].(*string)) != "value" {
-			t.Errorf("expected \"value\" actual: \"%s\"", (*(*value)[0].(*string)))
+		} else if (*(*value)[0]) != "value" {
+			t.Errorf("expected \"value\" actual: \"%s\"", (*(*value)[0]))
 		}
 	}	
 }
@@ -54,7 +54,7 @@ func TestCanParseMultipleArraysContainingSingleString(t *testing.T) {
 	} else if json_obj.GetType("key") != "*json.Array" {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key") 
+		value, value_errors := json_obj.GetArrayOfString("key") 
 
 		if value_errors != nil {
 			t.Errorf("map GetArray has errors")
@@ -62,8 +62,8 @@ func TestCanParseMultipleArraysContainingSingleString(t *testing.T) {
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 1 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if (*(*value)[0].(*string)) != "value" {
-			t.Errorf("expected \"value\" actual: \"%s\"", (*(*value)[0].(*string)))
+		} else if (*(*value)[0]) != "value" {
+			t.Errorf("expected \"value\" actual: \"%s\"", (*(*value)[0]))
 		}
 	}
 
@@ -72,7 +72,7 @@ func TestCanParseMultipleArraysContainingSingleString(t *testing.T) {
 	} else if json_obj.GetType("key2") != "*json.Array" {
 		t.Errorf("key2 is not a *json.Array: %s", json_obj.GetType("key2"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key2") 
+		value, value_errors := json_obj.GetArrayOfString("key2") 
 
 		if value_errors != nil {
 			t.Errorf("map GetArray has errors")
@@ -80,8 +80,8 @@ func TestCanParseMultipleArraysContainingSingleString(t *testing.T) {
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 1 {
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
-		} else if (*(*value)[0].(*string)) != "value2" {
-			t.Errorf("expected \"value2\" actual: \"%s\"", (*(*value)[0].(*string)))
+		} else if (*(*value)[0]) != "value2" {
+			t.Errorf("expected \"value2\" actual: \"%s\"", (*(*value)[0]))
 		}
 	}
 }
@@ -94,7 +94,7 @@ func TestCanParseArrayContainingMultipleStrings(t *testing.T) {
 	} else if json_obj.GetType("key") != "*json.Array" {
 		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
 	} else {			
-		value, value_errors := json_obj.GetArray("key") 
+		value, value_errors := json_obj.GetArrayOfString("key") 
 
 		if value_errors != nil {
 			t.Errorf("map GetArray has errors")
@@ -102,10 +102,10 @@ func TestCanParseArrayContainingMultipleStrings(t *testing.T) {
 			t.Errorf("GetArray is nil")
 		} else if len(*value) != 2 {
 			t.Errorf("expected: length=2 actual: length=%d", len(*value))
-		} else if (*(*value)[0].(*string)) != "value" {
-			t.Errorf("expected \"value\" actual: \"%s\"", (*(*value)[0].(*string)))
-		} else if (*(*value)[1].(*string)) != "value2" {
-			t.Errorf("expected \"value2\" actual: \"%s\"", (*(*value)[0].(*string)))
+		} else if (*(*value)[0]) != "value" {
+			t.Errorf("expected \"value\" actual: \"%s\"", (*(*value)[0]))
+		} else if (*(*value)[1]) != "value2" {
+			t.Errorf("expected \"value2\" actual: \"%s\"", (*(*value)[0]))
 		}
 	}
 }

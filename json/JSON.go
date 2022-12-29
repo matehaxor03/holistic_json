@@ -25,7 +25,7 @@ func getTimeNow() *time.Time {
 	return &now
 }
 
-func ParseJSON(s string) (*Map, []error) {
+func Parse(s string) (*Map, []error) {
 	var errors []error
 	if s == "" {
 		errors = append(errors, fmt.Errorf("error: value empty string"))
@@ -49,14 +49,22 @@ func ParseJSON(s string) (*Map, []error) {
 	}
 
 	runes := []rune(s)
-	metrics := Map{"{":Value{"value":0}, "}":Value{"value":0}, "[":Value{"value":0}, "]":Value{"value":0}, "opening_quote":Value{"value":0},"closing_quote":Value{"value":0}}
+	metrics := Map{}
+	metrics.SetIntValue("{", 0)
+	metrics.SetIntValue("}", 0)
+	metrics.SetIntValue("[", 0)
+	metrics.SetIntValue("]", 0)
+	metrics.SetIntValue("opening_quote", 0)
+	metrics.SetIntValue("closing_quote", 0)
+	//metrics := Map{"{":Value{"value":0}, "}":Value{"value":0}, "[":Value{"value":0}, "]":Value{"value":0}, "opening_quote":Value{"value":0},"closing_quote":Value{"value":0}}
 	mode := "looking_for_keys"
-	parent_map := Map{}
+	parent_map_value := Map{}
+	parent_map := Value{"value":&parent_map_value}
 	list := list.New()
 	list.PushFront(&parent_map)
 	index := uint64(0)
 	// parent map array and current map array etc
-	result_error :=  parseJSONMap(&runes, &index, &mode, list, &metrics)
+	result_error := parseJSONMap(&runes, &index, &mode, list, &metrics)
 
 	opening_bracket_count, opening_bracket_count_errors := metrics.GetInt("{")
 	closing_bracket_count, closing_bracket_count_errors := metrics.GetInt("}")
@@ -111,12 +119,20 @@ func ParseJSON(s string) (*Map, []error) {
 		errors = append(errors, fmt.Errorf("error: opening and closing quotes do not match, opening: %d closing: %d", *opening_quote_count, *closing_quote_count))
 	}
 
+	temp_parent_map_value, temp_parent_map_value_errors := parent_map.GetMap()
+	if temp_parent_map_value_errors != nil {
+		errors = append(errors, temp_parent_map_value_errors...) 
+	} else if common.IsNil(temp_parent_map_value) {
+		errors = append(errors, fmt.Errorf("json.ParseJSON parent map is nil"))
+	}
+
 	if len(errors) > 0 {
-		fmt.Println(s)
+		fmt.Println(s + " " + fmt.Sprintf("%s", errors))
 		return nil, errors
 	}
 
-	return &parent_map, nil
+	
+	return temp_parent_map_value, nil
 }
 
 
@@ -189,11 +205,15 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 			} else if string(value) == "}" {
 				if list.Len() > 1 {
 					list.Remove(list.Front())
-					if fmt.Sprintf("%T", list.Front().Value) == "*json.Map" {
+					front_value := (list.Front().Value).(*Value)
+					if front_value.IsMap() {
 						current_mode = mode_looking_for_keys
 					} else {
 						current_mode = mode_looking_for_value
-					}
+					} /*else {
+						errors = append(errors, fmt.Errorf("json.Parse front is neither a Map or Array", front_value.GetType()))
+						return errors
+					}*/
 				}	
 			} else if string(value) == "]" {
 				// this should not occur for valid json todo throw error
@@ -250,14 +270,22 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 				} else if string(value) == "{" {
 					new_mode := mode_looking_for_keys
 					new_map := Map{}
+					new_map_value := Value{"value":&new_map}
 
-					if fmt.Sprintf("%T", list.Front().Value) == "*json.Map" {
-						list.Front().Value.(*Map).SetMap(temp_key, &new_map)	
+					front_value := (list.Front().Value).(*Value)
+					if front_value.IsMap() {
+						front_value.SetValue(temp_key, &new_map_value)	
 					} else {
-						temp_array := list.Front().Value.(*Array)
-						*temp_array = append(*temp_array, Value{"value":&new_map})
+						temp_array, temp_array_errors := front_value.GetArray()
+						if temp_array_errors != nil {
+							return temp_array_errors
+						} else if common.IsNil(temp_array) {
+							errors = append(errors, fmt.Errorf("json.ParseJSON array is nil"))
+							return errors
+						}
+						*temp_array = append(*temp_array, new_map_value)
 					} 
-					list.PushFront(&new_map)
+					list.PushFront(&new_map_value)
 
 
 					found_value = false
@@ -266,14 +294,23 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 				} else if string(value) == "[" {
 					new_mode := mode_looking_for_value
 					new_array := Array{}
+					new_array_value := Value{"value":&new_array}
 
-					if fmt.Sprintf("%T", list.Front().Value) == "*json.Map" {
-						list.Front().Value.(*Map).SetArray(temp_key, &new_array)	
+					front_value := (list.Front().Value).(*Value)
+					if front_value.IsMap() {
+						front_value.SetValue(temp_key, &new_array_value)	
 					} else {
-						temp_array := list.Front().Value.(*Array)
-						*temp_array = append(*temp_array, Value{"value":&new_array})
+						temp_array, temp_array_errors := front_value.GetArray()
+						if temp_array_errors != nil {
+							return temp_array_errors
+						} else if common.IsNil(temp_array) {
+							errors = append(errors, fmt.Errorf("json.ParseJSON array is nil"))
+							return errors
+						}
+						*temp_array = append(*temp_array, new_array_value)
 					} 
-					list.PushFront(&new_array)
+
+					list.PushFront(&new_array_value)
 
 					
 					found_value = false
@@ -292,7 +329,8 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 					list.Remove(list.Front())
 
 					if list.Len() > 0 {
-						if fmt.Sprintf("%T", list.Front().Value) == "*json.Map" {
+						front_value := (list.Front().Value).(*Value)
+						if front_value.IsMap() {
 							current_mode = mode_looking_for_keys
 						} else {
 							current_mode = mode_looking_for_value
@@ -311,12 +349,13 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 					found_value = false
 					list.Remove(list.Front())
 
-					if fmt.Sprintf("%T", list.Front().Value) == "*json.Map" {
+					front_value := (list.Front().Value).(*Value)
+					if front_value.IsMap() {
 						current_mode = mode_looking_for_keys
 					} else {
 						current_mode = mode_looking_for_value
-					}
-					
+					} 
+
 				} else if string(value) == "," {
 					parse_errors := parseJSONValue(temp_key, temp_value, list)
 					if parse_errors != nil {
@@ -326,11 +365,12 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 					temp_key = ""
 					temp_value = ""
 
-					if fmt.Sprintf("%T", list.Front().Value) == "*json.Map" {
+					front_value := (list.Front().Value).(*Value)
+					if front_value.IsMap() {
 						current_mode = mode_looking_for_keys
 					} else {
 						current_mode = mode_looking_for_value
-					}
+					} 
 		
 					found_value = false
 				} else {
@@ -356,11 +396,12 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *list.List, m
 				temp_key = ""
 				temp_value = ""
 
-				if fmt.Sprintf("%T", list.Front().Value) == "*json.Map" {
+				front_value := (list.Front().Value).(*Value)
+				if front_value.IsMap() {
 					current_mode = mode_looking_for_keys
 				} else {
 					current_mode = mode_looking_for_value
-				}
+				} 
 	
 				found_value = false
 
@@ -618,7 +659,7 @@ func parseJSONValue(temp_key string, temp_value string, list *list.List) []error
 	} else if type_of_front == "*json.Value" {
 		value_obj = (*front_value.(*Value))
 	} else {
-		errors = append(errors, fmt.Errorf("error: front of list was not of type json.Value"))
+		errors = append(errors, fmt.Errorf("error: front of list was not of type json.Value and was %s", type_of_front))
 	}
 
 	if len(errors) > 0 {
@@ -743,6 +784,10 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 	}
 	
 	switch rep {
+	case "json.Value":
+		ConvertInterfaceValueToJSONStringValue(json, (value.(Value))["value"])
+	case "*json.Value":
+		ConvertInterfaceValueToJSONStringValue(json, (*(value.(*Value)))["value"])
 	case "string":
 		json.WriteString("\"")
 		json.WriteString(strings.ReplaceAll(value.(string), "\"", "\\\""))
@@ -1041,6 +1086,10 @@ func ConvertInterfaceValueToStringValue(value interface{}) (*string, []error) {
 		result = fmt.Sprintf("%f", *(value.(*float32)))
 	case "float32":
 		result = fmt.Sprintf("%f", (value.(float32)))
+	case "json.Value":
+		return ConvertInterfaceValueToStringValue((value.(Value))["value"])
+	case "*json.Value":
+		return ConvertInterfaceValueToStringValue((*(value.(*Value)))["value"])
 	default:
 		errors = append(errors, fmt.Errorf("error: JSON.ConvertInterfaceValueToJSONStringValue: type %s is not supported please implement", rep))
 	}

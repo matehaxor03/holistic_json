@@ -8,7 +8,7 @@ import (
 )
 
 func ParseJSONSuccessfully(t *testing.T, json_string string) (*json.Map) {
-	json, json_errors := json.ParseJSON(json_string)
+	json, json_errors := json.Parse(json_string)
 
 	if json_errors != nil {
 		t.Errorf("%s", json_errors)
@@ -47,7 +47,7 @@ func TestCanParseMinimal(t *testing.T) {
 }
 
 func TestCannotParseEmptyString(t *testing.T) {
-	value, value_errors := json.ParseJSON("")
+	value, value_errors := json.Parse("")
 
 	if value_errors == nil {
 		t.Errorf("no error on parse")
@@ -59,7 +59,7 @@ func TestCannotParseEmptyString(t *testing.T) {
 }
 
 func TestCannotParseMalformedBrackets1(t *testing.T) {
-	value, value_errors := json.ParseJSON("{")
+	value, value_errors := json.Parse("{")
 
 	if value_errors == nil {
 		t.Errorf("no error on parse")
@@ -71,7 +71,7 @@ func TestCannotParseMalformedBrackets1(t *testing.T) {
 }
 
 func TestCannotParseMalformedBrackets2(t *testing.T) {
-	value, value_errors := json.ParseJSON("}")
+	value, value_errors := json.Parse("}")
 
 	if value_errors == nil {
 		t.Errorf("no error on parse")

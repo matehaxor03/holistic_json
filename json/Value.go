@@ -11,13 +11,13 @@ import (
 type Value map[string]interface{}
 
 func (v Value) GetMap() (*Map, []error) {
-	if common.IsNil(v["value"]) {
+	if v.IsNil() {
 		return nil, nil
 	}
 
 	var errors []error
 	var result Map
-	type_of := common.GetType(v["value"])
+	type_of := v.GetType()
 	if type_of == "json.Map" {
 		result = (v["value"]).(Map)
 	} else if type_of == "*json.Map" {
@@ -28,6 +28,84 @@ func (v Value) GetMap() (*Map, []error) {
 	}
 
 	return &result, nil
+}
+
+func (v Value) SetMap(s string, m *Map) []error {
+	var errors []error
+	if v.IsMap() {
+		temp_map, temp_map_errors := v.GetMap()
+		if temp_map_errors != nil {
+			return temp_map_errors
+		} else if common.IsNil(temp_map) {
+			errors = append(errors, fmt.Errorf("Value.SetMap map is nil"))
+		} else {
+			(*temp_map)[s] = Value{"value": m}
+		}
+	} else {
+		errors = append(errors, fmt.Errorf("Value.SetMap cannot set map on type %s", v.GetType()))
+	}
+
+	if len(errors) > 0 {
+		return errors
+	}
+
+	return nil
+}
+
+func (v Value) SetValue(s string, m *Value) []error {
+	var errors []error
+	if v.IsMap() {
+		temp_map, temp_map_errors := v.GetMap()
+		if temp_map_errors != nil {
+			return temp_map_errors
+		} else if common.IsNil(temp_map) {
+			errors = append(errors, fmt.Errorf("Value.SetMap map is nil"))
+		} else {
+			(*temp_map)[s] = *m
+		}
+	} else {
+		errors = append(errors, fmt.Errorf("Value.SetMap cannot set map on type %s", v.GetType()))
+	}
+
+	if len(errors) > 0 {
+		return errors
+	}
+
+	return nil
+}
+
+func (v Value) SetValueValue(s string, m Value) []error {
+	return v.SetValue(s, &m)
+}
+
+func (v Value) SetMapValue(s string, m Map) []error {
+	return v.SetMap(s, &m)
+}
+
+func (v Value) SetArray(s string, a *Array) []error {
+	var errors []error
+	if v.IsMap() {
+		temp_map, temp_map_errors := v.GetMap()
+		if temp_map_errors != nil {
+			return temp_map_errors
+		} else if common.IsNil(temp_map) {
+			errors = append(errors, fmt.Errorf("Value.SetMap map is nil"))
+		} else {
+			(*temp_map)[s] = Value{"value": a}
+		}
+	} else {
+		errors = append(errors, fmt.Errorf("Value.SetArray cannot set arrary on type %s", v.GetType()))
+	}
+
+	if len(errors) > 0 {
+		return errors
+	}
+
+	return nil
+}
+
+func (v Value) SetArrayValue(s string, a Array) []error {
+	return v.SetArray(s, &a)
 }
 
 func (v Value) IsMap() (bool) {
@@ -56,14 +134,14 @@ func (v Value) GetFunc() (func(Map) []error, []error) {
 
 	var errors []error
 	var result (func(Map) []error)
-	rep := fmt.Sprintf("%T", v["value"])
+	rep := v.GetType()
 	switch rep {
 	case "func(json.Map) []error":
 		result = v["value"].(func(Map) []error)
 	case "*func(json.Map) []error":
 		result = *(v["value"].(*func(Map) []error))
 	default:
-		errors = append(errors, fmt.Errorf("error: Map.Func: type %s is not supported please implement for field: %s", rep))
+		errors = append(errors, fmt.Errorf("error: Map.Func: type %s is not supported please implement", rep))
 	}
 
 	if len(errors) > 0 {
@@ -74,14 +152,14 @@ func (v Value) GetFunc() (func(Map) []error, []error) {
 }
 
 func (v Value) GetErrors() ([]error, []error) {
-	if common.IsNil(v["value"]) {
+	if v.IsNil() {
 		return nil, nil
 	}
 
 	var errors []error
 	var result []error
 	
-	rep := fmt.Sprintf("%T", v["value"])
+	rep := v.GetType()
 	switch rep {
 	case "*[]error":
 		result = *(v["value"].(*[]error))
@@ -128,7 +206,7 @@ func (v Value) GetErrors() ([]error, []error) {
 			}
 		}
 	default:
-		errors = append(errors, fmt.Errorf("error: Value.GetErrors: type %s is not supported please implement for field: %s", rep))
+		errors = append(errors, fmt.Errorf("error: Value.GetErrors: type %s is not supported please implement", rep))
 	}
 
 	if len(errors) > 0 {
@@ -139,29 +217,28 @@ func (v Value) GetErrors() ([]error, []error) {
 }
 
 func (v Value) GetArray() (*Array, []error) {
-	if common.IsNil(v["value"]) {
+	if v.IsNil() {
 		return nil, nil
 	}
 
 	var errors []error
-	var result *Array
+	var result Array
 
-	rep := fmt.Sprintf("%T", v["value"])
+	rep := v.GetType()
 	switch rep {
 	case "*json.Array":
-		result = v["value"].(*Array)
+		result = *(v["value"].(*Array))
 	case "json.Array":
-		temp := v["value"].(Array)
-		result = &temp
+		result = v["value"].(Array)
 	default:
-		errors = append(errors, fmt.Errorf("error: Value.GetArray: type %s is not supported please implement for field: %s", rep))
+		errors = append(errors, fmt.Errorf("error: Value.GetArray: type %s is not supported please implement", rep))
 	}
 
 	if len(errors) > 0 {
 		return nil, errors
 	}
 
-	return result, nil
+	return &result, nil
 }
 
 func (v Value) GetArrayOfInt8() (*[](*int8), []error) {
@@ -373,6 +450,32 @@ func (v Value) GetArrayOfUInt64() (*[](*uint64), []error) {
 	return &result, nil
 }
 
+func (v Value) GetArrayOfString() (*[](*string), []error) {
+	array, array_errors := v.GetArray()
+	if array_errors != nil {
+		return nil, array_errors
+	} else if common.IsNil(array) {
+		return nil, nil
+	}
+
+	var errors []error
+	var result ([](*string))
+	for _, array_value := range *array {
+		string_value, string_value_errors := array_value.GetString()
+		if string_value_errors != nil {
+			errors = append(errors, string_value_errors...)
+		} else {
+			result = append(result, string_value)			 
+		}
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+	
+	return &result, nil
+}
+
 func (v Value) GetString() (*string, []error) {
 	if common.IsNil(v["value"]){
 		return nil, nil
@@ -441,7 +544,7 @@ func (v Value) IsArray() bool {
 }
 
 func (v Value) GetFloat64() (*float64, []error) {
-	if common.IsNil(v["value"]) {
+	if v.IsNil() {
 		return nil, nil
 	}
 
@@ -487,7 +590,7 @@ func (v Value) GetFloat64() (*float64, []error) {
 }
 
 func (v Value) GetFloat32() (*float32, []error) {
-	if common.IsNil(v["value"]) {
+	if v.IsNil() {
 		return nil, nil
 	}
 
@@ -555,7 +658,7 @@ func (v Value) GetFloat64Value() (float64, []error) {
 }
 
 func (v Value) GetRunes() (*[]rune, []error) {
-	if common.IsNil(v["value"]) {
+	if v.IsNil() {
 		return nil, nil
 	}
 
@@ -591,7 +694,7 @@ func (v Value) GetRunes() (*[]rune, []error) {
 }
 
 func (v Value) GetBool() (*bool, []error) {
-	if common.IsNil(v["value"]){
+	if v.IsNil() {
 		return nil, nil
 	}
 
@@ -656,7 +759,7 @@ func (v Value) GetInt64() (*int64, []error) {
 	var errors []error
 	var temp_value int64
 
-	if common.IsNil(v["value"]) {
+	if v.IsNil() {
 		return nil, nil
 	}
 
@@ -881,7 +984,7 @@ func (v Value) GetUInt64() (*uint64, []error) {
 }
 
 func (v Value) GetTime(decimal_places int) (*time.Time, []error) {
-	if common.IsNil(v["value"]) {
+	if v.IsNil() {
 		return nil, nil
 	}
 
@@ -889,11 +992,7 @@ func (v Value) GetTime(decimal_places int) (*time.Time, []error) {
 }
 
 func (v Value) GetType() string {
-	if common.IsNil(v["value"]) {
-		return "nil"
-	}
-
-	return fmt.Sprintf("%T", v["value"])
+	return common.GetType(v["value"])
 }
 
 func (v Value) IsInteger() bool {
@@ -1130,7 +1229,7 @@ func (v Value) GetUInt16Value() (uint16, []error) {
 
 
 func (v Value) GetInt32() (*int32, []error) {
-	if common.IsNil(v["value"]) {
+	if v.IsNil() {
 		return nil, nil
 	}
 	

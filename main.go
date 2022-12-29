@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	json.ParseJSON("{}")
+	json.Parse("{}")
 }

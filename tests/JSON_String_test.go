@@ -647,7 +647,7 @@ func TestCanParseStringWithQuoteKeyAndValue(t *testing.T) {
 }
 
 func TestCannotParseStringWithoutQuotePrefix(t *testing.T) {
-	json, json_errors := json.ParseJSON("{\"key\":value\"}")
+	json, json_errors := json.Parse("{\"key\":value\"}")
 
 	if json_errors == nil {
 		t.Errorf("expected errors for ParseJSON")
@@ -659,7 +659,7 @@ func TestCannotParseStringWithoutQuotePrefix(t *testing.T) {
 }
 
 func TestCannotParseStringWithoutQuoteSuffix(t *testing.T) {
-	json, json_errors := json.ParseJSON("{\"key\":\"value}")
+	json, json_errors := json.Parse("{\"key\":\"value}")
 
 	if json_errors == nil {
 		t.Errorf("expected errors for ParseJSON")

@@ -238,6 +238,14 @@ func (m Map) GetArrayOfUInt64(s string) (*[]*uint64, []error) {
 	return m[s].GetArrayOfUInt64()
 }
 
+func (m Map) GetArrayOfString(s string) (*[]*string, []error) {
+	if common.IsNil(m[s]){
+		return nil, nil
+	}
+
+	return m[s].GetArrayOfString()
+}
+
 func (m Map) GetString(s string) (*string, []error) {
 	if common.IsNil(m[s]) {
 		return nil, nil
@@ -645,5 +653,5 @@ func (m Map) Clone() (*Map, []error) {
 		return nil, request_payload_as_string_errors
 	}
 
-	return ParseJSON(json_payload_builder.String())
+	return Parse(json_payload_builder.String())
 }

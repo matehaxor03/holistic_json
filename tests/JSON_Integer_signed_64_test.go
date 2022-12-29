@@ -46,7 +46,7 @@ func TestCanParseNegativeInt64HighBoundary(t *testing.T) {
 }
 
 func TestCannotParseNegativeInt64Overflow(t *testing.T) {
-	json, json_errors := json.ParseJSON("{\"key\":-9223372036854775809}")
+	json, json_errors := json.Parse("{\"key\":-9223372036854775809}")
 
 	if json_errors == nil {
 		t.Errorf("there were no errors")

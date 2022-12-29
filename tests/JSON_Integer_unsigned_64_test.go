@@ -47,7 +47,7 @@ func TestCanParseUInt64HighBoundary(t *testing.T) {
 }
 
 func TestCannotParseUInt64Overflow(t *testing.T) {
-	json, json_errors := json.ParseJSON("{\"key\":18446744073709551616}")
+	json, json_errors := json.Parse("{\"key\":18446744073709551616}")
 
 	if json_errors == nil {
 		t.Errorf("there were no errors")

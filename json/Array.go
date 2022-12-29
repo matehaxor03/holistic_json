@@ -189,3 +189,23 @@ func (a *Array) AppendNil() {
 	appended_value := Value{"value":nil}
 	*a = append(*a, &appended_value)
 }
+
+func (a *Array) AppendMapValue(value Map) {
+	appended_value := Value{"value":&value}
+	*a = append(*a, &appended_value)
+}
+
+func (a *Array) AppendMap(value *Map) {
+	appended_value := Value{"value":value}
+	*a = append(*a, &appended_value)
+}
+
+func (a *Array) AppendArrayValue(value Array) {
+	appended_value := Value{"value":&value}
+	*a = append(*a, &appended_value)
+}
+
+func (a *Array) AppendArray(value *Array) {
+	appended_value := Value{"value":value}
+	*a = append(*a, &appended_value)
+}

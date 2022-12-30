@@ -1543,3 +1543,11 @@ func (v *Value) GetObject() (interface{}, []error) {
 	return (*v)["value"], nil
 }
 
+func (v Value) GetObjectForValue() (interface{}, []error) {
+	if common.IsNil((v)["value"]){
+		return nil, nil
+	}
+
+	return (v)["value"], nil
+}
+

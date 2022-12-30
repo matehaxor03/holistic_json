@@ -237,3 +237,29 @@ func (a *Array) GetStringValue(index int) (string, []error) {
 
 	return value, nil
 }
+
+func (a *Array) GetMap(index int) (*Map, []error) {
+	var errors []error
+	if index < 0 {
+		errors = append(errors, fmt.Errorf("Array.GetStringValue index is less than 0"))
+		return nil, errors
+	}
+
+	if index > (len(*a) - 1) {
+		errors = append(errors, fmt.Errorf("Array.GetStringValue index is out of range"))
+		return nil, errors
+	}
+
+	value, value_errors := ((*a)[index]).GetMap()
+	if value_errors != nil {
+		errors = append(errors, fmt.Errorf("Array.GetStringValue has errors: %s", fmt.Sprintf("%s", value_errors)))
+	} else if common.IsNil(value) {
+		errors = append(errors, fmt.Errorf("Array.GetStringValue value is nil"))
+	}
+
+	if len(errors) > 0 {
+		return nil, errors
+	}
+
+	return value, nil
+}

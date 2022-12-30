@@ -28,10 +28,6 @@ func (m *Map) SetMapValue(s string, zap Map) {
 }
 
 func (m *Map) IsNil(s string) bool {
-	if !m.HasKey(s) {
-		return true
-	}
-
 	return common.IsNil((*m)[s]) 
 }
 
@@ -323,10 +319,6 @@ func (m *Map) GetRunes(s string) (*[]rune, []error) {
 }
 
 func (m *Map) GetObject(s string) interface{} {
-	if !m.HasKey(s) {
-		return nil
-	}
-
 	if m.IsNil(s) {
 		return nil
 	}

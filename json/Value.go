@@ -1535,3 +1535,11 @@ func (v *Value) AppendValueValue(add Value) []error {
 	return nil
 }
 
+func (v *Value) GetObject() (interface{}, []error) {
+	if common.IsNil((*v)["value"]){
+		return nil, nil
+	}
+
+	return (*v)["value"], nil
+}
+

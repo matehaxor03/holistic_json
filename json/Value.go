@@ -492,6 +492,22 @@ func (v *Value) GetString() (*string, []error) {
 	return result, nil
 }
 
+func (v *Value) GetStringValue() (string, []error) {
+	var errors []error
+	result, result_errors := v.GetString()
+	if result_errors != nil {
+		errors = append(errors, result_errors...)
+	} else if common.IsNil(result) {
+		errors = append(errors, fmt.Errorf("Value.GetStringValue is nil"))
+	}
+	
+	if len(errors) > 0 {
+		return "", errors
+	}
+
+	return *result, nil
+}
+
 func (v *Value) IsFloat() (bool) {
 	if common.IsNil((*v)["value"]) {
 		return false

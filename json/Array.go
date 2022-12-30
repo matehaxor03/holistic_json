@@ -3,6 +3,8 @@ package json
 import (
 	"fmt"
 	"strings"
+	common "github.com/matehaxor03/holistic_common/common"
+
 )
 
 type Array [](*Value)
@@ -208,4 +210,30 @@ func (a *Array) AppendArrayValue(value Array) {
 func (a *Array) AppendArray(value *Array) {
 	appended_value := Value{"value":value}
 	*a = append(*a, &appended_value)
+}
+
+func (a *Array) GetStringValue(index int) (string, []error) {
+	var errors []error
+	if index < 0 {
+		errors = append(errors, fmt.Errorf("Array.GetStringValue index is less than 0"))
+		return "", errors
+	}
+
+	if index > (len(*a) - 1) {
+		errors = append(errors, fmt.Errorf("Array.GetStringValue index is out of range"))
+		return "", errors
+	}
+
+	value, value_errors := ((*a)[index]).GetStringValue()
+	if value_errors != nil {
+		errors = append(errors, fmt.Errorf("Array.GetStringValue has errors: %s", fmt.Sprintf("%s", value_errors)))
+	} else if common.IsNil(value) {
+		errors = append(errors, fmt.Errorf("Array.GetStringValue value is nil"))
+	}
+
+	if len(errors) > 0 {
+		return "", errors
+	}
+
+	return value, nil
 }

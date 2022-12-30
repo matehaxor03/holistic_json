@@ -28,22 +28,22 @@ func (m *Map) SetMapValue(s string, zap Map) {
 }
 
 func (m *Map) IsNil(s string) bool {
-	if common.IsNil(((*m)[s])) {
+	if !m.HasKey(s) {
 		return true
 	}
 
-	return ((*m)[s]).IsNil()
+	return common.IsNil((*m)[s]) 
 }
 
 func (m *Map) IsBool(s string) bool {
-	if common.IsNil(s) {
+	if m.IsNil(s) {
 		return false
 	}
 	return ((*m)[s]).IsBool()
 }
 
 func (m *Map) IsArray(s string) bool {
-	if common.IsNil(s) {
+	if m.IsNil(s) {
 		return false
 	}
 	return ((*m)[s]).IsArray()
@@ -57,7 +57,7 @@ func (m *Map) IsEmptyString(s string) bool {
 }
 
 func (m *Map) IsInteger(s string) bool {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return false
 	}
 	return ((*m)[s]).IsInteger()
@@ -150,14 +150,14 @@ func (m *Map) SetErrors(s string, errors []error) {
 
 
 func (m *Map) GetErrors(s string) ([]error, []error) {
-	if common.IsNil((*m)[s]) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 	return ((*m)[s]).GetErrors()
 }
 
 func (m *Map) GetType(s string) string {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return "nil"
 	}
 	
@@ -165,7 +165,7 @@ func (m *Map) GetType(s string) string {
 }
 
 func (m *Map) Func(s string) (func(Map) []error, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 	return ((*m)[s]).GetFunc()
@@ -177,7 +177,7 @@ func (m *Map) SetFunc(s string, function func(Map) []error) {
 }
 
 func (m *Map) GetArray(s string) (*Array, []error) {
-	if common.IsNil(((*m)[s])){
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -185,7 +185,7 @@ func (m *Map) GetArray(s string) (*Array, []error) {
 }
 
 func (m *Map) GetArrayOfInt8(s string) (*[]*int8, []error) {
-	if common.IsNil(((*m)[s])){
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -193,7 +193,7 @@ func (m *Map) GetArrayOfInt8(s string) (*[]*int8, []error) {
 }
 
 func (m *Map) GetArrayOfInt16(s string) (*[]*int16, []error) {
-	if common.IsNil(((*m)[s])){
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -201,7 +201,7 @@ func (m *Map) GetArrayOfInt16(s string) (*[]*int16, []error) {
 }
 
 func (m *Map) GetArrayOfInt32(s string) (*[]*int32, []error) {
-	if common.IsNil(((*m)[s])){
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -209,7 +209,7 @@ func (m *Map) GetArrayOfInt32(s string) (*[]*int32, []error) {
 }
 
 func (m *Map) GetArrayOfInt64(s string) (*[]*int64, []error) {
-	if common.IsNil(((*m)[s])){
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -217,7 +217,7 @@ func (m *Map) GetArrayOfInt64(s string) (*[]*int64, []error) {
 }
 
 func (m *Map) GetArrayOfUInt8(s string) (*[]*uint8, []error) {
-	if common.IsNil(((*m)[s])){
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -225,7 +225,7 @@ func (m *Map) GetArrayOfUInt8(s string) (*[]*uint8, []error) {
 }
 
 func (m *Map) GetArrayOfUInt16(s string) (*[]*uint16, []error) {
-	if common.IsNil(((*m)[s])){
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -233,7 +233,7 @@ func (m *Map) GetArrayOfUInt16(s string) (*[]*uint16, []error) {
 }
 
 func (m *Map) GetArrayOfUInt32(s string) (*[]*uint32, []error) {
-	if common.IsNil(((*m)[s])){
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -241,7 +241,7 @@ func (m *Map) GetArrayOfUInt32(s string) (*[]*uint32, []error) {
 }
 
 func (m *Map) GetArrayOfUInt64(s string) (*[]*uint64, []error) {
-	if common.IsNil(((*m)[s])){
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -249,7 +249,7 @@ func (m *Map) GetArrayOfUInt64(s string) (*[]*uint64, []error) {
 }
 
 func (m *Map) GetArrayOfString(s string) (*[]*string, []error) {
-	if common.IsNil(((*m)[s])){
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -257,14 +257,14 @@ func (m *Map) GetArrayOfString(s string) (*[]*string, []error) {
 }
 
 func (m *Map) GetString(s string) (*string, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 	return ((*m)[s]).GetString()
 }
 
 func (m *Map) IsFloat(s string) (bool) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return false
 	}
 
@@ -282,7 +282,7 @@ func (m *Map) GetStringValue(s string) (string, []error) {
 }
 
 func (m *Map) GetFloat32(s string) (*float32, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 	return ((*m)[s]).GetFloat32()
@@ -290,7 +290,7 @@ func (m *Map) GetFloat32(s string) (*float32, []error) {
 
 func (m *Map) GetFloat32Value(s string) (float32, []error) {
 	var errors []error
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		errors = append(errors, fmt.Errorf("error: Map.GetFloat32Value returned a nil value"))
 		return 0, errors
 	}
@@ -299,7 +299,7 @@ func (m *Map) GetFloat32Value(s string) (float32, []error) {
 
 func (m *Map) GetFloat64Value(s string) (float64, []error) {
 	var errors []error
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		errors = append(errors, fmt.Errorf("error: Map.GetFloat64Value returned a nil value"))
 		return 0, errors
 	}
@@ -315,7 +315,7 @@ func (m *Map) GetFloat64(s string) (*float64, []error) {
 }
 
 func (m *Map) GetRunes(s string) (*[]rune, []error) {
-	if ((*m)[s]) == nil {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -339,7 +339,7 @@ func (m *Map) SetObject(s string, object interface{}) {
 }
 
 func (m *Map) GetBool(s string) (*bool, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -402,7 +402,7 @@ func (m *Map) RemoveKey(key string) (*bool, []error) {
 }
 
 func (m *Map) GetInt64(s string) (*int64, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -410,14 +410,14 @@ func (m *Map) GetInt64(s string) (*int64, []error) {
 }
 
 func (m *Map) GetInt8(s string) (*int8, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 	return ((*m)[s]).GetInt8()
 }
 
 func (m *Map) GetInt8Value(s string) (int8, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		var errors []error
 		errors = append(errors, fmt.Errorf("Map.GetInt8Value was nil"))
 		return 0, errors
@@ -426,14 +426,14 @@ func (m *Map) GetInt8Value(s string) (int8, []error) {
 }
 
 func (m *Map) GetUInt8(s string) (*uint8, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 	return ((*m)[s]).GetUInt8()
 }
 
 func (m *Map) GetUInt8Value(s string) (uint8, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		var errors []error
 		errors = append(errors, fmt.Errorf("Map.GetUInt8Value was nil"))
 		return 0, errors
@@ -442,14 +442,14 @@ func (m *Map) GetUInt8Value(s string) (uint8, []error) {
 }
 
 func (m *Map) GetInt16(s string) (*int16, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 	return ((*m)[s]).GetInt16()
 }
 
 func (m *Map) GetInt16Value(s string) (int16, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		var errors []error
 		errors = append(errors, fmt.Errorf("Map.GetInt16Value was nil"))
 		return 0, errors
@@ -458,14 +458,14 @@ func (m *Map) GetInt16Value(s string) (int16, []error) {
 }
 
 func (m *Map) GetUInt16(s string) (*uint16, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 	return ((*m)[s]).GetUInt16()
 }
 
 func (m *Map) GetUInt16Value(s string) (uint16, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		var errors []error
 		errors = append(errors, fmt.Errorf("Map.GetUInt16Value was nil"))
 		return 0, errors
@@ -475,14 +475,14 @@ func (m *Map) GetUInt16Value(s string) (uint16, []error) {
 
 
 func (m *Map) GetInt32(s string) (*int32, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 	return ((*m)[s]).GetInt32()
 }
 
 func (m *Map) GetInt32Value(s string) (int32, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		var errors []error
 		errors = append(errors, fmt.Errorf("Map.GetInt32Value was nil"))
 		return 0, errors
@@ -491,7 +491,7 @@ func (m *Map) GetInt32Value(s string) (int32, []error) {
 }
 
 func (m *Map) GetInt64Value(s string) (int64, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		var errors []error
 		errors = append(errors, fmt.Errorf("Map.GetInt64Value was nil"))
 		return 0, errors
@@ -500,14 +500,14 @@ func (m *Map) GetInt64Value(s string) (int64, []error) {
 }
 
 func (m *Map) GetUInt32(s string) (*uint32, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 	return ((*m)[s]).GetUInt32()
 }
 
 func (m *Map) GetUInt32Value(s string) (uint32, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		var errors []error
 		errors = append(errors, fmt.Errorf("Map.GetUInt32Value was nil"))
 		return 0, errors
@@ -516,7 +516,7 @@ func (m *Map) GetUInt32Value(s string) (uint32, []error) {
 }
 
 func (m *Map) GetUInt64Value(s string) (uint64, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		var errors []error
 		errors = append(errors, fmt.Errorf("Map.GetUInt64Value was nil"))
 		return 0, errors
@@ -525,14 +525,14 @@ func (m *Map) GetUInt64Value(s string) (uint64, []error) {
 }
 
 func (m *Map) GetInt(s string) (*int, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 	return ((*m)[s]).GetInt()
 }
 
 func (m *Map) GetIntValue(s string) (int, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		var errors []error
 		errors = append(errors, fmt.Errorf("Map.GetIntValue was nil"))
 		return 0, errors
@@ -661,7 +661,7 @@ func (m *Map) SetFloat32Value(s string, value float32) {
 }
 
 func (m *Map) GetUInt64(s string) (*uint64, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 
@@ -674,7 +674,7 @@ func (m *Map) SetTime(s string, value *time.Time) {
 }
 
 func (m *Map) GetTime(s string, decimal_places int) (*time.Time, []error) {
-	if common.IsNil(((*m)[s])) {
+	if m.IsNil(s) {
 		return nil, nil
 	}
 

@@ -1002,6 +1002,10 @@ func (v *Value) GetType() string {
 	return common.GetType((*v)["value"])
 }
 
+func (v Value) GetTypeForValue() string {
+	return common.GetType((v)["value"])
+}
+
 func (v *Value) IsInteger() bool {
 	return common.IsInteger((*v)["value"])
 }

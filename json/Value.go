@@ -542,6 +542,10 @@ func (v *Value) IsNil() bool {
 	return common.IsNil((*v)["value"])
 }
 
+func (v Value) IsNilForValue() bool {
+	return common.IsNil((v)["value"])
+}
+
 func (v *Value) IsBool() bool {
 	return common.IsBool((*v)["value"])
 }
@@ -1540,7 +1544,7 @@ func (v *Value) AppendValueValue(add Value) []error {
 }
 
 func (v *Value) GetObject() (interface{}, []error) {
-	if common.IsNil((*v)["value"]){
+	if v.IsNil() {
 		return nil, nil
 	}
 
@@ -1548,7 +1552,7 @@ func (v *Value) GetObject() (interface{}, []error) {
 }
 
 func (v Value) GetObjectForValue() (interface{}, []error) {
-	if common.IsNil((v)["value"]){
+	if v.IsNilForValue() {
 		return nil, nil
 	}
 

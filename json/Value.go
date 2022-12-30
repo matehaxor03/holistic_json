@@ -16,16 +16,19 @@ func (v *Value) GetMap() (*Map, []error) {
 	}
 
 	var errors []error
-	var result Map
+	var result *Map
 	type_of := v.GetType()
 	if type_of == "*json.Map" {
-		result = *(((*v)["value"]).(*Map))
+		result = ((*v)["value"]).(*Map)
+	} else if type_of == "json.Map" {
+		temp := ((*v)["value"]).(Map)
+		result = &temp
 	} else {
 		errors = append(errors, fmt.Errorf("%s failed to unbox to json.Map", type_of))
 		return nil, errors
 	}
 
-	return &result, nil
+	return result, nil
 }
 
 func (v *Value) SetMap(s string, value *Map) []error {
@@ -221,6 +224,9 @@ func (v *Value) GetArray() (*Array, []error) {
 	switch rep {
 	case "*json.Array":
 		result = (*v)["value"].(*Array)
+	case "json.Array":
+		temp := (*v)["value"].(Array)
+		result = &temp
 	default:
 		errors = append(errors, fmt.Errorf("error: Value.GetArray: type %s is not supported please implement", rep))
 	}

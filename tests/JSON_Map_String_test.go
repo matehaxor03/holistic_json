@@ -67,7 +67,7 @@ func TestCanParseNestedMapWithMultipleStringValue(t *testing.T) {
 		} else if value == nil {
 			t.Errorf("GetMap is nil")
 		} else if len((value.Keys())) != 2 {
-			t.Errorf("expected key length: length=1 actual: length=%d", len((value.Keys())))
+			t.Errorf("expected key length: 2 actual: %d", len((value.Keys())))
 		} else {
 			inner_value, inner_value_errors := value.GetString("key1")
 			if inner_value_errors != nil {

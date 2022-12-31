@@ -159,13 +159,11 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 	mode_looking_for_key_name := "looking_for_key_name"
 	mode_looking_for_key_name_column := "looking_for_key_name_column"
 	mode_looking_for_value := "looking_for_value"
-	mode_looking_for_end_of_object_or_next_value := "mode_looking_for_end_of_object_or_next_value"
+	mode_looking_for_next_value_or_end := "mode_looking_for_next_value_or_end"
 	
 	var temp_key_r []rune
-	temp_value := ""
+	var temp_value_r []rune
 	parsing_string := false
-	found_value := false
-	found_key := false
 	temp_mode := cloneString(mode)
 	current_mode := *temp_mode
 
@@ -173,11 +171,52 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 		i := *index
 		value := (*runes)[*index]
 		
-		//fmt.Println(current_mode + " " + string(value))
-		//fmt.Println("key: " + string(temp_key_r) + " value: " + temp_value)
-		//fmt.Println("parsing string:" + fmt.Sprintf("%s", parsing_string) + "found value: " +  fmt.Sprintf("%s", found_value))
+		fmt.Println(current_mode + " " + string(value))
+		fmt.Println("key: " + string(temp_key_r) + " value: " + string(temp_value_r))
+
+		if current_mode == mode_looking_for_next_value_or_end {
+			if value == ' '  ||
+			   value == '\n' ||
+			   value == 'n' ||
+			   value == '\r' ||
+			   string(value) == "\\" ||
+			   value == '\t' ||
+			   value == ',' ||
+			   value == '\\' {
+				if value == ',' {
+					parse_errors := parseJSONValue(temp_key_r, temp_value_r, list)
+
+					if parse_errors != nil {
+						errors = append(errors, parse_errors...)
+					}
+					
+					temp_key_r = temp_key_r[:0]
+					temp_value_r = temp_value_r[:0]
+
+					if ((*list)[len(*list)-1]).IsMap() {
+						current_mode = mode_looking_for_keys
+					} else {
+						current_mode = mode_looking_for_value
+					} 
+				}
+				*index++
+				continue
+			} else {
+				current_mode = mode_looking_for_value
+			}
+		}
 
 		if !parsing_string {
+
+			if string(value) == "\"" && string((*runes)[i-1]) != "\\"{
+				parsing_string = true
+
+				opening_count, _ := metrics.GetInt("opening_quote")
+				*opening_count++
+				metrics.SetInt("opening_quote", opening_count)
+			} 
+
+
 			if string(value) == "{" {
 
 				opening_count, _ := metrics.GetInt("{")
@@ -202,11 +241,41 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 				*closing_count++
 				metrics.SetInt("]", closing_count)
 			}
-		}
-		
 
-		if current_mode == mode_looking_for_keys {
-			if string(value) == "}" {
+
+			if string(value) == "{" {
+				current_mode = mode_looking_for_keys
+				new_map := NewMap()
+				new_map_value := Value{"value":new_map}
+
+				if ((*list)[len(*list)-1]).IsMap() {
+					unquoted_key_name, unquoted_key_name_errors := unquote_key_value(string(temp_key_r))
+					if unquoted_key_name_errors != nil {
+						errors = append(errors, unquoted_key_name_errors...)
+					} else {
+						((*list)[len(*list)-1]).SetValue(unquoted_key_name, &new_map_value)	
+					}
+				} else {
+					append_errors := ((*list)[len(*list)-1]).AppendValue(&new_map_value)
+					if append_errors != nil {
+						return append_errors
+					}
+				} 
+
+				temp_key_r = temp_key_r[:0]
+				temp_value_r = temp_value_r[:0]
+
+				*list = append(*list, &new_map_value)
+			} else if string(value) == "}" {
+				parse_errors := parseJSONValue(temp_key_r, temp_value_r, list)
+				if parse_errors != nil {
+					errors = append(errors, parse_errors...)
+				}
+				
+				temp_key_r = temp_key_r[:0]
+				temp_value_r = temp_value_r[:0]
+
+				
 				if len(*list) > 1 {
 					*list = (*list)[:len(*list)-1]
 					if ((*list)[len(*list)-1]).IsMap() {
@@ -215,273 +284,106 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 						current_mode = mode_looking_for_value
 					} 
 				}	
-			} else if string(value) == "]" {
-				
-			} else {
-				if !found_key && string(value) != "\"" && string((*runes)[i-1]) != "\\" {
-					*index++
-					continue
+			} else if string(value) == "[" {
+				current_mode = mode_looking_for_value
+				new_array := Array{}
+				new_array_value := Value{"value":&new_array}
+
+				if ((*list)[len(*list)-1]).IsMap() {
+					unquoted_key_name, unquoted_key_name_errors := unquote_key_value(string(temp_key_r))
+					if unquoted_key_name_errors != nil {
+						errors = append(errors, unquoted_key_name_errors...)
+					} else {
+						((*list)[len(*list)-1]).SetValue(unquoted_key_name, &new_array_value)	
+					}
 				} else {
-					found_key = true
-				}
-	
-				if string(value) == "\"" && string((*runes)[i-1]) != "\\"{
-					parsing_string = true
-					current_mode = mode_looking_for_key_name
-	
-					opening_count, _ := metrics.GetInt("opening_quote")
-					*opening_count++
-					metrics.SetInt("opening_quote", opening_count)
-					temp_key_r = append(temp_key_r, value)
+					append_errors := ((*list)[len(*list)-1]).AppendValue(&new_array_value)
+					if append_errors != nil {
+						return append_errors
+					}
 				} 
-			}
-		} else if current_mode == mode_looking_for_key_name {
+
+				temp_key_r = temp_key_r[:0]
+				temp_value_r = temp_value_r[:0]
+
+				*list = append(*list, &new_array_value)
+			} else if string(value) == "]" {
+				parse_errors := parseJSONValue(temp_key_r, temp_value_r, list)
+
+				if parse_errors != nil {
+					errors = append(errors, parse_errors...)
+				}
+				
+				temp_key_r = temp_key_r[:0]
+				temp_value_r = temp_value_r[:0]
+
+
+				*list = (*list)[:len(*list)-1]
+
+				if ((*list)[len(*list)-1]).IsMap() {
+					current_mode = mode_looking_for_keys
+				} else {
+					current_mode = mode_looking_for_value
+				} 
+			} else if string(value) == "," {
+			   parse_errors := parseJSONValue(temp_key_r, temp_value_r, list)
+
+			   if parse_errors != nil {
+				   errors = append(errors, parse_errors...)
+			   }
+			   
+			   temp_key_r = temp_key_r[:0]
+			   temp_value_r = temp_value_r[:0]
+
+
+			   if ((*list)[len(*list)-1]).IsMap() {
+				   current_mode = mode_looking_for_keys
+			   } else {
+				   current_mode = mode_looking_for_value
+			   } 
+		   } else if current_mode == mode_looking_for_value {
+				temp_value_r = append(temp_value_r, value)
+		   }   
+		} else {
 			if string(value) == "\"" && string((*runes)[i-1]) != "\\" {
-				current_mode = mode_looking_for_key_name_column
 				parsing_string = false
 
-				opening_count, _ := metrics.GetInt("closing_quote")
-				*opening_count++
-				metrics.SetInt("closing_quote", opening_count)
+				closing_count, _ := metrics.GetInt("closing_quote")
+				*closing_count++
+				metrics.SetInt("closing_quote", closing_count)
+
+				if current_mode == mode_looking_for_value {
+					current_mode = mode_looking_for_next_value_or_end
+					temp_value_r = append(temp_value_r, value)
+				}
+			} else if current_mode == mode_looking_for_value {
+				temp_value_r = append(temp_value_r, value)
+			}
+		}
+
+
+		if current_mode == mode_looking_for_keys {	
+			if string(value) == "\"" && string((*runes)[i-1]) != "\\"{
+				current_mode = mode_looking_for_key_name
+				temp_key_r = append(temp_key_r, value)
+				parsing_string = true
+			} 
+		} else if current_mode == mode_looking_for_key_name {
+			if string(value) == "\"" && string((*runes)[i-1]) != "\\" {
+				current_mode = mode_looking_for_key_name_column	
+				parsing_string = false
 			} 
 			temp_key_r = append(temp_key_r, value)
-
 		} else if current_mode == mode_looking_for_key_name_column {
 			if string(value) == ":" {
 				current_mode = mode_looking_for_value
 			}
 		} else if current_mode == mode_looking_for_value {
-			
-			if !found_value && (string(value) == " " || string(value) == "\r" || string(value) == "\n" || string(value) == "\t") ||  string(value) == "\\" {
-				*index++
-				continue
-			} else {
-				found_value = true
-			}
+			//temp_value_r = append(temp_value_r, value)
+		} else if current_mode == mode_looking_for_next_value_or_end {
 
-			if !parsing_string {
-				if i > 0 && !parsing_string && string(value) == "\"" && string((*runes)[i-1]) != "\\" {
-					temp_value += string(value)
-					parsing_string = true
-					
-					opening_count, _ := metrics.GetInt("opening_quote")
-					*opening_count++
-					metrics.SetInt("opening_quote", opening_count)
-
-				} else if i == 0 && !parsing_string && string(value) == "\"" {
-					temp_value += string(value)
-					parsing_string = true
-					
-					opening_count, _ := metrics.GetInt("opening_quote")
-					*opening_count++
-					metrics.SetInt("opening_quote", opening_count)
-
-				} else if string(value) == "{" {
-					new_mode := mode_looking_for_keys
-					new_map := NewMap()
-					new_map_value := Value{"value":new_map}
-					found_key = false
-
-					if ((*list)[len(*list)-1]).IsMap() {
-						unquoted_key_name, unquoted_key_name_errors := unquote_key_value(string(temp_key_r))
-						if unquoted_key_name_errors != nil {
-							errors = append(errors, unquoted_key_name_errors...)
-						} else {
-							((*list)[len(*list)-1]).SetValue(unquoted_key_name, &new_map_value)	
-						}
-					} else {
-						append_errors := ((*list)[len(*list)-1]).AppendValue(&new_map_value)
-						if append_errors != nil {
-							return append_errors
-						}
-					} 
-					*list = append(*list, &new_map_value)
-					found_value = false
-					
-					*index++
-					parse_json_map_errors := parseJSONMap(runes, index, &new_mode, list, metrics)
-					if parse_json_map_errors != nil {
-						errors = append(errors, parse_json_map_errors...)
-					}
-				} else if string(value) == "[" {
-					new_mode := mode_looking_for_value
-					new_array := Array{}
-					new_array_value := Value{"value":&new_array}
-
-					if ((*list)[len(*list)-1]).IsMap() {
-						unquoted_key_name, unquoted_key_name_errors := unquote_key_value(string(temp_key_r))
-						if unquoted_key_name_errors != nil {
-							errors = append(errors, unquoted_key_name_errors...)
-						} else {
-							((*list)[len(*list)-1]).SetValue(unquoted_key_name, &new_array_value)	
-						}
-					} else {
-						append_errors := ((*list)[len(*list)-1]).AppendValue(&new_array_value)
-						if append_errors != nil {
-							return append_errors
-						}
-					} 
-					*list = append(*list, &new_array_value)
-					
-					found_value = false
-					
-					*index++
-					parse_json_map_errors := parseJSONMap(runes, index, &new_mode, list, metrics)
-					if parse_json_map_errors != nil {
-						errors = append(errors, parse_json_map_errors...)
-					}
-
-				} else if string(value) == "}" {
-					temp_key := string(temp_key_r)
-					parse_errors := parseJSONValue(temp_key, temp_value, list)
-
-					if parse_errors != nil {
-						errors = append(errors, parse_errors...)
-					}
-					
-					temp_key_r = temp_key_r[:0]
-					temp_value = ""
-
-					found_value = false
-					*list = (*list)[:len(*list)-1]
-
-					if len(*list) > 0 {
-						if ((*list)[len(*list)-1]).IsMap() {
-							current_mode = mode_looking_for_keys
-							found_key = false
-						} else {
-							current_mode = mode_looking_for_value
-						}
-					} 
-					
-				} else if string(value) == "]" {
-					temp_key := string(temp_key_r)
-					parse_errors := parseJSONValue(temp_key, temp_value, list)
-					if parse_errors != nil {
-						errors = append(errors, parse_errors...)
-					}
-					
-					temp_key_r = temp_key_r[:0]
-					temp_value = ""
-
-					found_value = false
-					*list = (*list)[:len(*list)-1]
-
-					if ((*list)[len(*list)-1]).IsMap() {
-						current_mode = mode_looking_for_keys
-						found_key = false
-					} else {
-						current_mode = mode_looking_for_value
-					} 
-
-				} else if string(value) == "," {
-					temp_key := string(temp_key_r)
-					parse_errors := parseJSONValue(temp_key, temp_value, list)
-					if parse_errors != nil {
-						errors = append(errors, parse_errors...)
-					}
-					
-					temp_key_r = temp_key_r[:0]
-					temp_value = ""
-
-					if ((*list)[len(*list)-1]).IsMap() {
-						current_mode = mode_looking_for_keys
-						found_key = false
-					} else {
-						current_mode = mode_looking_for_value
-					} 
+		} 
 		
-					found_value = false
-				} else {
-					temp_value += string(value)
-				}
-			} else if !parsing_string && string(value) == "\"" && string((*runes)[i-1]) != "\\" {
-				temp_value += string(value)
-				parsing_string = true
-
-				opening_quote, _ := metrics.GetInt("opening_quote")
-				*opening_quote++
-				metrics.SetInt("opening_quote", opening_quote)
-
-			} else if parsing_string && string(value) == "\"" && string((*runes)[i-1]) != "\\" {
-				temp_value += string(value)
-				parsing_string = false
-				found_value = false
-
-				closing_quote, _ := metrics.GetInt("closing_quote")
-				*closing_quote++
-				metrics.SetInt("closing_quote", closing_quote)
-
-				current_mode = mode_looking_for_end_of_object_or_next_value
-			} else {
-				temp_value += string(value)
-			}
-		} else if current_mode == mode_looking_for_end_of_object_or_next_value {
-			if string(value) == "," {
-				temp_key := string(temp_key_r)
-				parse_errors := parseJSONValue(temp_key, temp_value, list)
-				if parse_errors != nil {
-					errors = append(errors, parse_errors...)
-				}
-				
-				temp_key_r = temp_key_r[:0]
-				temp_value = ""
-
-				if ((*list)[len(*list)-1]).IsMap() {
-					current_mode = mode_looking_for_keys
-					found_key = false
-				} else {
-					current_mode = mode_looking_for_value
-				} 
-	
-				found_value = false
-			} else if string(value) == "]" {
-				temp_key := string(temp_key_r)
-				parse_errors := parseJSONValue(temp_key, temp_value, list)
-				if parse_errors != nil {
-					errors = append(errors, parse_errors...)
-				}
-				
-				temp_key_r = temp_key_r[:0]
-				temp_value = ""
-
-				found_value = false
-				*list = (*list)[:len(*list)-1]
-
-				if ((*list)[len(*list)-1]).IsMap() {
-					current_mode = mode_looking_for_keys
-					found_key = false
-				} else {
-					current_mode = mode_looking_for_value
-				} 
-			} else if string(value) == "}" {
-				temp_key := string(temp_key_r)
-				parse_errors := parseJSONValue(temp_key, temp_value, list)
-
-				if parse_errors != nil {
-					errors = append(errors, parse_errors...)
-				}
-				
-				temp_key_r = temp_key_r[:0]
-				temp_value = ""
-
-				found_value = false
-				*list = (*list)[:len(*list)-1]
-
-				if len(*list) > 0 {
-					if ((*list)[len(*list)-1]).IsMap() {
-						current_mode = mode_looking_for_keys
-						found_key = false
-					} else {
-						current_mode = mode_looking_for_value
-					}
-				} 
-			}
-		}
-
-		if len(errors) > 0 {
-			return errors
-		}
 
 		*index++
 	}
@@ -494,7 +396,7 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 }
 
 
-func parseJSONValue(key_value string, string_value string, list *([](*Value))) []error {
+func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []error {
 	var errors []error
 
 	if list == nil {
@@ -508,19 +410,38 @@ func parseJSONValue(key_value string, string_value string, list *([](*Value))) [
 	}
 
 	data_type := ""
+	//key_value = strings.TrimSpace(key_value)
+	//string_value = strings.TrimSpace(string_value)
+
+	key_value := string(key_rune)
+	string_value := string(string_rune)
+
+	fmt.Println(fmt.Sprintf("before key: '%s'", key_value))
+	fmt.Println(fmt.Sprintf("before value: '%s'", string_value))
+
 	key_value = strings.TrimSpace(key_value)
 	string_value = strings.TrimSpace(string_value)
 
-	key_value = strings.ReplaceAll(key_value, "\\", "")
-	string_value = strings.ReplaceAll(string_value, "\\", "")
+	key_value = strings.Replace(key_value, "\\\"", "\"", -1)
+	string_value = strings.Replace(string_value, "\\\"", "\"", -1)
+
+	
+
+	fmt.Println(fmt.Sprintf("after key: '%s'", key_value))
+	fmt.Println(fmt.Sprintf("after value: '%s'", string_value))
+
 
 
 	if ((*list)[len(*list)-1]).IsMap() {
-		if strings.HasPrefix(key_value, "\"") && strings.HasSuffix(key_value, "\"") {
-			dequoted_value := (key_value)[1:(len(key_value)-1)]
-			key_value = dequoted_value	
+		if key_value == "" && string_value == "" {
+			return nil
 		} else {
-			errors = append(errors, fmt.Errorf("error: key does not start with  \" and/or end with \" key: %s", key_value))
+			if strings.HasPrefix(key_value, "\"") && strings.HasSuffix(key_value, "\"") {
+				dequoted_value := (key_value)[1:(len(key_value)-1)]
+				key_value = dequoted_value	
+			} else {
+				errors = append(errors, fmt.Errorf("error: key does not start with  \" and/or end with \" key: '%s'", key_value))
+			}
 		}
 	}
 
@@ -530,7 +451,7 @@ func parseJSONValue(key_value string, string_value string, list *([](*Value))) [
 			dequoted_value := (string_value)[1:(len(string_value)-1)]
 			string_value = dequoted_value	
 		} else {
-			errors = append(errors, fmt.Errorf("error: value does not start with  \" and/or end with \" key: %s", string_value))
+			errors = append(errors, fmt.Errorf("error: value does not start with  \" and/or end with \" value: '%s'", string_value))
 		}
 	}
 	

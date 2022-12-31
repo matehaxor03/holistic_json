@@ -45,11 +45,8 @@ func (a *Array) ToJSONString(json *strings.Builder) ([]error) {
 }
 
 func (a *Array) AppendString(s *string) {
-	fmt.Println("appending " + *s)
 	appended_value := Value{"value":*s}
 	*a = append(*a, &appended_value)
-	fmt.Println(*a)
-	fmt.Println(len(*a))
 }
 
 func (a *Array) AppendStringValue(s string) {

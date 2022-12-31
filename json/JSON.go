@@ -44,13 +44,13 @@ func Parse(s string) (*Map, []error) {
 	}
 
 	if s == "{}" {
-		empty_map := Map{}
-		return &empty_map, nil
+		empty_map := NewMap()
+		return empty_map, nil
 	}
 
 	runes := []rune(s)
-	metrics := Map{}
-	metrics.SetIntValue("{", 0)
+	metrics := NewMap()
+	metrics.SetIntValue("{", 1)
 	metrics.SetIntValue("}", 0)
 	metrics.SetIntValue("[", 0)
 	metrics.SetIntValue("]", 0)
@@ -58,14 +58,14 @@ func Parse(s string) (*Map, []error) {
 	metrics.SetIntValue("closing_quote", 0)
 	//metrics := Map{"{":Value{"value":0}, "}":Value{"value":0}, "[":Value{"value":0}, "]":Value{"value":0}, "opening_quote":Value{"value":0},"closing_quote":Value{"value":0}}
 	mode := "looking_for_keys"
-	parent_map_value := Map{}
-	parent_map := Value{"value":&parent_map_value}
-	list := [](*Value){&parent_map}
+	parent_map := NewMap()
+	parent_map_value := Value{"value": parent_map}
+	list := [](*Value){&parent_map_value}
 	
 	//list.PushFront(&parent_map)
-	index := uint64(0)
+	index := uint64(1)
 	// parent map array and current map array etc
-	result_error := parseJSONMap(&runes, &index, &mode, &list, &metrics)
+	result_error := parseJSONMap(&runes, &index, &mode, &list, metrics)
 
 	opening_bracket_count, opening_bracket_count_errors := metrics.GetInt("{")
 	closing_bracket_count, closing_bracket_count_errors := metrics.GetInt("}")
@@ -104,7 +104,6 @@ func Parse(s string) (*Map, []error) {
 	}
 
 	if len(errors) > 0 {
-		fmt.Println(s + " " + fmt.Sprintf("%s", errors))
 		return nil, errors
 	}
 
@@ -120,21 +119,28 @@ func Parse(s string) (*Map, []error) {
 		errors = append(errors, fmt.Errorf("error: opening and closing quotes do not match, opening: %d closing: %d", *opening_quote_count, *closing_quote_count))
 	}
 
-	temp_parent_map_value, temp_parent_map_value_errors := parent_map.GetMap()
-	if temp_parent_map_value_errors != nil {
-		errors = append(errors, temp_parent_map_value_errors...) 
-	} else if common.IsNil(temp_parent_map_value) {
-		errors = append(errors, fmt.Errorf("json.ParseJSON parent map is nil"))
+	if len(errors) > 0 {
+		return nil, errors
+	}
+	
+	return parent_map, nil
+}
+
+func unquote_key_value(key string) (string, []error) {
+	var errors []error
+	if strings.HasPrefix(key, "\"") && strings.HasSuffix(key, "\"") {
+		key = (key)[1:(len(key)-1)]
+	} else {
+		errors = append(errors, fmt.Errorf("error: key does not start with  \" or end with \""))
 	}
 
 	if len(errors) > 0 {
-		fmt.Println(s + " " + fmt.Sprintf("%s", errors))
-		return nil, errors
+		return "", errors
 	}
 
-	
-	return temp_parent_map_value, nil
+	return key, nil
 }
+
 
 
 func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value)), metrics *Map) ([]error) {
@@ -153,11 +159,13 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 	mode_looking_for_key_name := "looking_for_key_name"
 	mode_looking_for_key_name_column := "looking_for_key_name_column"
 	mode_looking_for_value := "looking_for_value"
+	mode_looking_for_end_of_object_or_next_value := "mode_looking_for_end_of_object_or_next_value"
 	
-	temp_key := ""
+	var temp_key_r []rune
 	temp_value := ""
 	parsing_string := false
 	found_value := false
+	found_key := false
 	temp_mode := cloneString(mode)
 	current_mode := *temp_mode
 
@@ -166,7 +174,8 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 		value := (*runes)[*index]
 		
 		//fmt.Println(current_mode + " " + string(value))
-		//fmt.Println(temp_key + " " + temp_value + " parsing:" + fmt.Sprintf("%s", parsing_string) + "found value: " +  fmt.Sprintf("%s", found_value))
+		//fmt.Println("key: " + string(temp_key_r) + " value: " + temp_value)
+		//fmt.Println("parsing string:" + fmt.Sprintf("%s", parsing_string) + "found value: " +  fmt.Sprintf("%s", found_value))
 
 		if !parsing_string {
 			if string(value) == "{" {
@@ -197,36 +206,34 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 		
 
 		if current_mode == mode_looking_for_keys {
-			if string(value) == "\"" && string((*runes)[i-1]) != "\\"{
-				current_mode = mode_looking_for_key_name
-				parsing_string = true
-
-				opening_count, _ := metrics.GetInt("opening_quote")
-				*opening_count++
-				metrics.SetInt("opening_quote", opening_count)
-			} else if string(value) == "}" {
+			if string(value) == "}" {
 				if len(*list) > 1 {
 					*list = (*list)[:len(*list)-1]
-					//front_value := (list.Front().Value).(*Value)
 					if ((*list)[len(*list)-1]).IsMap() {
 						current_mode = mode_looking_for_keys
 					} else {
 						current_mode = mode_looking_for_value
-					} /*else {
-						errors = append(errors, fmt.Errorf("json.Parse front is neither a Map or Array", front_value.GetType()))
-						return errors
-					}*/
+					} 
 				}	
 			} else if string(value) == "]" {
-				// this should not occur for valid json todo throw error
-				/*if list.Len() > 1 {
-					list.Remove(list.Front())
-					if fmt.Sprintf("%T", list.Front().Value) == "*json.Map" {
-						current_mode = mode_looking_for_keys
-					} else {
-						current_mode = mode_looking_for_value
-					}
-				}*/
+				
+			} else {
+				if !found_key && string(value) != "\"" && string((*runes)[i-1]) != "\\" {
+					*index++
+					continue
+				} else {
+					found_key = true
+				}
+	
+				if string(value) == "\"" && string((*runes)[i-1]) != "\\"{
+					parsing_string = true
+					current_mode = mode_looking_for_key_name
+	
+					opening_count, _ := metrics.GetInt("opening_quote")
+					*opening_count++
+					metrics.SetInt("opening_quote", opening_count)
+					temp_key_r = append(temp_key_r, value)
+				} 
 			}
 		} else if current_mode == mode_looking_for_key_name {
 			if string(value) == "\"" && string((*runes)[i-1]) != "\\" {
@@ -236,9 +243,9 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 				opening_count, _ := metrics.GetInt("closing_quote")
 				*opening_count++
 				metrics.SetInt("closing_quote", opening_count)
-			} else {
-				temp_key += string(value)
-			}
+			} 
+			temp_key_r = append(temp_key_r, value)
+
 		} else if current_mode == mode_looking_for_key_name_column {
 			if string(value) == ":" {
 				current_mode = mode_looking_for_value
@@ -271,12 +278,17 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 
 				} else if string(value) == "{" {
 					new_mode := mode_looking_for_keys
-					new_map := Map{}
-					new_map_value := Value{"value":&new_map}
+					new_map := NewMap()
+					new_map_value := Value{"value":new_map}
+					found_key = false
 
-					//front_value := (list.Front().Value).(*Value)
 					if ((*list)[len(*list)-1]).IsMap() {
-						((*list)[len(*list)-1]).SetValue(temp_key, &new_map_value)	
+						unquoted_key_name, unquoted_key_name_errors := unquote_key_value(string(temp_key_r))
+						if unquoted_key_name_errors != nil {
+							errors = append(errors, unquoted_key_name_errors...)
+						} else {
+							((*list)[len(*list)-1]).SetValue(unquoted_key_name, &new_map_value)	
+						}
 					} else {
 						append_errors := ((*list)[len(*list)-1]).AppendValue(&new_map_value)
 						if append_errors != nil {
@@ -284,10 +296,8 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 						}
 					} 
 					*list = append(*list, &new_map_value)
-					//list.PushFront(&new_map_value)
-
-
 					found_value = false
+					
 					*index++
 					parse_json_map_errors := parseJSONMap(runes, index, &new_mode, list, metrics)
 					if parse_json_map_errors != nil {
@@ -298,9 +308,13 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 					new_array := Array{}
 					new_array_value := Value{"value":&new_array}
 
-					//front_value := (list.Front().Value).(*Value)
 					if ((*list)[len(*list)-1]).IsMap() {
-						((*list)[len(*list)-1]).SetValue(temp_key, &new_array_value)	
+						unquoted_key_name, unquoted_key_name_errors := unquote_key_value(string(temp_key_r))
+						if unquoted_key_name_errors != nil {
+							errors = append(errors, unquoted_key_name_errors...)
+						} else {
+							((*list)[len(*list)-1]).SetValue(unquoted_key_name, &new_array_value)	
+						}
 					} else {
 						append_errors := ((*list)[len(*list)-1]).AppendValue(&new_array_value)
 						if append_errors != nil {
@@ -308,42 +322,46 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 						}
 					} 
 					*list = append(*list, &new_array_value)
-
 					
 					found_value = false
+					
 					*index++
 					parse_json_map_errors := parseJSONMap(runes, index, &new_mode, list, metrics)
 					if parse_json_map_errors != nil {
 						errors = append(errors, parse_json_map_errors...)
 					}
+
 				} else if string(value) == "}" {
-					parse_errors := parseJSONValue(&temp_key, &temp_value, list)
+					temp_key := string(temp_key_r)
+					parse_errors := parseJSONValue(temp_key, temp_value, list)
+
 					if parse_errors != nil {
 						errors = append(errors, parse_errors...)
 					}
-
-					temp_key = ""
+					
+					temp_key_r = temp_key_r[:0]
 					temp_value = ""
 
 					found_value = false
 					*list = (*list)[:len(*list)-1]
 
 					if len(*list) > 0 {
-						//front_value := (list.Front().Value).(*Value)
 						if ((*list)[len(*list)-1]).IsMap() {
 							current_mode = mode_looking_for_keys
+							found_key = false
 						} else {
 							current_mode = mode_looking_for_value
 						}
 					} 
-
+					
 				} else if string(value) == "]" {
-					parse_errors := parseJSONValue(&temp_key, &temp_value, list)
+					temp_key := string(temp_key_r)
+					parse_errors := parseJSONValue(temp_key, temp_value, list)
 					if parse_errors != nil {
 						errors = append(errors, parse_errors...)
 					}
-
-					temp_key = ""
+					
+					temp_key_r = temp_key_r[:0]
 					temp_value = ""
 
 					found_value = false
@@ -351,22 +369,24 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 
 					if ((*list)[len(*list)-1]).IsMap() {
 						current_mode = mode_looking_for_keys
+						found_key = false
 					} else {
 						current_mode = mode_looking_for_value
 					} 
 
 				} else if string(value) == "," {
-					parse_errors := parseJSONValue(&temp_key, &temp_value, list)
+					temp_key := string(temp_key_r)
+					parse_errors := parseJSONValue(temp_key, temp_value, list)
 					if parse_errors != nil {
 						errors = append(errors, parse_errors...)
 					}
 					
-					temp_key = ""
+					temp_key_r = temp_key_r[:0]
 					temp_value = ""
 
-					//front_value := (list.Front().Value).(*Value)
 					if ((*list)[len(*list)-1]).IsMap() {
 						current_mode = mode_looking_for_keys
+						found_key = false
 					} else {
 						current_mode = mode_looking_for_value
 					} 
@@ -386,31 +406,77 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 			} else if parsing_string && string(value) == "\"" && string((*runes)[i-1]) != "\\" {
 				temp_value += string(value)
 				parsing_string = false
-				
-				parse_errors := parseJSONValue(&temp_key, &temp_value, list)
-				if parse_errors != nil {
-					errors = append(errors, parse_errors...)
-				}
-				
-				temp_key = ""
-				temp_value = ""
-
-				if ((*list)[len(*list)-1]).IsMap() {
-					current_mode = mode_looking_for_keys
-				} else {
-					current_mode = mode_looking_for_value
-				} 
-	
 				found_value = false
 
 				closing_quote, _ := metrics.GetInt("closing_quote")
 				*closing_quote++
 				metrics.SetInt("closing_quote", closing_quote)
+
+				current_mode = mode_looking_for_end_of_object_or_next_value
 			} else {
 				temp_value += string(value)
 			}
+		} else if current_mode == mode_looking_for_end_of_object_or_next_value {
+			if string(value) == "," {
+				temp_key := string(temp_key_r)
+				parse_errors := parseJSONValue(temp_key, temp_value, list)
+				if parse_errors != nil {
+					errors = append(errors, parse_errors...)
+				}
+				
+				temp_key_r = temp_key_r[:0]
+				temp_value = ""
 
-			
+				if ((*list)[len(*list)-1]).IsMap() {
+					current_mode = mode_looking_for_keys
+					found_key = false
+				} else {
+					current_mode = mode_looking_for_value
+				} 
+	
+				found_value = false
+			} else if string(value) == "]" {
+				temp_key := string(temp_key_r)
+				parse_errors := parseJSONValue(temp_key, temp_value, list)
+				if parse_errors != nil {
+					errors = append(errors, parse_errors...)
+				}
+				
+				temp_key_r = temp_key_r[:0]
+				temp_value = ""
+
+				found_value = false
+				*list = (*list)[:len(*list)-1]
+
+				if ((*list)[len(*list)-1]).IsMap() {
+					current_mode = mode_looking_for_keys
+					found_key = false
+				} else {
+					current_mode = mode_looking_for_value
+				} 
+			} else if string(value) == "}" {
+				temp_key := string(temp_key_r)
+				parse_errors := parseJSONValue(temp_key, temp_value, list)
+
+				if parse_errors != nil {
+					errors = append(errors, parse_errors...)
+				}
+				
+				temp_key_r = temp_key_r[:0]
+				temp_value = ""
+
+				found_value = false
+				*list = (*list)[:len(*list)-1]
+
+				if len(*list) > 0 {
+					if ((*list)[len(*list)-1]).IsMap() {
+						current_mode = mode_looking_for_keys
+						found_key = false
+					} else {
+						current_mode = mode_looking_for_value
+					}
+				} 
+			}
 		}
 
 		if len(errors) > 0 {
@@ -427,9 +493,10 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 	return nil
 }
 
-func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []error {
+
+func parseJSONValue(key_value string, string_value string, list *([](*Value))) []error {
 	var errors []error
-	
+
 	if list == nil {
 		errors = append(errors, fmt.Errorf("error: list is nil"))
 	} else if len(*list) == 0 {
@@ -440,14 +507,36 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 		return errors
 	}
 
-	temp_key := *key_ref
-	temp_value := *value_ref
-
-	temp_key = strings.ReplaceAll(temp_key, "\\\"", "\"")
-	temp_value = strings.ReplaceAll(temp_value, "\\\"", "\"")
-	
 	data_type := ""
-	string_value := cloneString(&temp_value)
+	key_value = strings.TrimSpace(key_value)
+	string_value = strings.TrimSpace(string_value)
+
+	key_value = strings.ReplaceAll(key_value, "\\", "")
+	string_value = strings.ReplaceAll(string_value, "\\", "")
+
+
+	if ((*list)[len(*list)-1]).IsMap() {
+		if strings.HasPrefix(key_value, "\"") && strings.HasSuffix(key_value, "\"") {
+			dequoted_value := (key_value)[1:(len(key_value)-1)]
+			key_value = dequoted_value	
+		} else {
+			errors = append(errors, fmt.Errorf("error: key does not start with  \" and/or end with \" key: %s", key_value))
+		}
+	}
+
+	if strings.Contains(string_value, "\"") {
+		if strings.HasPrefix(string_value, "\"") && strings.HasSuffix(string_value, "\"") {
+			data_type = "string"
+			dequoted_value := (string_value)[1:(len(string_value)-1)]
+			string_value = dequoted_value	
+		} else {
+			errors = append(errors, fmt.Errorf("error: value does not start with  \" and/or end with \" key: %s", string_value))
+		}
+	}
+	
+	if len(errors) > 0 {
+		return errors
+	}
 	
 	var boolean_value *bool
 	var float64_value *float64
@@ -461,59 +550,33 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 	var uint16_value *uint16
 	var uint8_value *uint8
 
-	//if strings.HasPrefix(*string_value, "\"") || strings.HasSuffix(*string_value, "\"") {
-	string_temp := strings.TrimSpace(*string_value)
-	string_value = &string_temp
-	fmt.Println(*string_value)
-	//}
+	if data_type != "string" {
+		string_value = strings.ReplaceAll(string_value, "\n", "")
+		string_value = strings.ReplaceAll(string_value, "\t", "")
+		string_value = strings.ReplaceAll(string_value, " ", "")
+		string_value = strings.ReplaceAll(string_value, "\r", "")
+		string_value = strings.ReplaceAll(string_value, "\\", "")
 
-
-	if strings.HasPrefix(*string_value, "\"") && strings.HasSuffix(*string_value, "\"") {
-		data_type = "string"
-		dequoted_value := (*string_value)[1:(len(*string_value)-1)]
-		string_value = &dequoted_value	
-	} else if strings.HasPrefix(*string_value, "\"") && !strings.HasSuffix(*string_value, "\"") {
-		*string_value = strings.TrimSpace(*string_value)
-		if !strings.HasPrefix(*string_value, "\"") && !strings.HasSuffix(*string_value, "\"") {
-			errors = append(errors, fmt.Errorf("error: value has \" as prefix but not \" as suffix"))
-			return errors
-		} else {
-			data_type = "string"
-			dequoted_value := (*string_value)[1:(len(*string_value)-1)]
-			string_value = &dequoted_value	
-		}
-	} else if !strings.HasPrefix(*string_value, "\"") && strings.HasSuffix(*string_value, "\"") {
-		*string_value = strings.TrimSpace(*string_value)
-		if !strings.HasPrefix(*string_value, "\"") && !strings.HasSuffix(*string_value, "\"") {
-			errors = append(errors, fmt.Errorf("error: value has \" as suffix but not \" as prefix"))
-			return errors
-		} else {
-			data_type = "string"
-			dequoted_value := (*string_value)[1:(len(*string_value)-1)]
-			string_value = &dequoted_value	
-		}
-	} else {
-		// when parsing emtpy array []
-		if *string_value == "" {
-			return nil
+		if string_value == "" {
+			string_value = "null"
 		}
 
-		if *string_value == "true" {
+		if string_value == "true" {
 			data_type = "bool"
 			boolean_value_true := true 
 			boolean_value = &boolean_value_true
-		} else if *string_value == "false" {
+		} else if string_value == "false" {
 			data_type = "bool"
 			boolean_value_false := false 
 			boolean_value = &boolean_value_false
-		} else if *string_value == "null" {
+		} else if string_value == "null" {
 			data_type = "null"
 		} else {
 			var negative_number bool
-			negative_number_count := strings.Count(*string_value, "-")
+			negative_number_count := strings.Count(string_value, "-")
 			if negative_number_count == 1 {
 				negative_number = true
-				if !strings.HasPrefix(*string_value, "-") {
+				if !strings.HasPrefix(string_value, "-") {
 					errors = append(errors, fmt.Errorf("error: negative symbol is not at the start of the number"))
 				}
 			} else if negative_number_count == 0 {
@@ -523,7 +586,7 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 			}
 
 			var decimal_number bool
-			decimal_count := strings.Count(*string_value, ".")
+			decimal_count := strings.Count(string_value, ".")
 			if decimal_count == 1 {
 				decimal_number = true
 			} else if decimal_count == 0 {
@@ -538,13 +601,13 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 
 			if decimal_number {
 				data_type = "float64"
-				float64_temp, float64_temp_error := strconv.ParseFloat(*string_value, 64)
+				float64_temp, float64_temp_error := strconv.ParseFloat(string_value, 64)
 				if float64_temp_error != nil {
 					errors = append(errors, fmt.Errorf("error: strconv.ParseFloat(*string_value, 64) error"))
 				} else {
 					float64_value = &float64_temp
 					
-					float32_temp, float32_temp_error := strconv.ParseFloat(*string_value, 32)
+					float32_temp, float32_temp_error := strconv.ParseFloat(string_value, 32)
 					if float32_temp_error != nil {
 					} else {
 						data_type = "float32"
@@ -559,14 +622,14 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 			} else {
 				if negative_number {
 					data_type = "int64"
-					int64_temp, int64_temp_error := strconv.ParseInt(*string_value, 10, 64)
+					int64_temp, int64_temp_error := strconv.ParseInt(string_value, 10, 64)
 					if int64_temp_error != nil {
 						errors = append(errors, fmt.Errorf("error: strconv.ParseInt(*string_value, 10, 64) error"))
 					} else {
 						int64_value = &int64_temp
 						if *int64_value >= -128 && *int64_value <= 127 {
 							data_type = "int8"
-							int8_temp, int8_temp_error := strconv.ParseInt(*string_value, 10, 8)
+							int8_temp, int8_temp_error := strconv.ParseInt(string_value, 10, 8)
 							if int8_temp_error != nil {
 								errors = append(errors, fmt.Errorf("error: strconv.ParseInt(*string_value, 10, 8) error"))
 							} else {
@@ -575,7 +638,7 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 							}
 						} else if *int64_value >= -32768 && *int64_value <= 32767 {
 							data_type = "int16"
-							int16_temp, int16_temp_error := strconv.ParseInt(*string_value, 10, 16)
+							int16_temp, int16_temp_error := strconv.ParseInt(string_value, 10, 16)
 							if int16_temp_error != nil {
 								errors = append(errors, fmt.Errorf("error: strconv.ParseInt(*string_value, 10, 16) error"))
 							} else {
@@ -584,7 +647,7 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 							}
 						} else if *int64_value >= -2147483648 && *int64_value <= 2147483647 {
 							data_type = "int32"
-							int32_temp, int32_temp_error := strconv.ParseInt(*string_value, 10, 32)
+							int32_temp, int32_temp_error := strconv.ParseInt(string_value, 10, 32)
 							if int32_temp_error != nil {
 								errors = append(errors, fmt.Errorf("error: strconv.ParseInt(*string_value, 10, 32) error"))
 							} else {
@@ -600,14 +663,14 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 
 				} else {
 					data_type = "uint64"
-					uint64_temp, uint64_temp_error := strconv.ParseUint(*string_value, 10, 64)
+					uint64_temp, uint64_temp_error := strconv.ParseUint(string_value, 10, 64)
 					if uint64_temp_error != nil {
 						errors = append(errors, fmt.Errorf("error: strconv.ParseUint(*string_value, 10, 64) error"))
 					} else {
 						uint64_value = &uint64_temp
 						if *uint64_value >= 0 && *uint64_value <= 255 {
 							data_type = "uint8"
-							int8_temp, int8_temp_error := strconv.ParseUint(*string_value, 10, 8)
+							int8_temp, int8_temp_error := strconv.ParseUint(string_value, 10, 8)
 							if int8_temp_error != nil {
 								errors = append(errors, fmt.Errorf("error:strconv.ParseUInt(*string_value, 10, 8) error"))
 							} else {
@@ -616,7 +679,7 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 							}
 						} else if *uint64_value >= 256 && *uint64_value <= 65535 {
 							data_type = "uint16"
-							int16_temp, int16_temp_error := strconv.ParseUint(*string_value, 10, 16)
+							int16_temp, int16_temp_error := strconv.ParseUint(string_value, 10, 16)
 							if int16_temp_error != nil {
 								errors = append(errors, fmt.Errorf("error: strconv.ParseUInt(*string_value, 10, 16) error"))
 							} else {
@@ -625,7 +688,7 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 							}
 						} else if *uint64_value >= 65536  && *uint64_value <= 4294967295 {
 							data_type = "uint32"
-							int32_temp, int32_temp_error := strconv.ParseUint(*string_value, 10, 32)
+							int32_temp, int32_temp_error := strconv.ParseUint(string_value, 10, 32)
 							if int32_temp_error != nil {
 								errors = append(errors, fmt.Errorf("error: strconv.ParseUInt(*string_value, 10, 32) error"))
 							} else {
@@ -669,7 +732,7 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 		}
 
 		if data_type == "string" {
-			value_as_array.AppendString(string_value)
+			value_as_array.AppendString(&string_value)
 		} else if data_type == "bool" {
 			value_as_array.AppendBool(boolean_value)
 		} else if data_type == "null" {
@@ -710,31 +773,31 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 		}
 
 		if data_type == "string" {
-			value_as_map.SetStringValue(temp_key, *string_value)
+			(*value_as_map).SetStringValue(key_value, string_value)
 		} else if data_type == "bool" {
-			value_as_map.SetBoolValue(temp_key, *boolean_value)
+			(*value_as_map).SetBoolValue(key_value, *boolean_value)
 		} else if data_type == "null" {
-			value_as_map.SetNil(temp_key)
+			(*value_as_map).SetNil(key_value)
 		} else if data_type == "float64" {
-			value_as_map.SetFloat64Value(temp_key, *float64_value)
+			(*value_as_map).SetFloat64Value(key_value, *float64_value)
 		} else if data_type == "float32" {
-			value_as_map.SetFloat32Value(temp_key, *float32_value)
+			(*value_as_map).SetFloat32Value(key_value, *float32_value)
 		} else if data_type == "int8" {
-			value_as_map.SetInt8Value(temp_key, *int8_value)
+			(*value_as_map).SetInt8Value(key_value, *int8_value)
 		} else if data_type == "int16" {
-			value_as_map.SetInt16Value(temp_key, *int16_value)
+			(*value_as_map).SetInt16Value(key_value, *int16_value)
 		} else if data_type == "int32" {
-			value_as_map.SetInt32Value(temp_key, *int32_value)
+			(*value_as_map).SetInt32Value(key_value, *int32_value)
 		} else if data_type == "int64" {
-			value_as_map.SetInt64Value(temp_key, *int64_value)
+			(*value_as_map).SetInt64Value(key_value, *int64_value)
 		} else if data_type == "uint8" {
-			value_as_map.SetUInt8Value(temp_key, *uint8_value)
+			(*value_as_map).SetUInt8Value(key_value, *uint8_value)
 		} else if data_type == "uint16" {
-			value_as_map.SetUInt16Value(temp_key, *uint16_value)
+			(*value_as_map).SetUInt16Value(key_value, *uint16_value)
 		} else if data_type == "uint32" {
-			value_as_map.SetUInt32Value(temp_key, *uint32_value)
+			(*value_as_map).SetUInt32Value(key_value, *uint32_value)
 		} else if data_type == "uint64" {
-			value_as_map.SetUInt64Value(temp_key, *uint64_value)
+			(*value_as_map).SetUInt64Value(key_value, *uint64_value)
 		} else {
 			errors = append(errors, fmt.Errorf("json.PaseJSONValue type is not supported for Map %s", data_type))
 		}
@@ -745,6 +808,9 @@ func parseJSONValue(key_ref *string, value_ref *string, list *([](*Value))) []er
 	if len(errors) > 0 {
 		return errors
 	}
+
+	//fmt.Println(fmt.Sprintf("key value '%s'", *key_value))
+	//fmt.Println(fmt.Sprintf("string value '%s'", *string_value))
 
 
 	return nil
@@ -757,37 +823,28 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 		return errors
 	}
 
-	if value == nil {
-		json.WriteString("null")
-		return nil
-	}
-
-	string_value := fmt.Sprintf("%s", value)
-
-	if string_value == "<nil>" {
-		json.WriteString("null")
-		return nil
-	}
-
 	rep := fmt.Sprintf("%T", value)
 
-	if string_value == "%!s("+rep+"=<nil>)" {
+	if common.IsNil(value) {
 		json.WriteString("null")
 		return nil
 	}
-	
+
 	switch rep {
 	case "json.Value":
 		ConvertInterfaceValueToJSONStringValue(json, (value.(Value))["value"])
 	case "*json.Value":
 		ConvertInterfaceValueToJSONStringValue(json, (*(value.(*Value)))["value"])
 	case "string":
+		temp_value := value.(string)
+		clone_string := common.CloneString(&temp_value)
 		json.WriteString("\"")
-		json.WriteString(strings.ReplaceAll(value.(string), "\"", "\\\""))
+		json.WriteString(strings.ReplaceAll(*clone_string, "\"", "\\\""))
 		json.WriteString( "\"")
 	case "*string":
+		clone_string := common.CloneString(value.(*string))
 		json.WriteString("\"")
-		json.WriteString(strings.ReplaceAll(*(value.(*string)), "\"", "\\\""))
+		json.WriteString(strings.ReplaceAll(*clone_string, "\"", "\\\""))
 		json.WriteString("\"")
 	case "error":
 		json.WriteString("\"")

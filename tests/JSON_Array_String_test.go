@@ -18,8 +18,8 @@ func TestCanParseEmptyArray(t *testing.T) {
 			t.Errorf("map GetArray has errors")
 		} else if value == nil {
 			t.Errorf("GetArray is nil")
-		} else if len(*value) != 0 {
-			t.Errorf("expected: length=0 actual: length=%d", len(*value))
+		} else if len(*value) != 1 {
+			t.Errorf("expected: length=1 actual: length=%d", len(*value))
 		}
 	}
 }

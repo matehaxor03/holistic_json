@@ -41,7 +41,7 @@ func (v *Value) SetMap(s string, value *Map) []error {
 			errors = append(errors, fmt.Errorf("Value.SetMap map is nil"))
 		} else {
 			set_map_value := Value{"value":value}
-			(*temp_map)[s] = &set_map_value
+			(*temp_map).SetValue(s, &set_map_value)
 		}
 	} else {
 		errors = append(errors, fmt.Errorf("Value.SetMap cannot set map on type %s", v.GetType()))
@@ -64,7 +64,7 @@ func (v *Value) SetValue(s string, value *Value) []error {
 			errors = append(errors, fmt.Errorf("Value.SetMap map is nil"))
 		} else {
 			set_map_value := value
-			(*temp_map)[s] = set_map_value
+			(*temp_map).SetValue(s, set_map_value)
 		}
 	} else {
 		errors = append(errors, fmt.Errorf("Value.SetMap cannot set map on type %s", v.GetType()))
@@ -87,7 +87,7 @@ func (v *Value) SetArray(s string, value *Array) []error {
 			errors = append(errors, fmt.Errorf("Value.SetMap map is nil"))
 		} else {
 			set_value := Value{"value":value}
-			(*temp_map)[s] = &set_value
+			(*temp_map).SetValue(s, &set_value)
 		}
 	} else {
 		errors = append(errors, fmt.Errorf("Value.SetArray cannot set arrary on type %s", v.GetType()))
@@ -237,6 +237,20 @@ func (v *Value) GetArray() (*Array, []error) {
 
 	return result, nil
 }
+
+func (v *Value) GetArrayValue() (Array, []error) {
+	array, array_errors := v.GetArray()
+	if array_errors != nil {
+		return Array{}, array_errors
+	} else if common.IsNil(array) {
+		var errors []error
+		errors = append(errors, fmt.Errorf("Value.GetArrayValue array is nil"))
+		return Array{}, errors
+	}
+
+	return *array, nil
+}
+
 
 func (v *Value) GetArrayOfInt8() (*[](*int8), []error) {
 	array, array_errors := v.GetArray()
@@ -668,7 +682,7 @@ func (v *Value) GetFloat64Value() (float64, []error) {
 	return *float64_value, nil
 }
 
-func (v *Value) GetRunes() (*[]rune, []error) {
+func (v *Value) GetRunes() (*[]*rune, []error) {
 	if v.IsNil() {
 		return nil, nil
 	}
@@ -696,9 +710,9 @@ func (v *Value) GetRunes() (*[]rune, []error) {
 		return nil, errors
 	}
 
-	var runes []rune
+	var runes [](*rune)
 	for _, runeValue := range *result {
-		runes = append(runes, runeValue)
+		runes = append(runes, &runeValue)
 	}
 
 	return &runes, nil
@@ -994,12 +1008,20 @@ func (v *Value) GetUInt64() (*uint64, []error) {
 	return &uint64_value, nil
 }
 
-func (v *Value) GetTime(decimal_places int) (*time.Time, []error) {
+func (v *Value) GetTimeWithDecimalPlaces(decimal_places int) (*time.Time, []error) {
 	if v.IsNil() {
 		return nil, nil
 	}
 
-	return common.GetTime((*v)["value"], decimal_places)
+	return common.GetTimeWithDecimalPlaces((*v)["value"], decimal_places)
+}
+
+func (v *Value) GetTime() (*time.Time, []error) {
+	if v.IsNil() {
+		return nil, nil
+	}
+
+	return common.GetTime((*v)["value"])
 }
 
 func (v *Value) GetType() string {

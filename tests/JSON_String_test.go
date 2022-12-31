@@ -630,7 +630,7 @@ func TestCanParseStringWithQuoteKeyAndValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"ke\\\"y\":\"val\\\"ue\"}")
 
 	if !json_obj.HasKey("ke\"y") {
-		t.Errorf("ke\"y not found")
+		t.Errorf("ke\"y not found keys: %s", json_obj.Keys())
 	} else if json_obj.GetType("ke\"y") != "string" {
 		t.Errorf("ke\"y is not a string: %s", json_obj.GetType("ke\"y"))
 	} else {

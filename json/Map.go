@@ -7,686 +7,873 @@ import (
 	common "github.com/matehaxor03/holistic_common/common"
 )
 
-type Map map[string](*Value)
+type Map struct {
+	Keys func() ([]string)
+	HasKey func(s string) (bool)
+	GetMap func(s string) (*Map, []error)
+	Values func() Array
+	SetMap func(s string, zap *Map) 
+	SetMapValue func(s string, zap Map)
+	SetValue func(s string, value *Value) 
+	//GetValue func(s string) (*Value, []error) 
 
-func (m *Map) GetMap(s string) (*Map, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
+	Clone func() (*Map, []error)
 
-	return ((*m)[s]).GetMap()
-}
 
-func (m *Map) SetMap(s string, zap *Map) {
-	set_map_value := Value{"value":zap}
-	((*m)[s]) = &set_map_value
-}
+	RemoveKey func(key string) (*bool, []error)
 
-func (m *Map) SetMapValue(s string, zap Map) {
-	set_map_value := Value{"value":&zap}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) IsNil(s string) bool {
-	return common.IsNil((*m)[s]) 
-}
-
-func (m *Map) IsBool(s string) bool {
-	if m.IsNil(s) {
-		return false
-	}
-	return ((*m)[s]).IsBool()
-}
-
-func (m *Map) IsArray(s string) bool {
-	if m.IsNil(s) {
-		return false
-	}
-	return ((*m)[s]).IsArray()
-}
-
-func (m *Map) IsEmptyString(s string) bool {
-	if m.IsNil(s) {
-		return false
-	}
-	return ((*m)[s]).IsEmptyString()
-}
-
-func (m *Map) IsInteger(s string) bool {
-	if m.IsNil(s) {
-		return false
-	}
-	return ((*m)[s]).IsInteger()
-}
-
-func (m *Map) IsString(s string) bool {
-	if m.IsNil(s) {
-		return false
-	}
-
-	return ((*m)[s]).IsString()
-}
-
-func (m *Map) IsMap(s string) bool {
-	if m.IsNil(s) {
-		return false
-	}
-
-	return ((*m)[s]).IsMap()
-}
-
-func (m *Map) IsBoolTrue(s string) bool {
-	if m.IsNil(s) {
-		return false
-	}
-	return ((*m)[s]).IsBoolTrue()
-}
-
-func (m *Map) IsBoolFalse(s string) bool {
-	if m.IsNil(s) {
-		return false
-	}
-	return ((*m)[s]).IsBoolFalse()
-}
-
-func (m *Map) ToJSONString(json *strings.Builder) ([]error) {
-	var errors []error
-	if json == nil {
-		errors = append(errors, fmt.Errorf("error: *strings.Builder is nil"))
-		return errors
-	}
+	IsNil func(s string) bool
+	IsBool func(s string) bool
 	
-	length := len(*m)
+	IsEmptyString func(s string) bool
+	IsInteger func(s string) bool 
+	IsString func(s string) bool
+	IsMap func(s string) bool
+	IsBoolTrue func(s string) bool
+	IsBoolFalse func(s string) bool
+	ToJSONString func(json *strings.Builder) ([]error)
 	
-	if length == 0 {
-		json.WriteString("{}")
+	SetErrors func(s string, errors []error)
+	GetErrors func(s string) ([]error, []error)
+	GetType func(s string) string
+	GetFunc func(s string) (func(Map) []error, []error)
+	SetFunc func(s string, function func(Map) []error)
+	
+	
+	SetStringValue func(s string, v string)
+	SetString func(s string, v *string)
+	GetString func(s string) (*string, []error)
+	GetStringValue func(s string) (string, []error)
+	
+	SetBoolValue func(s string, v bool)
+	SetBool func(s string, v *bool)
+	GetBool func(s string) (*bool, []error)
+	GetBoolValue func(s string) (bool, []error)
+	
+	SetNil func(s string)
+	
+	IsFloat func(s string) bool
+	SetFloat32Value func(s string, v float32)
+	SetFloat32 func(s string, v *float32)
+	GetFloat32 func(s string) (*float32, []error)
+	GetFloat32Value func(s string) (float32, []error)
+	SetFloat64Value func(s string, v float64)
+	SetFloat64 func(s string, v *float64)
+	GetFloat64 func(s string) (*float64, []error)
+	GetFloat64Value func(s string) (float64, []error)
+	
+	GetIntValue func(s string) (int, []error)
+	SetIntValue func(s string, v int)
+	SetInt func(s string, v *int)
+	GetInt func(s string) (*int, []error)
+	GetInt8Value func(s string) (int8, []error)
+	SetInt8Value func(s string, v int8)
+	SetInt8 func(s string, v *int8)
+	GetInt8 func(s string) (*int8, []error)
+	GetInt16Value func(s string) (int16, []error)
+	SetInt16Value func(s string, v int16)
+	SetInt16 func(s string, v *int16)
+	GetInt16 func(s string) (*int16, []error)
+	GetInt32Value func(s string) (int32, []error)
+	SetInt32Value func(s string, v int32)
+	SetInt32 func(s string, v *int32)
+	GetInt32 func(s string) (*int32, []error)
+	GetInt64Value func(s string) (int64, []error)
+	SetInt64Value func(s string, v int64)
+	SetInt64 func(s string, v *int64)
+	GetInt64 func(s string) (*int64, []error)
+
+	GetUIntValue func(s string) (uint, []error)
+	SetUIntValue func(s string, v uint)
+	SetUInt func(s string, v *uint)
+	GetUInt func(s string) (*uint, []error)
+	GetUInt8Value func(s string) (uint8, []error)
+	SetUInt8Value func(s string, v uint8)
+	SetUInt8 func(s string, v *uint8)
+	GetUInt8 func(s string) (*uint8, []error)
+	GetUInt16Value func(s string) (uint16, []error)
+	SetUInt16Value func(s string, v uint16)
+	SetUInt16 func(s string, v *uint16)
+	GetUInt16 func(s string) (*uint16, []error)
+	GetUInt32Value func(s string) (uint32, []error)
+	SetUInt32Value func(s string, v uint32)
+	SetUInt32 func(s string, v *uint32)
+	GetUInt32 func(s string) (*uint32, []error)
+	GetUInt64Value func(s string) (uint64, []error)
+	SetUInt64Value func(s string, v uint64)
+	SetUInt64 func(s string, v *uint64)
+	GetUInt64 func(s string) (*uint64, []error)
+
+	IsArray func(s string) bool
+	SetArray func(s string, array *Array)
+	SetArrayValue func(s string, array Array)
+
+	GetArray func(s string) ((*Array), []error)
+	GetArrayValue func(s string) ((Array), []error)
+	GetArrayOfInt func(s string) (*[]*int, []error)
+	GetArrayOfInt8 func(s string) (*[]*int8, []error)
+	GetArrayOfInt16 func(s string) (*[]*int16, []error)
+	GetArrayOfInt32 func(s string) (*[]*int32, []error)
+	GetArrayOfInt64 func(s string) (*[]*int64, []error)
+	
+	GetArrayOfUInt func(s string) (*[]*uint, []error)
+	GetArrayOfUInt8 func(s string) (*[]*uint8, []error)
+	GetArrayOfUInt16 func(s string) (*[]*uint16, []error)
+	GetArrayOfUInt32 func(s string) (*[]*uint32, []error)
+	GetArrayOfUInt64 func(s string) (*[]*uint64, []error)
+
+	GetArrayOfString func(s string) (*[]*string, []error)
+
+	GetRunes func(s string) (*[]*rune, []error)
+
+	GetObject func(s string) (interface{})
+	SetObject func(s string, object interface{}) 
+
+	SetTime func (s string, value *time.Time)
+	GetTime func (s string) (*time.Time, []error)
+	GetTimeWithDecimalPlaces func(s string, decimal_places int) (*time.Time, []error)
+
+}
+
+func NewMap() *Map {
+	some_value := "not"
+	some_value += "nil"
+	internal_map := make(map[string]*Value)
+
+
+	get_internal_map := func() (map[string]*Value)  {
+		return internal_map
+	}
+
+	is_value_nil := func(s string) (bool) {
+		m := get_internal_map()
+		
+		value, found := m[s]
+		if !found {
+			return true
+		}
+
+		if common.IsNil(value) {
+			return true
+		}
+
+		return false
+	}
+
+	keys := func() ([]string) {
+		m := get_internal_map()
+		
+
+		var keys []string
+		for key, _ := range m {
+			keys = append(keys, key)
+		}
+		
+		return keys
+	}
+
+	hasKey := func(s string) (bool) {
+		keys := keys()
+		for _, key := range keys {
+			if key == s {
+				return true
+			}
+		}
+		return false
+	}
+
+	toJSONString := func(json *strings.Builder) ([]error) {
+		if json == nil {
+			var errors []error
+			errors = append(errors, fmt.Errorf("error: *strings.Builder is nil"))
+			return errors
+		}
+		
+		keys := keys()
+		if common.IsNil(keys) {
+			json.WriteString("{}")
+			return nil
+		}
+		
+		length := len(keys)
+
+		if length == 0 || cap(keys) == 0 {
+			json.WriteString("{}")
+			return nil
+		}
+
+		var errors []error
+		m := get_internal_map()
+		json.WriteString("{")
+		for i := 0; i < length; i++ {
+			key := (keys)[i]
+			key_clone := common.CloneString(&key)
+			escaped_key, escaped_key_error := common.EscapeString(*key_clone, "\"")
+			if escaped_key_error != nil {
+				errors = append(errors, escaped_key_error)
+				return errors
+			}
+			json.WriteString("\"")
+			json.WriteString(escaped_key)
+			json.WriteString("\":")
+			string_conversion_errors := ConvertInterfaceValueToJSONStringValue(json, m[key])
+			if string_conversion_errors != nil {
+				errors = append(errors, string_conversion_errors...)
+			}
+	
+			if i < length - 1 {
+				json.WriteString(",")
+			}
+		}
+		json.WriteString("}")
+	
+		if len(errors) > 0 {
+			return errors
+		}
 		return nil
 	}
 
-	keys := m.Keys()
-	
-
-	json.WriteString("{")
-	for i := 0; i < length; i++ {
-		key := keys[i]
-		json.WriteString("\"")
-		json.WriteString(strings.ReplaceAll(key, "\"", "\\\""))
-		json.WriteString("\":")
-		string_conversion_errors := ConvertInterfaceValueToJSONStringValue(json, (*m)[key])
-		if string_conversion_errors != nil {
-			errors = append(errors, string_conversion_errors...)
+	clone := func() (*Map, []error) {
+		var json_payload_builder strings.Builder
+		request_payload_as_string_errors := toJSONString(&json_payload_builder)
+		if request_payload_as_string_errors != nil {
+			return nil, request_payload_as_string_errors
 		}
-
-		if i < length - 1 {
-			json.WriteString(",")
-		}
-	}
-	json.WriteString("}")
-
-	if len(errors) > 0 {
-		return errors
-	}
-	return nil
-}
-
-func (m *Map) SetArray(s string, array *Array) {
-	set_map_value := Value{"value":array}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetArrayValue(s string, array Array) {
-	set_map_value := Value{"value":&array}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetErrors(s string, errors []error) {
-	set_map_value := Value{"value":errors}
-	((*m)[s]) = &set_map_value
-}
-
-
-func (m *Map) GetErrors(s string) ([]error, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-	return ((*m)[s]).GetErrors()
-}
-
-func (m *Map) GetType(s string) string {
-	if m.IsNil(s) {
-		return "nil"
+	
+		return Parse(json_payload_builder.String())
 	}
 	
-	return ((*m)[s]).GetType()
-}
 
-func (m *Map) Func(s string) (func(Map) []error, []error) {
-	if m.IsNil(s) {
-		return nil, nil
+	return &Map{
+		GetMap: func(s string) (*Map, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()
+			return (m[s]).GetMap()
+		},
+		SetMap: func(s string, zap *Map) {
+			m := get_internal_map()
+			set_map_value := Value{"value":zap}
+			(m[s]) = &set_map_value
+		},
+		SetMapValue: func(s string, zap Map) {
+			m := get_internal_map()
+			set_map_value := Value{"value":&zap}
+			(m[s]) = &set_map_value
+		},
+		IsNil: func(s string) bool {
+			return is_value_nil(s)
+		},
+		IsBool: func(s string) bool {
+			if is_value_nil(s) {
+				return false
+			}
+			m := get_internal_map()
+			return (m[s]).IsBool()
+		},
+		IsArray: func(s string) bool {
+			if is_value_nil(s) {
+				return false
+			}
+			m := get_internal_map()
+			return (m[s]).IsArray()
+		},
+		IsEmptyString: func(s string) bool {
+			if is_value_nil(s) {
+				return false
+			}
+			m := get_internal_map()
+			return (m[s]).IsEmptyString()
+		},
+		IsInteger: func(s string) bool {
+			if is_value_nil(s) {
+				return false
+			}
+			m := get_internal_map()
+			return (m[s]).IsInteger()
+		},
+		IsString: func(s string) bool {
+			if is_value_nil(s) {
+				return false
+			}
+			m := get_internal_map()
+			return (m[s]).IsString()
+		},
+		IsMap: func(s string) bool {
+			if is_value_nil(s) {
+				return false
+			}
+			m := get_internal_map()
+			return (m[s]).IsMap()
+		},
+		IsBoolTrue: func(s string) bool {
+			if is_value_nil(s) {
+				return false
+			}
+			m := get_internal_map()
+			return (m[s]).IsBoolTrue()
+		},
+		IsBoolFalse: func(s string) bool {
+			if is_value_nil(s) {
+				return false
+			}
+			m := get_internal_map()
+			return (m[s]).IsBoolFalse()
+		},
+		ToJSONString: func(json_payload_builder *strings.Builder) ([]error) {
+			return toJSONString(json_payload_builder)
+		},
+		Keys: func() ([]string) {
+			return keys()
+		},
+		SetArray: func(s string, array *Array) {
+			m := get_internal_map()
+			set_map_value := Value{"value":array}
+			(m[s]) = &set_map_value
+		},
+		SetArrayValue: func(s string, array Array) {
+			m := get_internal_map()
+			set_map_value := Value{"value":&array}
+			(m[s]) = &set_map_value
+		},
+		SetErrors: func(s string, errors []error) {
+			m := get_internal_map()
+			set_map_value := Value{"value":errors}
+			(m[s]) = &set_map_value
+		},
+		GetErrors: func(s string) ([]error, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()
+			return (m[s]).GetErrors()
+		},
+		GetType: func(s string) string {
+			if is_value_nil(s) {
+				return "nil"
+			}
+			m := get_internal_map()		
+			return (m[s]).GetType()
+		},
+		GetFunc: func(s string) (func(Map) []error, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetFunc()
+		},
+		SetFunc: func(s string, function func(Map) []error) {
+			m := get_internal_map()
+			set_map_value := Value{"value":function}
+			(m[s]) = &set_map_value
+		},
+		GetArray: func(s string) (*Array, []error) {
+			if is_value_nil(s) {
+				return  nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetArray()
+		},
+		GetArrayValue: func(s string) (Array, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("json.Map.GetArrayValue array is nil"))
+				return Array{}, errors
+			}
+			m := get_internal_map()			
+			return (m[s]).GetArrayValue()
+		},
+		GetArrayOfInt8: func(s string) (*[]*int8, []error) {
+			if is_value_nil(s) {
+				return  nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetArrayOfInt8()
+		},
+		GetArrayOfInt16: func(s string) (*[]*int16, []error) {
+			if is_value_nil(s) {
+				return  nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetArrayOfInt16()
+		},
+		GetArrayOfInt32: func (s string) (*[]*int32, []error) {
+			if is_value_nil(s) {
+				return  nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetArrayOfInt32()
+		},
+		GetArrayOfInt64: func(s string) (*[]*int64, []error) {
+			if is_value_nil(s) {
+				return  nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetArrayOfInt64()
+		},
+		GetArrayOfUInt8: func(s string) (*[]*uint8, []error) {
+			if is_value_nil(s) {
+				return  nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetArrayOfUInt8()
+		},
+		GetArrayOfUInt16: func(s string) (*[]*uint16, []error) {
+			if is_value_nil(s) {
+				return  nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetArrayOfUInt16()
+		},
+		GetArrayOfUInt32: func(s string) (*[]*uint32, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetArrayOfUInt32()
+		},
+		GetArrayOfUInt64: func(s string) (*[]*uint64, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetArrayOfUInt64()
+		},
+		GetArrayOfString: func(s string) (*[]*string, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetArrayOfString()
+		},
+		GetString: func(s string) (*string, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetString()
+		},
+		IsFloat: func(s string) (bool) {
+			if is_value_nil(s) {
+				return false
+			}
+			m := get_internal_map()		
+			return (m[s]).IsFloat()
+		},
+		GetStringValue: func(s string) (string, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("json.Map.GetStringValue value is nil"))
+				return "", errors
+			}
+			m := get_internal_map()		
+			return (m[s]).GetStringValue()
+		},
+		GetFloat32: func(s string) (*float32, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetFloat32()
+		},
+		GetFloat32Value: func(s string) (float32, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("json.Map.GetFloat32Value value is nil"))
+				return 0, errors
+			}
+			m := get_internal_map()		
+			return (m[s]).GetFloat32Value()
+		},
+		GetFloat64Value: func(s string) (float64, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("json.Map.GetFloat64Value value is nil"))
+				return 0, errors
+			}
+			m := get_internal_map()		
+			return (m[s]).GetFloat64Value()
+		},
+		GetFloat64: func (s string) (*float64, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetFloat64()
+		},
+		GetRunes: func(s string) (*[]*rune, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetRunes()
+		},
+		GetObject: func(s string) interface{} {
+			if is_value_nil(s) {
+				return nil
+			}
+			m := get_internal_map()		
+			return (m[s])
+		},
+		SetObject: func(s string, object interface{}) {
+			set_map_value := Value{"value":object}
+			m := get_internal_map()		
+			(m[s]) = &set_map_value
+		},
+		GetBool: func(s string) (*bool, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetBool()
+		},
+		SetBool: func(s string, value *bool) {
+			set_map_value := Value{"value":value}
+			m := get_internal_map()		
+			(m[s]) = &set_map_value
+		},
+		SetBoolValue: func(s string, value bool) {
+			set_map_value := Value{"value":value}
+			m := get_internal_map()		
+			(m[s]) = &set_map_value
+		},
+		SetString: func(s string, value *string) {
+			set_map_value := Value{"value":value}
+			m := get_internal_map()		
+			(m[s]) = &set_map_value
+		},
+		SetStringValue: func(s string, value string) {
+			set_map_value := Value{"value":value}
+			m := get_internal_map()		
+			(m[s]) = &set_map_value
+		},
+		SetNil: func(s string) {
+			m := get_internal_map()
+			set_map_value := Value{"value":nil}
+			(m[s]) = &set_map_value
+		},
+		HasKey: func(s string) (bool) {
+			return hasKey(s)
+		},
+		RemoveKey: func(s string) (*bool, []error) {
+			var result bool
+			if is_value_nil(s) {
+				var errors []error
+				result = false
+				errors = append(errors, fmt.Errorf("error: key %s not found", s))
+				return &result, errors
+			}	
+
+			if !hasKey(s) {
+				var errors []error
+				result = false
+				errors = append(errors, fmt.Errorf("error: key %s not found", s))
+				return &result, errors
+			}
+
+			result = true
+			m := get_internal_map()		
+			delete(m, s)
+			return &result, nil 
+		},
+		GetInt64: func(s string) (*int64, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()	
+			return (m[s]).GetInt64()
+		},
+		GetInt8: func(s string) (*int8, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()	
+			return (m[s]).GetInt8()
+		},
+		GetInt8Value: func(s string) (int8, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("Map.GetInt8Value was nil"))
+				return 0, errors
+			}
+			m := get_internal_map()	
+			return (m[s]).GetInt8Value()
+		},
+		GetUInt8: func(s string) (*uint8, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()	
+			return (m[s]).GetUInt8()
+		},
+		GetUInt8Value: func(s string) (uint8, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("json.Map.GetUInt8Value value is nil"))
+				return 0, errors
+			}
+			m := get_internal_map()		
+			return (m[s]).GetUInt8Value()
+		},
+		GetInt16: func(s string) (*int16, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()	
+			return (m[s]).GetInt16()
+		},
+		GetInt16Value: func(s string) (int16, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("json.Map.GetInt16Value value is nil"))
+				return 0, errors
+			}
+			m := get_internal_map()		
+			return (m[s]).GetInt16Value()
+		},
+		GetUInt16: func(s string) (*uint16, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()	
+			return (m[s]).GetUInt16()
+		},
+		GetUInt16Value: func (s string) (uint16, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("json.Map.GetUInt16Value value is nil"))
+				return 0, errors
+			}
+			m := get_internal_map()		
+			return (m[s]).GetUInt16Value()
+		},
+		GetInt32: func(s string) (*int32, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()	
+			return (m[s]).GetInt32()
+		},	
+		GetInt32Value: func(s string) (int32, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("json.Map.GetInt32Value value is nil"))
+				return 0, errors
+			}
+			m := get_internal_map()		
+			return (m[s]).GetInt32Value()
+		},
+		GetInt64Value: func(s string) (int64, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("json.Map.GetInt64Value value is nil"))
+				return 0, errors
+			}
+			m := get_internal_map()		
+			return (m[s]).GetInt64Value()
+		},
+		GetUInt32: func(s string) (*uint32, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()	
+			return (m[s]).GetUInt32()
+		},
+		GetUInt32Value: func(s string) (uint32, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("json.Map.GetUInt32Value value is nil"))
+				return 0, errors
+			}
+			m := get_internal_map()		
+			return (m[s]).GetUInt32Value()
+		},
+		GetUInt64Value: func(s string) (uint64, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("json.Map.GetUInt64Value value is nil"))
+				return 0, errors
+			}
+			m := get_internal_map()		
+			return (m[s]).GetUInt64Value()
+		},
+		GetInt: func(s string) (*int, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()	
+			return (m[s]).GetInt()
+		},
+		GetIntValue: func(s string) (int, []error) {
+			if is_value_nil(s) {
+				var errors []error
+				errors = append(errors, fmt.Errorf("json.Map.GetIntValue value is nil"))
+				return 0, errors
+			}
+			m := get_internal_map()		
+			return (m[s]).GetIntValue()
+		},
+		SetInt: func(s string, value *int) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetInt64: func(s string, value *int64) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetInt32: func(s string, value *int32) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetInt16: func(s string, value *int16) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetInt8: func(s string, value *int8) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetIntValue: func(s string, value int) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetInt64Value: func(s string, value int64) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetInt32Value: func(s string, value int32) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetInt16Value: func(s string, value int16) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetInt8Value: func(s string, value int8) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetUInt: func(s string, value *uint) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetUInt64: func(s string, value *uint64) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetUInt32: func(s string, value *uint32) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetUInt16: func(s string, value *uint16) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetUInt8: func(s string, value *uint8) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetUIntValue: func(s string, value uint) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetUInt64Value: func(s string, value uint64) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetUInt32Value: func(s string, value uint32) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetUInt16Value: func(s string, value uint16) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetUInt8Value: func(s string, value uint8) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetFloat64: func(s string, value *float64) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetFloat64Value: func(s string, value float64) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetFloat32: func(s string, value *float32) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		SetFloat32Value: func(s string, value float32) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		GetUInt64: func(s string) (*uint64, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()	
+			return (m[s]).GetUInt64()
+		},
+		SetTime: func (s string, value *time.Time) {
+			m := get_internal_map()	
+			set_map_value := Value{"value":value}
+			(m[s]) = &set_map_value
+		},
+		GetTime: func(s string) (*time.Time, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()	
+			return (m[s]).GetTime()
+		},
+		GetTimeWithDecimalPlaces: func(s string, decimal_places int) (*time.Time, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()	
+			return (m[s]).GetTimeWithDecimalPlaces(decimal_places)
+		},
+		Values: func() Array {
+			array := Array{}
+			m := get_internal_map()
+			for _, f := range m {
+				array = append(array, f)
+			}
+			return array
+		},
+		Clone: func() (*Map, []error) {
+			return clone()
+		},
+		SetValue: func(s string, value *Value)  {
+			m := get_internal_map()	
+			(m[s]) = value
+		},
 	}
-	return ((*m)[s]).GetFunc()
-}
-
-func (m *Map) SetFunc(s string, function func(Map) []error) {
-	set_map_value := Value{"value":function}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) GetArray(s string) (*Array, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetArray()
-}
-
-func (m *Map) GetArrayOfInt8(s string) (*[]*int8, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetArrayOfInt8()
-}
-
-func (m *Map) GetArrayOfInt16(s string) (*[]*int16, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetArrayOfInt16()
-}
-
-func (m *Map) GetArrayOfInt32(s string) (*[]*int32, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetArrayOfInt32()
-}
-
-func (m *Map) GetArrayOfInt64(s string) (*[]*int64, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetArrayOfInt64()
-}
-
-func (m *Map) GetArrayOfUInt8(s string) (*[]*uint8, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetArrayOfUInt8()
-}
-
-func (m *Map) GetArrayOfUInt16(s string) (*[]*uint16, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetArrayOfUInt16()
-}
-
-func (m *Map) GetArrayOfUInt32(s string) (*[]*uint32, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetArrayOfUInt32()
-}
-
-func (m *Map) GetArrayOfUInt64(s string) (*[]*uint64, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetArrayOfUInt64()
-}
-
-func (m *Map) GetArrayOfString(s string) (*[]*string, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetArrayOfString()
-}
-
-func (m *Map) GetString(s string) (*string, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-	return ((*m)[s]).GetString()
-}
-
-func (m *Map) IsFloat(s string) (bool) {
-	if m.IsNil(s) {
-		return false
-	}
-
-	return ((*m)[s]).IsFloat()
-}
-
-func (m *Map) GetStringValue(s string) (string, []error) {
-	string_value, string_value_errors := m.GetString(s)
-	if string_value_errors != nil {
-		return "", string_value_errors
-	} else if string_value == nil {
-		return "", nil
-	}
-	return *string_value, nil
-}
-
-func (m *Map) GetFloat32(s string) (*float32, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-	return ((*m)[s]).GetFloat32()
-}
-
-func (m *Map) GetFloat32Value(s string) (float32, []error) {
-	var errors []error
-	if m.IsNil(s) {
-		errors = append(errors, fmt.Errorf("error: Map.GetFloat32Value returned a nil value"))
-		return 0, errors
-	}
-	return ((*m)[s]).GetFloat32Value()
-}
-
-func (m *Map) GetFloat64Value(s string) (float64, []error) {
-	var errors []error
-	if m.IsNil(s) {
-		errors = append(errors, fmt.Errorf("error: Map.GetFloat64Value returned a nil value"))
-		return 0, errors
-	}
-	return ((*m)[s]).GetFloat64Value()
-}
-
-func (m *Map) GetFloat64(s string) (*float64, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetFloat64()
-}
-
-func (m *Map) GetRunes(s string) (*[]rune, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetRunes()
-}
-
-func (m *Map) GetObject(s string) interface{} {
-	if m.IsNil(s) {
-		return nil
-	}
-	return ((*m)[s])
-}
-
-func (m *Map) SetObject(s string, object interface{}) {
-	set_map_value := Value{"value":object}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) GetBool(s string) (*bool, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetBool()
-}
-
-func (m *Map) SetBool(s string, value *bool) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetBoolValue(s string, value bool) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetString(s string, value *string) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetStringValue(s string, value string) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetNil(s string) {
-	set_map_value := Value{"value":nil}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) Keys() []string {
-	keys := make([]string, 0, len(*m))
-    for k := range *m {
-        keys = append(keys, k)
-    }
-	return keys
-}
-
-func (m *Map) HasKey(key string) bool {
-	if _, found := (*m)[key]; found {
-		return true
-	} else {
-		return false
-	}
-}
-
-func (m *Map) RemoveKey(key string) (*bool, []error) {
-	var errors []error
-	var result bool
-	if !m.HasKey(key) {
-		result = false
-		errors = append(errors, fmt.Errorf("error: key %s not found", key))
-		return &result, errors
-	}	
-
-	result = true
-	delete(*m, key)
-	return &result, nil 
-}
-
-func (m *Map) GetInt64(s string) (*int64, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetInt64()
-}
-
-func (m *Map) GetInt8(s string) (*int8, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-	return ((*m)[s]).GetInt8()
-}
-
-func (m *Map) GetInt8Value(s string) (int8, []error) {
-	if m.IsNil(s) {
-		var errors []error
-		errors = append(errors, fmt.Errorf("Map.GetInt8Value was nil"))
-		return 0, errors
-	}
-	return ((*m)[s]).GetInt8Value()
-}
-
-func (m *Map) GetUInt8(s string) (*uint8, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-	return ((*m)[s]).GetUInt8()
-}
-
-func (m *Map) GetUInt8Value(s string) (uint8, []error) {
-	if m.IsNil(s) {
-		var errors []error
-		errors = append(errors, fmt.Errorf("Map.GetUInt8Value was nil"))
-		return 0, errors
-	}
-	return ((*m)[s]).GetUInt8Value()
-}
-
-func (m *Map) GetInt16(s string) (*int16, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-	return ((*m)[s]).GetInt16()
-}
-
-func (m *Map) GetInt16Value(s string) (int16, []error) {
-	if m.IsNil(s) {
-		var errors []error
-		errors = append(errors, fmt.Errorf("Map.GetInt16Value was nil"))
-		return 0, errors
-	}
-	return ((*m)[s]).GetInt16Value()
-}
-
-func (m *Map) GetUInt16(s string) (*uint16, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-	return ((*m)[s]).GetUInt16()
-}
-
-func (m *Map) GetUInt16Value(s string) (uint16, []error) {
-	if m.IsNil(s) {
-		var errors []error
-		errors = append(errors, fmt.Errorf("Map.GetUInt16Value was nil"))
-		return 0, errors
-	}
-	return ((*m)[s]).GetUInt16Value()
-}
-
-
-func (m *Map) GetInt32(s string) (*int32, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-	return ((*m)[s]).GetInt32()
-}
-
-func (m *Map) GetInt32Value(s string) (int32, []error) {
-	if m.IsNil(s) {
-		var errors []error
-		errors = append(errors, fmt.Errorf("Map.GetInt32Value was nil"))
-		return 0, errors
-	}
-	return ((*m)[s]).GetInt32Value()
-}
-
-func (m *Map) GetInt64Value(s string) (int64, []error) {
-	if m.IsNil(s) {
-		var errors []error
-		errors = append(errors, fmt.Errorf("Map.GetInt64Value was nil"))
-		return 0, errors
-	}
-	return ((*m)[s]).GetInt64Value()
-}
-
-func (m *Map) GetUInt32(s string) (*uint32, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-	return ((*m)[s]).GetUInt32()
-}
-
-func (m *Map) GetUInt32Value(s string) (uint32, []error) {
-	if m.IsNil(s) {
-		var errors []error
-		errors = append(errors, fmt.Errorf("Map.GetUInt32Value was nil"))
-		return 0, errors
-	}
-	return ((*m)[s]).GetUInt32Value()
-}
-
-func (m *Map) GetUInt64Value(s string) (uint64, []error) {
-	if m.IsNil(s) {
-		var errors []error
-		errors = append(errors, fmt.Errorf("Map.GetUInt64Value was nil"))
-		return 0, errors
-	}
-	return ((*m)[s]).GetUInt64Value()
-}
-
-func (m *Map) GetInt(s string) (*int, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-	return ((*m)[s]).GetInt()
-}
-
-func (m *Map) GetIntValue(s string) (int, []error) {
-	if m.IsNil(s) {
-		var errors []error
-		errors = append(errors, fmt.Errorf("Map.GetIntValue was nil"))
-		return 0, errors
-	}
-	return ((*m)[s]).GetIntValue()
-}
-
-func (m *Map) SetInt(s string, value *int) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetInt64(s string, value *int64) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetInt32(s string, value *int32) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetInt16(s string, value *int16) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetInt8(s string, value *int8) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetIntValue(s string, value int) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetInt64Value(s string, value int64) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetInt32Value(s string, value int32) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetInt16Value(s string, value int16) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetInt8Value(s string, value int8) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetUInt(s string, value *uint) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetUInt64(s string, value *uint64) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetUInt32(s string, value *uint32) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetUInt16(s string, value *uint16) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetUInt8(s string, value *uint8) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetUIntValue(s string, value uint) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetUInt64Value(s string, value uint64) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetUInt32Value(s string, value uint32) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetUInt16Value(s string, value uint16) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetUInt8Value(s string, value uint8) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetFloat64(s string, value *float64) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetFloat64Value(s string, value float64) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetFloat32(s string, value *float32) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) SetFloat32Value(s string, value float32) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) GetUInt64(s string) (*uint64, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetUInt64()
-}
-	
-func (m *Map) SetTime(s string, value *time.Time) {
-	set_map_value := Value{"value":value}
-	((*m)[s]) = &set_map_value
-}
-
-func (m *Map) GetTime(s string, decimal_places int) (*time.Time, []error) {
-	if m.IsNil(s) {
-		return nil, nil
-	}
-
-	return ((*m)[s]).GetTime(decimal_places)
-}
-
-func (m *Map) Values() Array {
-	array := Array{}
-	for _, f := range *m {
-		array = append(array, f)
-	}
-	return array
-}
-
-func (m *Map) Clone() (*Map, []error) {
-	var json_payload_builder strings.Builder
-	request_payload_as_string_errors := m.ToJSONString(&json_payload_builder)
-	if request_payload_as_string_errors != nil {
-		return nil, request_payload_as_string_errors
-	}
-
-	return Parse(json_payload_builder.String())
 }

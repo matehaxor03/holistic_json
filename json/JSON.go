@@ -308,7 +308,7 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 			} else if string(value) == "[" {
 
 				current_mode = mode_looking_for_value
-				new_array := newArray()
+				new_array := NewArray()
 				new_array_value := newValue(new_array)
 
 				if ((*list)[len(*list)-1]).IsMap() {

@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"strings"
 	common "github.com/matehaxor03/holistic_common/common"
-
 )
 
 type Array struct {
 	ToJSONString func(json *strings.Builder) ([]error) 
 	AppendString func (value *string)
 	AppendStringValue func(value string)
+	AppendInterface func(value *interface{})
+	AppendInterfaceValue func(value interface{})
 	AppendUInt func(value *uint)
 	AppendUIntValue func(value uint)
 	AppendUInt8 func(value *uint8)
@@ -80,21 +81,48 @@ type Array struct {
 	Values func() *[](*Value)
 }
 
-func newArray() *Array {
-	var this_value *Array
-	temp_array := make([](*Value), 0)
-	array := &temp_array
+func NewArray() (*Array) {
+	array, _ :=  NewArrayOfValues(nil)
+	return array
+}
 
-	set_this_value := func(value *Array) {
-		this_value = value
+func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
+	var errors []error
+	var this_array *Array
+	var internal_values *[](*Value)
+
+	if !common.IsNil(a) {
+		temp_array := make([](*Value), len(*a))
+		internal_values = &temp_array
+	} else {
+		temp_array := make([](*Value), 0)
+		internal_values = &temp_array
+	}
+	
+	if !common.IsNil(a) {
+		for index, value := range *a {
+			if common.IsMap(value) ||
+			   common.IsArray(value) ||
+			   common.IsValue(value) {
+				errors = append(errors, fmt.Errorf("cannot create array with non-primitive type %s", common.GetType(value)))
+			} else {
+				// for now just assume it's a value... to do map array and maps etc
+				converted_value := newValue(value)
+				(*internal_values)[index] = converted_value
+			}
+		}
+	} 
+
+	set_this := func(array *Array) {
+		this_array = array
 	}
 	
 	this := func() *Array {
-		return this_value
+		return this_array
 	}
 
 	values := func() *[](*Value) {
-		return array
+		return internal_values
 	}
 
 	created_array := Array{
@@ -273,6 +301,16 @@ func newArray() *Array {
 			appended_value := newValue(value)
 			*a = append(*a, appended_value)
 		},
+		AppendInterface: func(value *interface{}) {
+			a := this().Values()
+			appended_value := newValue(value)
+			*a = append(*a, appended_value)
+		},
+		AppendInterfaceValue: func(value interface{}) {
+			a := this().Values()
+			appended_value := newValue(value)
+			*a = append(*a, appended_value)
+		},
 		AppendNil: func() {
 			a := this().Values()
 			*a = append(*a, nil)
@@ -297,6 +335,7 @@ func newArray() *Array {
 			appended_value := newValue(value)
 			*a = append(*a, appended_value)
 		},
+		
 		AppendValue: func(value *Value) {
 			a := this().Values()
 			*a = append(*a, value)
@@ -968,8 +1007,11 @@ func newArray() *Array {
 			return getObject()
 		},*/
 	}
-	set_this_value(&created_array)
-	return &created_array
+	set_this(&created_array)
+	if len(errors) > 0 {
+		return nil, errors
+	}
+	return &created_array, nil
 }
 
 

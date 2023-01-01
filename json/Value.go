@@ -97,16 +97,13 @@ type Value struct {
 	GetArrayOfFloat32Value func() ([]float32, []error)
 	GetArrayOfFloat64 func() (*[]*float64, []error)
 	GetArrayOfFloat64Value func() ([]float64, []error)
-
-
-
 }
 
 func newValue(v interface{}) (*Value) {
 	var this_value *Value
 	internal_value := v
 
-	set_this_value := func(value *Value) {
+	set_this := func(value *Value) {
 		this_value = value
 	}
 	
@@ -1680,7 +1677,7 @@ func newValue(v interface{}) (*Value) {
 			return getObject()
 		},
 	}
-	set_this_value( &created_value)
+	set_this( &created_value)
 	return &created_value
 }
 

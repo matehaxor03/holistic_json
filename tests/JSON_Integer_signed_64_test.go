@@ -16,7 +16,7 @@ func TestCanParseNegativeInt64LowBoundary(t *testing.T) {
 		value, value_errors := json_obj.GetInt64("key") 
 
 		if value_errors != nil {
-			t.Errorf("map GetInt64 has errors")
+			t.Errorf("map GetInt64 has errors %s", value_errors)
 		} else if value == nil {
 			t.Errorf("GetInt64 is nil")
 		} else if *value != -2147483649 {
@@ -36,7 +36,7 @@ func TestCanParseNegativeInt64HighBoundary(t *testing.T) {
 		value, value_errors := json_obj.GetInt64("key") 
 
 		if value_errors != nil {
-			t.Errorf("map GetInt64 has errors")
+			t.Errorf("map GetInt64 has errors %s", value_errors)
 		} else if value == nil {
 			t.Errorf("GetInt64 is nil")
 		} else if *value != -9223372036854775808 {

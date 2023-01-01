@@ -69,7 +69,7 @@ func TestCanParseUInt64PositiveMuitpleHighBondary(t *testing.T) {
 		value, value_errors := json_obj.GetUInt64("key") 
 
 		if value_errors != nil {
-			t.Errorf("map GetInt64 has errors")
+			t.Errorf("map GetInt64 has errors %s", value_errors)
 		} else if value == nil {
 			t.Errorf("GetUInt64 is nil")
 		} else if *value != 4294967296 {
@@ -85,7 +85,7 @@ func TestCanParseUInt64PositiveMuitpleHighBondary(t *testing.T) {
 		value, value_errors := json_obj.GetUInt64("key2") 
 
 		if value_errors != nil {
-			t.Errorf("map GetInt64 has errors")
+			t.Errorf("map GetInt64 has errors %s", value_errors)
 		} else if value == nil {
 			t.Errorf("GetUInt64 is nil")
 		} else if *value != 4294967297 {

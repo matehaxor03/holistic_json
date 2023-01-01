@@ -288,7 +288,7 @@ func newValue(v interface{}) (*Value) {
 				}
 			case "json.Array":
 				string_array := this().GetObject().(Array)
-				for _, string_array_value := range string_array {
+				for _, string_array_value := range *(string_array.Values()) {
 					converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
 					if converted_errors != nil {
 						errors = append(errors, converted_errors...)
@@ -298,7 +298,7 @@ func newValue(v interface{}) (*Value) {
 				}
 			case "*json.Array":
 				string_array := this().GetObject().(*Array)
-				for _, string_array_value := range *string_array {
+				for _, string_array_value := range *(string_array.Values()) {
 					converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
 					if converted_errors != nil {
 						errors = append(errors, converted_errors...)
@@ -363,12 +363,16 @@ func newValue(v interface{}) (*Value) {
 		
 			var errors []error
 			var result ([](*int8))
-			for _, array_value := range *array {
-				int8_value, int8_value_errors := array_value.GetInt8()
-				if int8_value_errors != nil {
-					errors = append(errors, int8_value_errors...)
+			for _, array_value := range *(array.Values()) {
+				if common.IsNil(array_value) {
+					result = append(result, nil)			 
 				} else {
-					result = append(result, int8_value)			 
+					int8_value, int8_value_errors := array_value.GetInt8()
+					if int8_value_errors != nil {
+						errors = append(errors, int8_value_errors...)
+					} else {
+						result = append(result, int8_value)			 
+					}
 				}
 			}
 		
@@ -388,12 +392,16 @@ func newValue(v interface{}) (*Value) {
 
 			var errors []error
 			var result ([](*int16))
-			for _, array_value := range *array {
-				int16_value, int16_value_errors := array_value.GetInt16()
-				if int16_value_errors != nil {
-					errors = append(errors, int16_value_errors...)
+			for _, array_value := range *(array.Values()) {
+				if common.IsNil(array_value) {
+					result = append(result, nil)			 
 				} else {
-					result = append(result, int16_value)			 
+					int16_value, int16_value_errors := array_value.GetInt16()
+					if int16_value_errors != nil {
+						errors = append(errors, int16_value_errors...)
+					} else {
+						result = append(result, int16_value)			 
+					}
 				}
 			}
 
@@ -413,12 +421,16 @@ func newValue(v interface{}) (*Value) {
 		
 			var errors []error
 			var result ([](*int32))
-			for _, array_value := range *array {
-				int32_value, int32_value_errors := array_value.GetInt32()
-				if int32_value_errors != nil {
-					errors = append(errors, int32_value_errors...)
+			for _, array_value := range *(array.Values()) {
+				if common.IsNil(array_value) {
+					result = append(result, nil)			 
 				} else {
-					result = append(result, int32_value)			 
+					int32_value, int32_value_errors := array_value.GetInt32()
+					if int32_value_errors != nil {
+						errors = append(errors, int32_value_errors...)
+					} else {
+						result = append(result, int32_value)			 
+					}
 				}
 			}
 		
@@ -438,12 +450,16 @@ func newValue(v interface{}) (*Value) {
 		
 			var errors []error
 			var result ([](*int64))
-			for _, array_value := range *array {
-				int64_value, int64_value_errors := array_value.GetInt64()
-				if int64_value_errors != nil {
-					errors = append(errors, int64_value_errors...)
+			for _, array_value := range *(array.Values()) {
+				if common.IsNil(array_value) {
+					result = append(result, nil)			 
 				} else {
-					result = append(result, int64_value)			 
+					int64_value, int64_value_errors := array_value.GetInt64()
+					if int64_value_errors != nil {
+						errors = append(errors, int64_value_errors...)
+					} else {
+						result = append(result, int64_value)			 
+					}
 				}
 			}
 		
@@ -463,12 +479,16 @@ func newValue(v interface{}) (*Value) {
 		
 			var errors []error
 			var result ([](*uint8))
-			for _, array_value := range *array {
-				uint8_value, uint8_value_errors := array_value.GetUInt8()
-				if uint8_value_errors != nil {
-					errors = append(errors, uint8_value_errors...)
+			for _, array_value := range *(array.Values()) {
+				if common.IsNil(array_value) {
+					result = append(result, nil)			 
 				} else {
-					result = append(result, uint8_value)			 
+					uint8_value, uint8_value_errors := array_value.GetUInt8()
+					if uint8_value_errors != nil {
+						errors = append(errors, uint8_value_errors...)
+					} else {
+						result = append(result, uint8_value)			 
+					}
 				}
 			}
 		
@@ -488,12 +508,16 @@ func newValue(v interface{}) (*Value) {
 		
 			var errors []error
 			var result ([](*uint16))
-			for _, array_value := range *array {
-				uint16_value, uint16_value_errors := array_value.GetUInt16()
-				if uint16_value_errors != nil {
-					errors = append(errors, uint16_value_errors...)
+			for _, array_value := range *(array.Values()) {
+				if common.IsNil(array_value) {
+					result = append(result, nil)			 
 				} else {
-					result = append(result, uint16_value)			 
+					uint16_value, uint16_value_errors := array_value.GetUInt16()
+					if uint16_value_errors != nil {
+						errors = append(errors, uint16_value_errors...)
+					} else {
+						result = append(result, uint16_value)			 
+					}
 				}
 			}
 		
@@ -513,12 +537,16 @@ func newValue(v interface{}) (*Value) {
 		
 			var errors []error
 			var result ([](*uint32))
-			for _, array_value := range *array {
-				uint32_value, uint32_value_errors := array_value.GetUInt32()
-				if uint32_value_errors != nil {
-					errors = append(errors, uint32_value_errors...)
+			for _, array_value := range *(array.Values()) {
+				if common.IsNil(array_value) {
+					result = append(result, nil)			 
 				} else {
-					result = append(result, uint32_value)			 
+					uint32_value, uint32_value_errors := array_value.GetUInt32()
+					if uint32_value_errors != nil {
+						errors = append(errors, uint32_value_errors...)
+					} else {
+						result = append(result, uint32_value)			 
+					}
 				}
 			}
 		
@@ -538,12 +566,16 @@ func newValue(v interface{}) (*Value) {
 		
 			var errors []error
 			var result ([](*uint64))
-			for _, array_value := range *array {
-				uint64_value, uint64_value_errors := array_value.GetUInt64()
-				if uint64_value_errors != nil {
-					errors = append(errors, uint64_value_errors...)
+			for _, array_value := range *(array.Values()) {
+				if common.IsNil(array_value) {
+					result = append(result, nil)			 
 				} else {
-					result = append(result, uint64_value)			 
+					uint64_value, uint64_value_errors := array_value.GetUInt64()
+					if uint64_value_errors != nil {
+						errors = append(errors, uint64_value_errors...)
+					} else {
+						result = append(result, uint64_value)			 
+					}
 				}
 			}
 		
@@ -563,12 +595,16 @@ func newValue(v interface{}) (*Value) {
 		
 			var errors []error
 			var result ([](*string))
-			for _, array_value := range *array {
-				string_value, string_value_errors := array_value.GetString()
-				if string_value_errors != nil {
-					errors = append(errors, string_value_errors...)
+			for _, array_value := range *(array.Values()) {
+				if common.IsNil(array_value) {
+					result = append(result, nil)			 
 				} else {
-					result = append(result, string_value)			 
+					string_value, string_value_errors := array_value.GetString()
+					if string_value_errors != nil {
+						errors = append(errors, string_value_errors...)
+					} else {
+						result = append(result, string_value)			 
+					}
 				}
 			}
 		
@@ -1616,8 +1652,7 @@ func newValue(v interface{}) (*Value) {
 				} else if common.IsNil(array) {
 					errors = append(errors, fmt.Errorf("Value.AppendValue array is nil"))
 				} else {
-					add_value := add
-					*array = append(*array, add_value)
+					(*array).AppendValue(add)
 				}
 			} else {
 				errors = append(errors, fmt.Errorf("Value.AppendValue not supported for type %s", this().GetType()))
@@ -1638,8 +1673,7 @@ func newValue(v interface{}) (*Value) {
 				} else if common.IsNil(array) {
 					errors = append(errors, fmt.Errorf("Value.AppendValue array is nil"))
 				} else {
-					add_value := add
-					*array = append(*array, &add_value)
+					(*array).AppendValueValue(add)
 				}
 			} else {
 				errors = append(errors, fmt.Errorf("Value.AppendValue not supported for type %s", this().GetType()))

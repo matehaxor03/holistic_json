@@ -11,7 +11,7 @@ type Map struct {
 	Keys func() ([]string)
 	HasKey func(s string) (bool)
 	GetMap func(s string) (*Map, []error)
-	Values func() Array
+	Values func() *Array
 	SetMap func(s string, zap *Map) 
 	SetMapValue func(s string, zap Map)
 	SetValue func(s string, value *Value) 
@@ -859,11 +859,11 @@ func NewMap() *Map {
 			m := get_internal_map()	
 			return (m[s]).GetTimeWithDecimalPlaces(decimal_places)
 		},
-		Values: func() Array {
-			array := Array{}
+		Values: func() *Array {
+			array := newArray()
 			m := get_internal_map()
 			for _, f := range m {
-				array = append(array, f)
+				array.AppendValue(f)
 			}
 			return array
 		},

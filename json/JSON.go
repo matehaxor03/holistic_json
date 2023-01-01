@@ -308,8 +308,8 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 			} else if string(value) == "[" {
 
 				current_mode = mode_looking_for_value
-				new_array := Array{}
-				new_array_value := newValue(&new_array)
+				new_array := newArray()
+				new_array_value := newValue(new_array)
 
 				if ((*list)[len(*list)-1]).IsMap() {
 
@@ -672,6 +672,8 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 		} else if common.IsNil(value_as_array) {
 			errors = append(errors, fmt.Errorf("json.parseJSONValue array is nil"))
 		}
+
+		fmt.Println(fmt.Sprintf("%s",  value_as_array))
 
 		if len(errors) > 0 {
 			return errors

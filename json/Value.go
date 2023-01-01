@@ -93,6 +93,8 @@ type Value struct {
 	SetIntToMap func(key string, int_value *int) ([]error)
 	SetIntValueToMap func(key string, int_value int) ([]error)
 	AppendValueValue func(add Value) []error
+	GetArrayOfFloat32 func() (*[]*float32, []error)
+	GetArrayOfFloat32Value func() ([]float32, []error)
 
 
 
@@ -363,6 +365,24 @@ func newValue(v interface{}) (*Value) {
 			}
 
 			return *array, nil
+		},
+		GetArrayOfFloat32: func() (*[](*float32), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfFloat32()
+		},
+		GetArrayOfFloat32Value: func() ([](float32), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfFloat32Value()
 		},
 		GetArrayOfInt: func() (*[](*int), []error) {
 			array, array_errors := this().GetArray()

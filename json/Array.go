@@ -8,7 +8,6 @@ import (
 )
 
 type Array struct {
-
 	ToJSONString func(json *strings.Builder) ([]error) 
 	AppendString func (value *string)
 	AppendStringValue func(value string)
@@ -70,6 +69,8 @@ type Array struct {
 	GetArrayOfUInt64Value func() ([](uint64), []error) 
 	GetArrayOfString func() (*[](*string), []error)
 	GetArrayOfStringValue func() ([](string), []error)
+	GetArrayOfFloat32 func() (*[]*float32, []error)
+	GetArrayOfFloat32Value func() ([]float32, []error)
 
 
 	//GetObject func() (*[](*interface{}))
@@ -830,6 +831,60 @@ func newArray() *Array {
 					errors = append(errors, fmt.Errorf("array contained a null value")) 
 				} else {
 					string_value, string_value_errors := array_value.GetStringValue()
+					if string_value_errors != nil {
+						errors = append(errors, string_value_errors...)
+					} else {
+						result = append(result, string_value)			 
+					}
+				}
+			}
+		
+			if len(errors) > 0 {
+				return nil, errors
+			}
+			
+			return result, nil
+		},
+		GetArrayOfFloat32: func() (*[](*float32), []error) {
+			array_values := this().Values()
+			if common.IsNil(array_values) {
+				return nil, nil
+			}
+		
+			var errors []error
+			var result ([](*float32))
+			for _, array_value := range *array_values {
+				if common.IsNil(array_value) {
+					result = append(result, nil)			 
+				} else {
+					string_value, string_value_errors := array_value.GetFloat32()
+					if string_value_errors != nil {
+						errors = append(errors, string_value_errors...)
+					} else {
+						result = append(result, string_value)			 
+					}
+				}
+			}
+		
+			if len(errors) > 0 {
+				return nil, errors
+			}
+			
+			return &result, nil
+		},
+		GetArrayOfFloat32Value: func() ([](float32), []error) {
+			array_values := this().Values()
+			if common.IsNil(array_values) {
+				return nil, nil
+			}
+		
+			var errors []error
+			var result ([](float32))
+			for _, array_value := range *array_values {
+				if common.IsNil(array_value) {
+					errors = append(errors, fmt.Errorf("array contained a null value")) 
+				} else {
+					string_value, string_value_errors := array_value.GetFloat32Value()
 					if string_value_errors != nil {
 						errors = append(errors, string_value_errors...)
 					} else {

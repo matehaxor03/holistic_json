@@ -33,6 +33,16 @@ type Value struct {
 	GetArrayOfUInt16 func() (*[](*uint16), []error)
 	GetArrayOfUInt32 func() (*[](*uint32), []error) 
 	GetArrayOfUInt64 func() (*[](*uint64), []error) 
+	GetArrayOfIntValue func() ([](int), []error)
+	GetArrayOfInt8Value func() ([](int8), []error)
+	GetArrayOfInt16Value func() ([](int16), []error)
+	GetArrayOfInt32Value func() ([](int32), []error) 
+	GetArrayOfInt64Value func() ([](int64), []error) 
+	GetArrayOfUIntValue func() ([](uint), []error)
+	GetArrayOfUInt8Value func() ([](uint8), []error)
+	GetArrayOfUInt16Value func() ([](uint16), []error)
+	GetArrayOfUInt32Value func() ([](uint32), []error) 
+	GetArrayOfUInt64Value func() ([](uint64), []error) 
 	GetStringValue func() (string, []error) 
 	GetString func() (*string, []error) 
 	GetBool func() (*bool, []error) 
@@ -50,6 +60,7 @@ type Value struct {
 	IsInteger func() bool
 	IsString func() bool
 	GetArrayOfString func() (*[](*string), []error)
+	GetArrayOfStringValue func() ([](string), []error)
 	GetFloat32 func() (*float32, []error) 
 	GetFloat32Value func() (float32, []error) 
 	GetFloat64 func() (*float64, []error) 
@@ -353,6 +364,15 @@ func newValue(v interface{}) (*Value) {
 
 			return *array, nil
 		},
+		GetArrayOfInt: func() (*[](*int), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfInt()
+		},
 		GetArrayOfInt8: func() (*[](*int8), []error) {
 			array, array_errors := this().GetArray()
 			if array_errors != nil {
@@ -360,27 +380,7 @@ func newValue(v interface{}) (*Value) {
 			} else if common.IsNil(array) {
 				return nil, nil
 			}
-		
-			var errors []error
-			var result ([](*int8))
-			for _, array_value := range *(array.Values()) {
-				if common.IsNil(array_value) {
-					result = append(result, nil)			 
-				} else {
-					int8_value, int8_value_errors := array_value.GetInt8()
-					if int8_value_errors != nil {
-						errors = append(errors, int8_value_errors...)
-					} else {
-						result = append(result, int8_value)			 
-					}
-				}
-			}
-		
-			if len(errors) > 0 {
-				return nil, errors
-			}
-			
-			return &result, nil
+			return array.GetArrayOfInt8()
 		},
 		GetArrayOfInt16: func() (*[](*int16), []error) {
 			array, array_errors := this().GetArray()
@@ -389,27 +389,7 @@ func newValue(v interface{}) (*Value) {
 			} else if common.IsNil(array) {
 				return nil, nil
 			}
-
-			var errors []error
-			var result ([](*int16))
-			for _, array_value := range *(array.Values()) {
-				if common.IsNil(array_value) {
-					result = append(result, nil)			 
-				} else {
-					int16_value, int16_value_errors := array_value.GetInt16()
-					if int16_value_errors != nil {
-						errors = append(errors, int16_value_errors...)
-					} else {
-						result = append(result, int16_value)			 
-					}
-				}
-			}
-
-			if len(errors) > 0 {
-				return nil, errors
-			}
-			
-			return &result, nil
+			return array.GetArrayOfInt16()
 		},
 		GetArrayOfInt32: func() (*[](*int32), []error) {
 			array, array_errors := this().GetArray()
@@ -418,27 +398,7 @@ func newValue(v interface{}) (*Value) {
 			} else if common.IsNil(array) {
 				return nil, nil
 			}
-		
-			var errors []error
-			var result ([](*int32))
-			for _, array_value := range *(array.Values()) {
-				if common.IsNil(array_value) {
-					result = append(result, nil)			 
-				} else {
-					int32_value, int32_value_errors := array_value.GetInt32()
-					if int32_value_errors != nil {
-						errors = append(errors, int32_value_errors...)
-					} else {
-						result = append(result, int32_value)			 
-					}
-				}
-			}
-		
-			if len(errors) > 0 {
-				return nil, errors
-			}
-			
-			return &result, nil
+			return array.GetArrayOfInt32()
 		},
 		GetArrayOfInt64: func() (*[](*int64), []error) {
 			array, array_errors := this().GetArray()
@@ -447,27 +407,61 @@ func newValue(v interface{}) (*Value) {
 			} else if common.IsNil(array) {
 				return nil, nil
 			}
-		
-			var errors []error
-			var result ([](*int64))
-			for _, array_value := range *(array.Values()) {
-				if common.IsNil(array_value) {
-					result = append(result, nil)			 
-				} else {
-					int64_value, int64_value_errors := array_value.GetInt64()
-					if int64_value_errors != nil {
-						errors = append(errors, int64_value_errors...)
-					} else {
-						result = append(result, int64_value)			 
-					}
-				}
+			return array.GetArrayOfInt64()
+		},
+		GetArrayOfIntValue: func() ([](int), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
 			}
-		
-			if len(errors) > 0 {
-				return nil, errors
+			return array.GetArrayOfIntValue()
+		},
+		GetArrayOfInt8Value: func() ([](int8), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
 			}
-			
-			return &result, nil
+			return array.GetArrayOfInt8Value()
+		},
+		GetArrayOfInt16Value: func() ([](int16), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfInt16Value()
+		},
+		GetArrayOfInt32Value: func() ([](int32), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfInt32Value()
+		},
+		GetArrayOfInt64Value: func() ([](int64), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfInt64Value()
+		},
+		GetArrayOfUInt: func() (*[](*uint), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfUInt()
 		},
 		GetArrayOfUInt8: func() (*[](*uint8), []error) {
 			array, array_errors := this().GetArray()
@@ -476,27 +470,7 @@ func newValue(v interface{}) (*Value) {
 			} else if common.IsNil(array) {
 				return nil, nil
 			}
-		
-			var errors []error
-			var result ([](*uint8))
-			for _, array_value := range *(array.Values()) {
-				if common.IsNil(array_value) {
-					result = append(result, nil)			 
-				} else {
-					uint8_value, uint8_value_errors := array_value.GetUInt8()
-					if uint8_value_errors != nil {
-						errors = append(errors, uint8_value_errors...)
-					} else {
-						result = append(result, uint8_value)			 
-					}
-				}
-			}
-		
-			if len(errors) > 0 {
-				return nil, errors
-			}
-			
-			return &result, nil
+			return array.GetArrayOfUInt8()
 		},
 		GetArrayOfUInt16: func() (*[](*uint16), []error) {
 			array, array_errors := this().GetArray()
@@ -505,27 +479,7 @@ func newValue(v interface{}) (*Value) {
 			} else if common.IsNil(array) {
 				return nil, nil
 			}
-		
-			var errors []error
-			var result ([](*uint16))
-			for _, array_value := range *(array.Values()) {
-				if common.IsNil(array_value) {
-					result = append(result, nil)			 
-				} else {
-					uint16_value, uint16_value_errors := array_value.GetUInt16()
-					if uint16_value_errors != nil {
-						errors = append(errors, uint16_value_errors...)
-					} else {
-						result = append(result, uint16_value)			 
-					}
-				}
-			}
-		
-			if len(errors) > 0 {
-				return nil, errors
-			}
-			
-			return &result, nil
+			return array.GetArrayOfUInt16()
 		},
 		GetArrayOfUInt32: func() (*[](*uint32), []error) {
 			array, array_errors := this().GetArray()
@@ -534,27 +488,7 @@ func newValue(v interface{}) (*Value) {
 			} else if common.IsNil(array) {
 				return nil, nil
 			}
-		
-			var errors []error
-			var result ([](*uint32))
-			for _, array_value := range *(array.Values()) {
-				if common.IsNil(array_value) {
-					result = append(result, nil)			 
-				} else {
-					uint32_value, uint32_value_errors := array_value.GetUInt32()
-					if uint32_value_errors != nil {
-						errors = append(errors, uint32_value_errors...)
-					} else {
-						result = append(result, uint32_value)			 
-					}
-				}
-			}
-		
-			if len(errors) > 0 {
-				return nil, errors
-			}
-			
-			return &result, nil
+			return array.GetArrayOfUInt32()
 		},
 		GetArrayOfUInt64: func() (*[](*uint64), []error) {
 			array, array_errors := this().GetArray()
@@ -563,27 +497,52 @@ func newValue(v interface{}) (*Value) {
 			} else if common.IsNil(array) {
 				return nil, nil
 			}
-		
-			var errors []error
-			var result ([](*uint64))
-			for _, array_value := range *(array.Values()) {
-				if common.IsNil(array_value) {
-					result = append(result, nil)			 
-				} else {
-					uint64_value, uint64_value_errors := array_value.GetUInt64()
-					if uint64_value_errors != nil {
-						errors = append(errors, uint64_value_errors...)
-					} else {
-						result = append(result, uint64_value)			 
-					}
-				}
+			return array.GetArrayOfUInt64()
+		},
+		GetArrayOfUIntValue: func() ([](uint), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
 			}
-		
-			if len(errors) > 0 {
-				return nil, errors
+			return array.GetArrayOfUIntValue()
+		},
+		GetArrayOfUInt8Value: func() ([](uint8), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
 			}
-			
-			return &result, nil
+			return array.GetArrayOfUInt8Value()
+		},
+		GetArrayOfUInt16Value: func() ([](uint16), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfUInt16Value()
+		},
+		GetArrayOfUInt32Value: func() ([](uint32), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfUInt32Value()
+		},
+		GetArrayOfUInt64Value: func() ([](uint64), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfUInt64Value()
 		},
 		GetArrayOfString: func() (*[](*string), []error) {
 			array, array_errors := this().GetArray()
@@ -592,27 +551,16 @@ func newValue(v interface{}) (*Value) {
 			} else if common.IsNil(array) {
 				return nil, nil
 			}
-		
-			var errors []error
-			var result ([](*string))
-			for _, array_value := range *(array.Values()) {
-				if common.IsNil(array_value) {
-					result = append(result, nil)			 
-				} else {
-					string_value, string_value_errors := array_value.GetString()
-					if string_value_errors != nil {
-						errors = append(errors, string_value_errors...)
-					} else {
-						result = append(result, string_value)			 
-					}
-				}
+			return array.GetArrayOfString()
+		},
+		GetArrayOfStringValue: func() ([](string), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
 			}
-		
-			if len(errors) > 0 {
-				return nil, errors
-			}
-			
-			return &result, nil
+			return array.GetArrayOfStringValue()
 		},
 		GetString: func() (*string, []error) {
 			if common.IsNil(this().GetObject()){

@@ -71,6 +71,8 @@ type Array struct {
 	GetArrayOfStringValue func() ([](string), []error)
 	GetArrayOfFloat32 func() (*[]*float32, []error)
 	GetArrayOfFloat32Value func() ([]float32, []error)
+	GetArrayOfFloat64 func() (*[]*float64, []error)
+	GetArrayOfFloat64Value func() ([]float64, []error)
 
 
 	//GetObject func() (*[](*interface{}))
@@ -892,12 +894,71 @@ func newArray() *Array {
 					}
 				}
 			}
-		
+
+
 			if len(errors) > 0 {
 				return nil, errors
 			}
 			
 			return result, nil
+
+			
+			},
+			GetArrayOfFloat64: func() (*[](*float64), []error) {
+				array_values := this().Values()
+				if common.IsNil(array_values) {
+					return nil, nil
+				}
+			
+				var errors []error
+				var result ([](*float64))
+				for _, array_value := range *array_values {
+					if common.IsNil(array_value) {
+						result = append(result, nil)			 
+					} else {
+						string_value, string_value_errors := array_value.GetFloat64()
+						if string_value_errors != nil {
+							errors = append(errors, string_value_errors...)
+						} else {
+							result = append(result, string_value)			 
+						}
+					}
+				}
+			
+				if len(errors) > 0 {
+					return nil, errors
+				}
+				
+				return &result, nil
+			},
+			GetArrayOfFloat64Value: func() ([](float64), []error) {
+			
+				array_values := this().Values()
+				if common.IsNil(array_values) {
+					return nil, nil
+				}
+			
+				var errors []error
+				var result ([](float64))
+				for _, array_value := range *array_values {
+					if common.IsNil(array_value) {
+						errors = append(errors, fmt.Errorf("array contained a null value")) 
+					} else {
+						string_value, string_value_errors := array_value.GetFloat64Value()
+						if string_value_errors != nil {
+							errors = append(errors, string_value_errors...)
+						} else {
+							result = append(result, string_value)			 
+						}
+					}
+				}
+			
+		
+				if len(errors) > 0 {
+					return nil, errors
+				}
+				
+				return result, nil
 		},
 		/*
 		SetObject: func(value *[](*interface{})) {

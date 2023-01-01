@@ -95,6 +95,8 @@ type Value struct {
 	AppendValueValue func(add Value) []error
 	GetArrayOfFloat32 func() (*[]*float32, []error)
 	GetArrayOfFloat32Value func() ([]float32, []error)
+	GetArrayOfFloat64 func() (*[]*float64, []error)
+	GetArrayOfFloat64Value func() ([]float64, []error)
 
 
 
@@ -383,6 +385,24 @@ func newValue(v interface{}) (*Value) {
 				return nil, nil
 			}
 			return array.GetArrayOfFloat32Value()
+		},
+		GetArrayOfFloat64: func() (*[](*float64), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfFloat64()
+		},
+		GetArrayOfFloat64Value: func() ([](float64), []error) {
+			array, array_errors := this().GetArray()
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfFloat64Value()
 		},
 		GetArrayOfInt: func() (*[](*int), []error) {
 			array, array_errors := this().GetArray()

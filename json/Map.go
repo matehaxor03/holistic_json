@@ -124,6 +124,8 @@ type Map struct {
 
 	GetArrayOfFloat32 func(s string) (*[]*float32, []error)
 	GetArrayOfFloat32Value func(s string) ([]float32, []error)
+	GetArrayOfFloat64 func(s string) (*[]*float64, []error)
+	GetArrayOfFloat64Value func(s string) ([]float64, []error)
 
 	GetArrayOfString func(s string) (*[]*string, []error)
 
@@ -454,6 +456,20 @@ func NewMap() *Map {
 			}
 			m := get_internal_map()		
 			return (m[s]).GetArrayOfFloat32Value()
+		},
+		GetArrayOfFloat64: func(s string) (*[]*float64, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetArrayOfFloat64()
+		},
+		GetArrayOfFloat64Value: func(s string) ([]float64, []error) {
+			if is_value_nil(s) {
+				return nil, nil
+			}
+			m := get_internal_map()		
+			return (m[s]).GetArrayOfFloat64Value()
 		},
 		GetArrayOfString: func(s string) (*[]*string, []error) {
 			if is_value_nil(s) {

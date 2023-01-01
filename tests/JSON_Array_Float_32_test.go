@@ -27,7 +27,7 @@ func TestCanParseArrayContainingSingleFloat32Boundary(t *testing.T) {
 	}
 }
 
-func TestCanParseMultipleArraysContainingSingleFloat328LowBoundary(t *testing.T) {
+func TestCanParseMultipleArraysContainingSingleFloat32LowBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":[0.123457],\"key2\":[-0.7654321]}")
 
 	if !json_obj.HasKey("key") {

@@ -79,8 +79,7 @@ type Array struct {
 
 	GetObject func() (*[](*interface{}))
 	SetObject func(object *[](*interface{})) 
-	Values func() *[](*Value)
-	GetValue func() *Value
+	GetValues func() *[](*Value)
 }
 
 func NewArrayValue() (Array) {
@@ -94,56 +93,55 @@ func NewArray() (*Array) {
 
 func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 	var errors []error
-	var this_value *Value
+
 	var this_array *Array
 	interface_values := a
-	var internal_values *[](*Value)
+	var values *[](*Value)
 
 	if !common.IsNil(a) {
 		temp_array := make([](*Value), len(*a))
-		internal_values = &temp_array
+		values = &temp_array
 	} else {
 		temp_array := make([](*Value), 0)
-		internal_values = &temp_array
+		values = &temp_array
 	}
 	
 	if !common.IsNil(a) {
+		current_type := ""
 		for index, value := range *a {
-			if common.IsMap(value) ||
-			   common.IsArray(value) ||
-			   common.IsValue(value) {
-				errors = append(errors, fmt.Errorf("cannot create array with non-primitive type %s", common.GetType(value)))
+			current_type = common.GetType(*value)
+			if current_type == "json.Value" {
+				temp_value := ((*value).(Value))
+				(*values)[index] = &temp_value
+			} else if current_type == "*json.Value" {
+				(*values)[index] = (*value).(*Value)
 			} else {
 				// todo: for now just assume it's a value... to do map array and maps etc
 				converted_value := NewValue(value)
-				(*internal_values)[index] = converted_value
+				(*values)[index] = converted_value
 			}
 		}
 	} 
 
-	set_this := func(array *Array) {
-		this_array = array
-		this_value = this_array.GetValue()
-	}
-	
-	this := func() *Array {
-		return this_array
-	}
-
-	values := func() *[](*Value) {
-		return internal_values
+	getValues := func() *[](*Value) {
+		return values
 	}
 
 	setObject := func(a *[]*interface{}) {
 		interface_values = a
+		
 	}
 
-	getObject :=  func() *[]*interface{} {
+	getObject := func() *[]*interface{} {
 		return interface_values
 	}
 
-	getValue := func() *Value {
-		return this_value
+	set_this := func(array *Array) {
+		this_array = array
+	}
+
+	this := func() *Array {
+		return this_array
 	}
 
 	created_array := Array{
@@ -155,7 +153,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 				return errors
 			}
 			
-			a := (*this()).Values()
+			a := this().GetValues()
 			length := len(*a)
 		
 			if length == 0 {
@@ -183,196 +181,196 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return nil
 		},
 		AppendString: func(value *string) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendStringValue: func(value string) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt: func(value *uint) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUIntValue: func(value uint) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt8: func(value *uint8) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt8Value: func(value uint8) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt16: func(value *uint16) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt16Value: func(value uint16) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt32: func(value *uint32) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt32Value: func(value uint32) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt64: func(value *uint64) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt64Value: func(value uint64) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt: func(value *int) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendIntValue: func(value int) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt8: func(value *int8) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt8Value: func(value int8) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt16: func(value *int16) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt16Value: func(value int16) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt32: func(value *int32) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt32Value: func(value int32) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt64: func(value *int64) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt64Value: func(value int64) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendFloat32: func(value *float32) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendFloat32Value: func(value float32) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendFloat64: func(value *float64) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendFloat64Value: func(value float64) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendBool: func(value *bool) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendBoolValue: func(value bool) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInterface: func(value *interface{}) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInterfaceValue: func(value interface{}) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendNil: func() {
-			a := this().Values()
+			a := getValues()
 			*a = append(*a, nil)
 		},
 		AppendMap: func(value *Map) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendMapValue: func(value Map) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendArray: func(value *Array) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendArrayValue: func(value Array) {
-			a := this().Values()
+			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendValue: func(value *Value) {
-			a := this().Values()
+			a := getValues()
 			*a = append(*a, value)
 		},
 		AppendValueValue: func(value Value) {
-			a := this().Values()
+			a := getValues()
 			*a = append(*a, &value)
 		},
-		Values: func() *[](*Value) {
-			return values()
+		GetValues: func() *[](*Value) {
+			return getValues()
 		},
-		GetValue: func() *Value {
+		/*GetValue: func() *Value {
 			return getValue()
-		},
+		},*/
 		GetStringValue: func(index int) (string, []error) {
 			var errors []error
-			a := this().Values()
+			a := getValues()
 			
 			if index < 0 {
 				errors = append(errors, fmt.Errorf("Array.GetStringValue index is less than 0"))
@@ -404,7 +402,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 				return nil, errors
 			}
 		
-			a := this().Values()
+			a := getValues()
 			if index > (len(*a) - 1) {
 				errors = append(errors, fmt.Errorf("Array.GetStringValue index is out of range"))
 				return nil, errors
@@ -424,7 +422,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return value, nil
 		},
 		GetArrayOfInt8: func() (*[](*int8), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -451,7 +449,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return &result, nil
 		},
 		GetArrayOfInt16: func() (*[](*int16), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -478,7 +476,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return &result, nil
 		},
 		GetArrayOfInt32: func() (*[](*int32), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -505,7 +503,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return &result, nil
 		},
 		GetArrayOfInt64: func() (*[](*int64), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -532,7 +530,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return &result, nil
 		},
 		GetArrayOfUInt8: func() (*[](*uint8), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -559,7 +557,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return &result, nil
 		},
 		GetArrayOfUInt16: func() (*[](*uint16), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -586,7 +584,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return &result, nil
 		},
 		GetArrayOfUInt32: func() (*[](*uint32), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -613,7 +611,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return &result, nil
 		},
 		GetArrayOfUInt64: func() (*[](*uint64), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -640,7 +638,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return &result, nil
 		},
 		GetArrayOfInt8Value: func() ([](int8), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -667,7 +665,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return result, nil
 		},
 		GetArrayOfInt16Value: func() ([](int16), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -694,7 +692,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return result, nil
 		},
 		GetArrayOfInt32Value: func() ([](int32), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -721,7 +719,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return result, nil
 		},
 		GetArrayOfInt64Value: func() ([](int64), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -748,7 +746,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return result, nil
 		},
 		GetArrayOfUInt8Value: func() ([]uint8, []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -775,7 +773,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return result, nil
 		},
 		GetArrayOfUInt16Value: func() ([](uint16), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -802,7 +800,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return result, nil
 		},
 		GetArrayOfUInt32Value: func() ([](uint32), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -829,7 +827,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return result, nil
 		},
 		GetArrayOfUInt64Value: func() ([](uint64), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -856,7 +854,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return result, nil
 		},
 		GetArrayOfBool: func() (*[](*bool), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -883,7 +881,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return &result, nil
 		},
 		GetArrayOfBoolValue: func() ([](bool), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -910,7 +908,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return result, nil
 		},
 		GetArrayOfString: func() (*[](*string), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -937,7 +935,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return &result, nil
 		},
 		GetArrayOfStringValue: func() ([](string), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -964,7 +962,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return result, nil
 		},
 		GetArrayOfFloat32: func() (*[](*float32), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -991,7 +989,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			return &result, nil
 		},
 		GetArrayOfFloat32Value: func() ([](float32), []error) {
-			array_values := this().Values()
+			array_values := getValues()
 			if common.IsNil(array_values) {
 				return nil, nil
 			}
@@ -1021,7 +1019,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			
 			},
 			GetArrayOfFloat64: func() (*[](*float64), []error) {
-				array_values := this().Values()
+				array_values := getValues()
 				if common.IsNil(array_values) {
 					return nil, nil
 				}
@@ -1049,7 +1047,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			},
 			GetArrayOfFloat64Value: func() ([](float64), []error) {
 			
-				array_values := this().Values()
+				array_values := getValues()
 				if common.IsNil(array_values) {
 					return nil, nil
 				}

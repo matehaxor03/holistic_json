@@ -115,11 +115,11 @@ func NewValue(v interface{}) (*Value) {
 		},
 		SetArray: func(value *Array) {
 			setObject(value.GetObject())
-			set_this(value.GetValue())
+			set_this(NewValue(value))
 		},
 		SetArrayValue: func(value Array) {
 			setObject(value.GetObject())
-			set_this(value.GetValue())
+			set_this(NewValue(value))
 		},
 		IsMap: func() (bool) {
 			return common.IsMap(this().GetObject())
@@ -247,7 +247,7 @@ func NewValue(v interface{}) (*Value) {
 				}
 			case "json.Array":
 				string_array := this().GetObject().(Array)
-				for _, string_array_value := range *(string_array.Values()) {
+				for _, string_array_value := range *(string_array.GetValues()) {
 					converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
 					if converted_errors != nil {
 						errors = append(errors, converted_errors...)
@@ -257,7 +257,7 @@ func NewValue(v interface{}) (*Value) {
 				}
 			case "*json.Array":
 				string_array := this().GetObject().(*Array)
-				for _, string_array_value := range *(string_array.Values()) {
+				for _, string_array_value := range *(string_array.GetValues()) {
 					converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
 					if converted_errors != nil {
 						errors = append(errors, converted_errors...)

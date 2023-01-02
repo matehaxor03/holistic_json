@@ -175,8 +175,8 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 		return internal_map_of_interfaces
 	}
 
-	set_internal_map_value_of_interfaces := func(interfaces *map[string]*interface{}) {
-		internal_map_of_interfaces = interfaces
+	set_internal_map_value_of_interfaces := func(value *map[string]*interface{}) {
+		internal_map_of_interfaces = value
 	}
 
 	isValueNil := func() (bool) {
@@ -314,7 +314,21 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 	
 		return Parse(json_payload_builder.String())
 	}
-	
+
+	if !common.IsNil(m) {
+		current_type := ""
+		for key, value := range *internal_map_of_interfaces {
+			current_type = common.GetType(*value)
+			if current_type == "json.Value" {
+				temp_value := ((*value).(Value))
+				internal_map[key] = &temp_value
+			} else if current_type == "*json.Value" {
+				internal_map[key] = ((*value).(*Value))
+			} else {
+				internal_map[key] = NewValue(value)
+			}
+		}
+	}
 
 	return &Map{
 		GetMap: func(s string) (*Map, []error) {

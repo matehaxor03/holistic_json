@@ -534,36 +534,25 @@ func newValue(v interface{}) (*Value) {
 				result = &value
 				break
 			case "*bool":
-				if fmt.Sprintf("%s", this().GetObject()) != "%!s(*bool=<nil>)" {
-					value := *(this().GetObject().(*bool))
-					result = &value
-				} else {
-					return nil, nil
-				}
-				break
+				result = this().GetObject().(*bool)
 			case "*string":
-				if fmt.Sprintf("%s", this().GetObject()) != "%!s(*string=<nil>)" {
-					value := *(this().GetObject().(*string))
-					if value == "1" {
-						boolean_result := true
-						result = &boolean_result
-					} else if value == "0" {
-						boolean_result := false
-						result = &boolean_result
-					} else {
-						errors = append(errors, fmt.Errorf("error: Map.GetBool: unknown value for *string: %s", value))
-						result = nil
-					}
-				} else {
-					return nil, nil
-				}
-				break
-			case "string":
-				value := (this().GetObject().(string))
-				if value == "1" {
+				value := *(this().GetObject().(*string))
+				if value == "1" || value == "true"{
 					boolean_result := true
 					result = &boolean_result
-				} else if value == "0" {
+				} else if value == "0" || value == "false" {
+					boolean_result := false
+					result = &boolean_result
+				} else {
+					errors = append(errors, fmt.Errorf("error: Map.GetBool: unknown value for *string: %s", value))
+					result = nil
+				}
+			case "string":
+				value := (this().GetObject().(string))
+				if value == "1" || value == "true" {
+					boolean_result := true
+					result = &boolean_result
+				} else if value == "0" || value == "false" {
 					boolean_result := false
 					result = &boolean_result
 				} else {
@@ -576,6 +565,52 @@ func newValue(v interface{}) (*Value) {
 		
 			if len(errors) > 0 {
 				return nil, errors
+			}
+		
+			return result, nil
+		},
+		GetBoolValue: func() (bool, []error) {
+			var errors []error
+			if common.IsNil(this().GetObject()) {
+				errors = append(errors, fmt.Errorf("value is nil"))
+				return false, errors
+			}
+		
+			var result bool
+			rep := common.GetType(getObject())
+			switch rep {
+			case "bool":
+				result = this().GetObject().(bool)
+				break
+			case "*bool":
+				result = *(this().GetObject().(*bool))
+				break
+			case "*string":
+				value := *(this().GetObject().(*string))
+				if value == "1" || value == "true" {
+					result = true
+				} else if value == "0" || value == "false" {
+					result = false
+				} else {
+					errors = append(errors, fmt.Errorf("error: Value.GetBoolValue: unknown value"))
+					result = false
+				}
+			case "string":
+				value := (this().GetObject().(string))
+				if value == "1" || value == "true" {
+					result = true
+				} else if value == "0" || value == "false" {
+					result = false
+				} else {
+					errors = append(errors, fmt.Errorf("error: Value.GetBoolValue: unknown value"))
+					result = false
+				}
+			default:
+				errors = append(errors, fmt.Errorf("error: Map.GetBool: type %s is not supported please implement", rep))
+			}
+		
+			if len(errors) > 0 {
+				return false, errors
 			}
 		
 			return result, nil

@@ -129,6 +129,9 @@ type Map struct {
 	GetArrayOfFloat64 func(s string) (*[]*float64, []error)
 	GetArrayOfFloat64Value func(s string) ([]float64, []error)
 
+	GetArrayOfBool func(s string) (*[]*bool, []error)
+	GetArrayOfBoolValue func(s string) ([]bool, []error)
+
 	GetArrayOfString func(s string) (*[]*string, []error)
 
 	GetRunes func(s string) (*[]*rune, []error)
@@ -533,6 +536,24 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 				return nil, nil
 			}
 			return array.GetArrayOfString()
+		},
+		GetArrayOfBool: func(s string) (*[]*bool, []error) {
+			array, array_errors := getArray(s)
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfBool()
+		},
+		GetArrayOfBoolValue: func(s string) ([]bool, []error) {
+			array, array_errors := getArray(s)
+			if array_errors != nil {
+				return nil, array_errors
+			} else if common.IsNil(array) {
+				return nil, nil
+			}
+			return array.GetArrayOfBoolValue()
 		},
 		GetString: func(s string) (*string, []error) {
 			if isValueNilForMap(s) {

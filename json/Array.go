@@ -74,6 +74,9 @@ type Array struct {
 	GetArrayOfFloat32Value func() ([]float32, []error)
 	GetArrayOfFloat64 func() (*[]*float64, []error)
 	GetArrayOfFloat64Value func() ([]float64, []error)
+	GetArrayOfBool func() (*[]*bool, []error)
+	GetArrayOfBoolValue func() ([]bool, []error)
+
 	GetObject func() (*[](*interface{}))
 	SetObject func(object *[](*interface{})) 
 	Values func() *[](*Value)
@@ -342,7 +345,6 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			appended_value := newValue(value)
 			*a = append(*a, appended_value)
 		},
-		
 		AppendValue: func(value *Value) {
 			a := this().Values()
 			*a = append(*a, value)
@@ -829,6 +831,60 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 						errors = append(errors, uint64_value_errors...)
 					} else {
 						result = append(result, uint64_value)			 
+					}
+				}
+			}
+		
+			if len(errors) > 0 {
+				return nil, errors
+			}
+			
+			return result, nil
+		},
+		GetArrayOfBool: func() (*[](*bool), []error) {
+			array_values := this().Values()
+			if common.IsNil(array_values) {
+				return nil, nil
+			}
+		
+			var errors []error
+			var result ([](*bool))
+			for _, array_value := range *array_values {
+				if common.IsNil(array_value) {
+					result = append(result, nil)			 
+				} else {
+					string_value, string_value_errors := array_value.GetBool()
+					if string_value_errors != nil {
+						errors = append(errors, string_value_errors...)
+					} else {
+						result = append(result, string_value)			 
+					}
+				}
+			}
+		
+			if len(errors) > 0 {
+				return nil, errors
+			}
+			
+			return &result, nil
+		},
+		GetArrayOfBoolValue: func() ([](bool), []error) {
+			array_values := this().Values()
+			if common.IsNil(array_values) {
+				return nil, nil
+			}
+		
+			var errors []error
+			var result ([](bool))
+			for _, array_value := range *array_values {
+				if common.IsNil(array_value) {
+					errors = append(errors, fmt.Errorf("array contained nil value"))		 
+				} else {
+					string_value, string_value_errors := array_value.GetBoolValue()
+					if string_value_errors != nil {
+						errors = append(errors, string_value_errors...)
+					} else {
+						result = append(result, string_value)			 
 					}
 				}
 			}

@@ -292,3 +292,18 @@ func TestCanParseArrayContainingMultiplFloat32HighBoundary(t *testing.T) {
 		}
 	}
 }
+
+func TestCannotParseArrayContainingSingleFloat32BoundaryWhenNilValue(t *testing.T) {
+	json_obj := ParseJSONSuccessfully(t, "{\"key\":[null]}")
+	
+	{
+		value, value_errors := json_obj.GetArrayOfFloat32Value("key") 
+		if value_errors == nil {
+			t.Errorf("expected to have errors actual: no errors")
+		} 
+
+		if value != nil {
+			t.Errorf("expect array to be nil")
+		}
+	}
+}

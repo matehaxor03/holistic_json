@@ -87,13 +87,10 @@ func NewArrayValue() (Array) {
 }
 
 func NewArray() (*Array) {
-	array, _ :=  NewArrayOfValues(nil)
-	return array
+	return  NewArrayOfValues(nil)
 }
 
-func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
-	var errors []error
-
+func NewArrayOfValues(a *[]*interface{}) (*Array) {
 	var this_array *Array
 	interface_values := a
 	var values *[](*Value)
@@ -1082,10 +1079,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 		},
 	}
 	set_this(&created_array)
-	if len(errors) > 0 {
-		return nil, errors
-	}
-	return &created_array, nil
+	return &created_array
 }
 
 

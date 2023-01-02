@@ -147,6 +147,10 @@ type Map struct {
 
 }
 
+func NewMapValue() Map {
+	return *(NewMapOfValues(nil))
+}
+
 func NewMap() *Map {
 	return NewMapOfValues(nil)
 }

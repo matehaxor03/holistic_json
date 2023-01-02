@@ -83,6 +83,10 @@ type Array struct {
 	GetValue func() *Value
 }
 
+func NewArrayValue() (Array) {
+	return *(NewArray())
+}
+
 func NewArray() (*Array) {
 	array, _ :=  NewArrayOfValues(nil)
 	return array

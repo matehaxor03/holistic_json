@@ -138,8 +138,8 @@ type Map struct {
 
 	GetObjectForMap func(s string) (interface{})
 	SetObjectForMap func(s string, object interface{}) 
-	GetObject func() (*map[string]*interface{})
-	SetObject func(object *map[string]*interface{}) 
+	GetObject func() (*map[string]interface{})
+	SetObject func(object *map[string]interface{}) 
 
 	SetTime func (s string, value *time.Time)
 	GetTime func (s string) (*time.Time, []error)
@@ -155,7 +155,7 @@ func NewMap() *Map {
 	return NewMapOfValues(nil)
 }
 
-func NewMapOfValues(m *map[string]*interface{}) *Map {
+func NewMapOfValues(m *map[string]interface{}) *Map {
 	internal_map_of_interfaces := m
 	internal_map := make(map[string]*Value)
 
@@ -171,11 +171,11 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 		get_internal_map()[s] = value
 	}
 
-	get_internal_map_of_interfaces := func() *map[string]*interface{} {
+	get_internal_map_of_interfaces := func() *map[string]interface{} {
 		return internal_map_of_interfaces
 	}
 
-	set_internal_map_value_of_interfaces := func(value *map[string]*interface{}) {
+	set_internal_map_value_of_interfaces := func(value *map[string]interface{}) {
 		internal_map_of_interfaces = value
 	}
 
@@ -318,14 +318,14 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 	if !common.IsNil(m) {
 		current_type := ""
 		for key, value := range *internal_map_of_interfaces {
-			current_type = common.GetType(*value)
+			current_type = common.GetType(value)
 			if current_type == "json.Value" {
-				temp_value := ((*value).(Value))
+				temp_value := ((value).(Value))
 				internal_map[key] = &temp_value
 			} else if current_type == "*json.Value" {
-				internal_map[key] = ((*value).(*Value))
+				internal_map[key] = ((value).(*Value))
 			} else {
-				internal_map[key] = NewValue(*value)
+				internal_map[key] = NewValue(value)
 			}
 		}
 	}
@@ -637,13 +637,13 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
-		GetObject: func() *map[string]*interface{} {
+		GetObject: func() *map[string]interface{} {
 			if isValueNil() {
 				return nil
 			}
 			return (get_internal_map_of_interfaces())
 		},
-		SetObject: func(i *map[string]*interface{}) {
+		SetObject: func(i *map[string]interface{}) {
 			set_internal_map_value_of_interfaces(i)
 		},
 		GetBool: func(s string) (*bool, []error) {

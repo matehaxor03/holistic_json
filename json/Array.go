@@ -110,7 +110,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 			   common.IsValue(value) {
 				errors = append(errors, fmt.Errorf("cannot create array with non-primitive type %s", common.GetType(value)))
 			} else {
-				// for now just assume it's a value... to do map array and maps etc
+				// todo: for now just assume it's a value... to do map array and maps etc
 				converted_value := newValue(value)
 				(*internal_values)[index] = converted_value
 			}

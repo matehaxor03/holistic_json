@@ -6,7 +6,6 @@ import (
 	"fmt"
 )
 
-// low boundary
 func TestCanParseFloat64PositiveLowBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":" + fmt.Sprintf("%f", (math.MaxFloat32 * 10)) +"}")
 	
@@ -155,7 +154,6 @@ func TestCanParseFloat64MultipleLowBoundary(t *testing.T) {
 	}
 }
 
-// high boundary
 func TestCanParseFloat64PositiveHighBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":170000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.00}")
 	

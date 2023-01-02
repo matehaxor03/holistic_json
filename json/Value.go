@@ -8,8 +8,6 @@ import (
 	"strconv"
 )
 
-//type Value map[string](interface{})
-
 type Value struct {
 
 	GetMap func() (*Map, []error) 

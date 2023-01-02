@@ -4,7 +4,6 @@ import (
     "testing"
 )
 
-// uint8 boundary low
 func TestCanParseArrayContainingSingleUInt8LowBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":[0]}")
 
@@ -135,7 +134,6 @@ func TestCanParseArrayContainingMultipleUInt8LowBoundary(t *testing.T) {
 	}
 }
 
-// uint8 boundary high
 func TestCanParseArrayContainingSingleUInt8HighBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":[255]}")
 

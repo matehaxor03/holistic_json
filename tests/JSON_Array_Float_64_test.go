@@ -6,7 +6,6 @@ import (
 	"math"
 )
 
-// low boundary
 func TestCanParseArrayContainingSingleFloat64Boundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":[" + fmt.Sprintf("%f", (math.MaxFloat32 * 10)) +"]}")
 
@@ -167,7 +166,6 @@ func TestCanParseArrayContainingMultipleFloat64LowBoundary(t *testing.T) {
 	}
 }
 
-// high boundary 
 func TestCanParseArrayContainingSingleFloat64HighBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":[" + fmt.Sprintf("%f", (math.MaxFloat64 / 10.0)) +"]}")
 

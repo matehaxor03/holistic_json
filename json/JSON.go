@@ -56,15 +56,12 @@ func Parse(s string) (*Map, []error) {
 	metrics.SetIntValue("]", 0)
 	metrics.SetIntValue("opening_quote", 0)
 	metrics.SetIntValue("closing_quote", 0)
-	//metrics := Map{"{":Value{"value":0}, "}":Value{"value":0}, "[":Value{"value":0}, "]":Value{"value":0}, "opening_quote":Value{"value":0},"closing_quote":Value{"value":0}}
 	mode := "looking_for_keys"
 	parent_map := NewMap()
 	parent_map_value := newValue(parent_map)
 	list := [](*Value){parent_map_value}
 	
-	//list.PushFront(&parent_map)
 	index := uint64(1)
-	// parent map array and current map array etc
 	result_error := parseJSONMap(&runes, &index, &mode, &list, metrics)
 
 	opening_bracket_count, opening_bracket_count_errors := metrics.GetInt("{")

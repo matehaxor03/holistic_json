@@ -4,7 +4,6 @@ import (
     "testing"
 )
 
-// low boundary
 func TestCanParseArrayContainingSingleFloat32Boundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":[0.0]}")
 	{
@@ -162,7 +161,6 @@ func TestCanParseArrayContainingMultipleFloat32LowBoundary(t *testing.T) {
 	}
 }
 
-// float32 boundary high
 func TestCanParseArrayContainingSingleFloat32HighBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":[340000000000000000000000000000000000000.00]}")
 

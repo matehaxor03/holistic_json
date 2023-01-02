@@ -14,10 +14,13 @@ type Value struct {
 
 	GetMap func() (*Map, []error) 
 	GetMapValue func() (Map, []error) 
-	SetMap func(value *Map) []error
-	SetValue func(value *Value) []error
-	SetArray func(value *Array) []error
-	SetArrayValue func(a Array) []error
+	SetMap func(value *Map) 
+	SetMapValue func(value Map) 
+	SetValue func(value *Value) 
+	GetValue func() *Value
+	SetValueValue func(value Value) 
+	SetArray func(value *Array)
+	SetArrayValue func(a Array) 
 	IsMap func() (bool) 
 	IsEmptyString func() bool
 	GetFunc func() (func(Map) []error, []error)
@@ -96,32 +99,33 @@ func newValue(v interface{}) (*Value) {
 	}
 	
 	created_value := Value{
-		SetValue: func(value *Value) []error {
-			// todo do not allow array or map values
-			set_this(value)
+		SetValue: func(value *Value) {
 			setObject(value.GetObject())
-			return nil
+			set_this(value)	
 		},
-		SetArray: func(value *Array) []error {
-			// todo only allow array
-			set_this(newValue(value))
+		GetValue: func() *Value {
+			return this()
+		},
+		SetValueValue: func(value Value) {
 			setObject(value.GetObject())
-			return nil
+			set_this(&value)
 		},
-		SetArrayValue: func(a Array) []error {
-			return this().SetArray(&a)
+		SetArray: func(value *Array) {
+			setObject(value.GetObject())
+			set_this(value.GetValue())
+		},
+		SetArrayValue: func(value Array) {
+			setObject(value.GetObject())
+			set_this(value.GetValue())
 		},
 		IsMap: func() (bool) {
-			if common.IsNil(this().GetObject()) {
-				return false
-			}
 			return common.IsMap(this().GetObject())
 		},
-		SetMap: func(value *Map) []error {
-			// todo only allow map
-			set_this(newValue(value))
+		SetMap: func(value *Map) {
 			setObject(value.GetObject())
-			return nil
+		},
+		SetMapValue: func(value Map) {
+			setObject(value.GetObject())
 		},
 		IsEmptyString: func() bool {
 			if common.IsNil(this().GetObject()) {

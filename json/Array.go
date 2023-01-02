@@ -80,6 +80,7 @@ type Array struct {
 	GetObject func() (*[](*interface{}))
 	SetObject func(object *[](*interface{})) 
 	Values func() *[](*Value)
+	GetValue func() *Value
 }
 
 func NewArray() (*Array) {
@@ -89,6 +90,7 @@ func NewArray() (*Array) {
 
 func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 	var errors []error
+	var this_value *Value
 	var this_array *Array
 	interface_values := a
 	var internal_values *[](*Value)
@@ -117,6 +119,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 
 	set_this := func(array *Array) {
 		this_array = array
+		this_value = this_array.GetValue()
 	}
 	
 	this := func() *Array {
@@ -133,6 +136,10 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 
 	getObject :=  func() *[]*interface{} {
 		return interface_values
+	}
+
+	getValue := func() *Value {
+		return this_value
 	}
 
 	created_array := Array{
@@ -355,6 +362,9 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 		},
 		Values: func() *[](*Value) {
 			return values()
+		},
+		GetValue: func() *Value {
+			return getValue()
 		},
 		GetStringValue: func(index int) (string, []error) {
 			var errors []error

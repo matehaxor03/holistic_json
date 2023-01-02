@@ -33,6 +33,7 @@ type Value struct {
 	GetObject func() (interface{})
 	SetObject func(value interface{})
 
+	IsNumber func() bool
 	IsFloat func() bool
 	IsBool func() bool
 	IsBoolTrue func() bool
@@ -344,19 +345,10 @@ func newValue(v interface{}) (*Value) {
 			return *result, nil
 		},
 		IsFloat: func() (bool) {
-			if common.IsNil(this().GetObject()) {
-				return false
-			}
-		
-			type_of := common.GetType(this().GetObject())
-			if type_of == "float32" || 
-			   type_of == "*float32" || 
-			   type_of == "float64" || 
-			   type_of == "*float64" {
-				return true
-			}
-		
-			return false
+			return common.IsFloat(this().GetObject())
+		},
+		IsNumber: func() (bool) {
+			return common.IsNumber(this().GetObject())
 		},
 		IsString: func() (bool) {
 			if common.IsNil(this().GetObject()) {

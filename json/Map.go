@@ -325,7 +325,7 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 			} else if current_type == "*json.Value" {
 				internal_map[key] = ((*value).(*Value))
 			} else {
-				internal_map[key] = NewValue(value)
+				internal_map[key] = NewValue(*value)
 			}
 		}
 	}

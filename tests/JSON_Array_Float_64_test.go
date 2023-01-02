@@ -10,11 +10,7 @@ import (
 func TestCanParseArrayContainingSingleFloat64Boundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":[" + fmt.Sprintf("%f", (math.MaxFloat32 * 10)) +"]}")
 
-	if !json_obj.HasKey("key") {
-		t.Errorf("key not found")
-	} else if !json_obj.IsArray("key") {
-		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
-	} else {			
+	{		
 		value, value_errors := json_obj.GetArrayOfFloat64("key") 
 
 		if value_errors != nil {
@@ -27,16 +23,26 @@ func TestCanParseArrayContainingSingleFloat64Boundary(t *testing.T) {
 			t.Errorf("error: expected: %f actual: %f", float64(math.MaxFloat32 * 10), *((*value)[0]))
 		}
 	}
+
+	{		
+		value, value_errors := json_obj.GetArrayOfFloat64Value("key") 
+
+		if value_errors != nil {
+			t.Errorf("error: %s", value_errors)
+		} else if value == nil {
+			t.Errorf("error: GetArray is nil")
+		} else if len(value) != 1 {
+			t.Errorf("error: expected: length=1 actual: length=%d", len(value))
+		} else if ((value)[0]) != float64(math.MaxFloat32 * 10) {
+			t.Errorf("error: expected: %f actual: %f", float64(math.MaxFloat32 * 10), ((value)[0]))
+		}
+	}
 }
 
 func TestCanParseMultipleArraysContainingSingleFloat64LowBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":[" + fmt.Sprintf("%f", (math.MaxFloat32 * 10)) +"],\"key2\":[" + fmt.Sprintf("%f", (-1 * math.MaxFloat32 * 10)) +"]}")
 
-	if !json_obj.HasKey("key") {
-		t.Errorf("key not found")
-	} else if !json_obj.IsArray("key") {
-		t.Errorf("key is not a *json.Array: %s", json_obj.GetType("key"))
-	} else {			
+	{		
 		value, value_errors := json_obj.GetArrayOfFloat64("key") 
 
 		if value_errors != nil {
@@ -50,11 +56,21 @@ func TestCanParseMultipleArraysContainingSingleFloat64LowBoundary(t *testing.T) 
 		}
 	}
 
-	if !json_obj.HasKey("key2") {
-		t.Errorf("key2 not found")
-	} else if !json_obj.IsArray("key2") {
-		t.Errorf("key2 is not a *json.Array: %s", json_obj.GetType("key2"))
-	} else {			
+	{		
+		value, value_errors := json_obj.GetArrayOfFloat64Value("key") 
+
+		if value_errors != nil {
+			t.Errorf("%s", value_errors)
+		} else if value == nil {
+			t.Errorf("GetArray is nil")
+		} else if len(value) != 1 {
+			t.Errorf("expected: length=1 actual: length=%d", len(value))
+		} else if ((value)[0]) != float64(math.MaxFloat32 * 10) {
+			t.Errorf("expected %f actual: %f", float64(math.MaxFloat32 * 10), ((value)[0]))
+		}
+	}
+
+	{		
 		value, value_errors := json_obj.GetArrayOfFloat64("key2") 
 
 		if value_errors != nil {
@@ -65,6 +81,20 @@ func TestCanParseMultipleArraysContainingSingleFloat64LowBoundary(t *testing.T) 
 			t.Errorf("expected: length=1 actual: length=%d", len(*value))
 		} else if *((*value)[0]) != float64(-1 * math.MaxFloat32 * 10) {
 			t.Errorf("expected %f actual: %f", float64(-1 * math.MaxFloat32 * 10), *((*value)[0]))
+		}
+	}
+
+	{		
+		value, value_errors := json_obj.GetArrayOfFloat64Value("key2") 
+
+		if value_errors != nil {
+			t.Errorf("%s", value_errors)
+		} else if value == nil {
+			t.Errorf("GetArray is nil")
+		} else if len(value) != 1 {
+			t.Errorf("expected: length=1 actual: length=%d", len(value))
+		} else if ((value)[0]) != float64(-1 * math.MaxFloat32 * 10) {
+			t.Errorf("expected %f actual: %f", float64(-1 * math.MaxFloat32 * 10), ((value)[0]))
 		}
 	}
 }

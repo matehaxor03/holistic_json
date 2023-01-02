@@ -114,7 +114,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array) {
 				(*values)[index] = (*value).(*Value)
 			} else {
 				// todo: for now just assume it's a value... to do map array and maps etc
-				converted_value := NewValue(value)
+				converted_value := NewValue(*value)
 				(*values)[index] = converted_value
 			}
 		}
@@ -126,7 +126,6 @@ func NewArrayOfValues(a *[]*interface{}) (*Array) {
 
 	setObject := func(a *[]*interface{}) {
 		interface_values = a
-		
 	}
 
 	getObject := func() *[]*interface{} {

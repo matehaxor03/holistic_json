@@ -269,13 +269,20 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 					if unquoted_key_name_errors != nil {
 						errors = append(errors, unquoted_key_name_errors...)
 					} else {
-						((*list)[len(*list)-1]).SetValue(unquoted_key_name, new_map_value)	
+						get_map, get_map_errors := ((*list)[len(*list)-1]).GetMapValue()
+						if get_map_errors != nil {
+							errors = append(errors, get_map_errors...)
+						} else {
+							get_map.SetValue(unquoted_key_name, new_map_value)	
+						}
+						//((*list)[len(*list)-1]).SetValue(unquoted_key_name, new_map_value)	
 					}
 				} else {
-
-					append_errors := ((*list)[len(*list)-1]).AppendValue(new_map_value)
-					if append_errors != nil {
-						return append_errors
+					get_array, get_array_errors := ((*list)[len(*list)-1]).GetArrayValue()
+					if get_array_errors != nil {
+						errors = append(errors, get_array_errors...)
+					} else {
+						get_array.AppendValue(new_map_value)
 					}
 				} 
 
@@ -317,12 +324,20 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 					if unquoted_key_name_errors != nil {
 						errors = append(errors, unquoted_key_name_errors...)
 					} else {
-						((*list)[len(*list)-1]).SetValue(unquoted_key_name, new_array_value)	
+						get_map, get_map_errors := ((*list)[len(*list)-1]).GetMapValue()
+						if get_map_errors != nil {
+							errors = append(errors, get_map_errors...)
+						} else {
+							get_map.SetArray(unquoted_key_name, new_array)	
+						}
+						//((*list)[len(*list)-1]).SetValue(unquoted_key_name, new_array_value)	
 					}
 				} else {
-					append_errors := ((*list)[len(*list)-1]).AppendValue(new_array_value)
-					if append_errors != nil {
-						return append_errors
+					get_array, get_array_errors := ((*list)[len(*list)-1]).GetArrayValue()
+					if get_array_errors != nil {
+						errors = append(errors, get_array_errors...)
+					} else {
+						get_array.AppendValue(new_array_value)
 					}
 				} 
 

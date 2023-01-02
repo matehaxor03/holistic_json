@@ -13,41 +13,21 @@ import (
 type Value struct {
 
 	GetMap func() (*Map, []error) 
-	SetMap func(s string, value *Map) []error
-	SetValue func(s string, value *Value) []error
-	SetArray func(s string, value *Array) []error
-	SetArrayValue func(s string, a Array) []error
+	GetMapValue func() (Map, []error) 
+	SetMap func(value *Map) []error
+	SetValue func(value *Value) []error
+	SetArray func(value *Array) []error
+	SetArrayValue func(a Array) []error
 	IsMap func() (bool) 
 	IsEmptyString func() bool
 	GetFunc func() (func(Map) []error, []error)
 	GetErrors func() ([]error, []error)
 	GetArray func() (*Array, []error)
 	GetArrayValue func() (Array, []error)
-	GetArrayOfInt func() (*[](*int), []error)
-	GetArrayOfInt8 func() (*[](*int8), []error)
-	GetArrayOfInt16 func() (*[](*int16), []error)
-	GetArrayOfInt32 func() (*[](*int32), []error) 
-	GetArrayOfInt64 func() (*[](*int64), []error) 
-	GetArrayOfUInt func() (*[](*uint), []error)
-	GetArrayOfUInt8 func() (*[](*uint8), []error)
-	GetArrayOfUInt16 func() (*[](*uint16), []error)
-	GetArrayOfUInt32 func() (*[](*uint32), []error) 
-	GetArrayOfUInt64 func() (*[](*uint64), []error) 
-	GetArrayOfIntValue func() ([](int), []error)
-	GetArrayOfInt8Value func() ([](int8), []error)
-	GetArrayOfInt16Value func() ([](int16), []error)
-	GetArrayOfInt32Value func() ([](int32), []error) 
-	GetArrayOfInt64Value func() ([](int64), []error) 
-	GetArrayOfUIntValue func() ([](uint), []error)
-	GetArrayOfUInt8Value func() ([](uint8), []error)
-	GetArrayOfUInt16Value func() ([](uint16), []error)
-	GetArrayOfUInt32Value func() ([](uint32), []error) 
-	GetArrayOfUInt64Value func() ([](uint64), []error) 
 	GetStringValue func() (string, []error) 
 	GetString func() (*string, []error) 
 	GetBool func() (*bool, []error) 
 	GetBoolValue func() (bool, []error) 
-	AppendValue func(add *Value) []error
 	IsArray func() bool
 	GetType func() string
 	GetObject func() (interface{})
@@ -59,8 +39,6 @@ type Value struct {
 	IsBoolFalse func() bool
 	IsInteger func() bool
 	IsString func() bool
-	GetArrayOfString func() (*[](*string), []error)
-	GetArrayOfStringValue func() ([](string), []error)
 	GetFloat32 func() (*float32, []error) 
 	GetFloat32Value func() (float32, []error) 
 	GetFloat64 func() (*float64, []error) 
@@ -89,14 +67,7 @@ type Value struct {
 	GetTimeWithDecimalPlaces func(decimal_places int) (*time.Time, []error)
 	GetTime func() (*time.Time, []error)
 	IsNil func() bool
-	GetIntFromMap func(key string) (*int, []error)
-	SetIntToMap func(key string, int_value *int) ([]error)
-	SetIntValueToMap func(key string, int_value int) ([]error)
 	AppendValueValue func(add Value) []error
-	GetArrayOfFloat32 func() (*[]*float32, []error)
-	GetArrayOfFloat32Value func() ([]float32, []error)
-	GetArrayOfFloat64 func() (*[]*float64, []error)
-	GetArrayOfFloat64Value func() ([]float64, []error)
 }
 
 func newValue(v interface{}) (*Value) {
@@ -111,16 +82,12 @@ func newValue(v interface{}) (*Value) {
 		return this_value
 	}
 
-	get_internal_value := func() interface{} {
-		return internal_value
-	}
-
 	getObject := func() interface{} {
-		if common.IsNil(get_internal_value()) {
+		if common.IsNil(internal_value) {
 			return nil
 		}
 	
-		return get_internal_value()
+		return internal_value
 	}
 
 	setObject := func(value interface{}) {
@@ -128,52 +95,20 @@ func newValue(v interface{}) (*Value) {
 	}
 	
 	created_value := Value{
-		SetValue: func(s string, value *Value) []error {
-			var errors []error
-			if common.IsMap(this().GetObject()) {
-				temp_map, temp_map_errors := this().GetMap()
-				if temp_map_errors != nil {
-					return temp_map_errors
-				} else if common.IsNil(temp_map) {
-					errors = append(errors, fmt.Errorf("Value.SetMap map is nil"))
-				} else {
-					set_map_value := value
-					(*temp_map).SetValue(s, set_map_value)
-				}
-			} else {
-				errors = append(errors, fmt.Errorf("Value.SetMap cannot set map on type %s", this().GetType()))
-			}
-		
-			if len(errors) > 0 {
-				return errors
-			}
-		
+		SetValue: func(value *Value) []error {
+			// todo do not allow array or map values
+			set_this(value)
+			setObject(value.GetObject())
 			return nil
 		},
-		SetArray: func(s string, value *Array) []error {
-			var errors []error
-			if common.IsMap(this().GetObject()) {
-				temp_map, temp_map_errors := this().GetMap()
-				if temp_map_errors != nil {
-					return temp_map_errors
-				} else if common.IsNil(temp_map) {
-					errors = append(errors, fmt.Errorf("Value.SetMap map is nil"))
-				} else {
-					set_value := newValue(value)
-					(*temp_map).SetValue(s, set_value)
-				}
-			} else {
-				errors = append(errors, fmt.Errorf("Value.SetArray cannot set arrary on type %s", this().GetType()))
-			}
-		
-			if len(errors) > 0 {
-				return errors
-			}
-		
+		SetArray: func(value *Array) []error {
+			// todo only allow array
+			set_this(newValue(value))
+			setObject(value.GetObject())
 			return nil
 		},
-		SetArrayValue: func(s string, a Array) []error {
-			return this().SetArray(s, &a)
+		SetArrayValue: func(a Array) []error {
+			return this().SetArray(&a)
 		},
 		IsMap: func() (bool) {
 			if common.IsNil(this().GetObject()) {
@@ -181,26 +116,10 @@ func newValue(v interface{}) (*Value) {
 			}
 			return common.IsMap(this().GetObject())
 		},
-		SetMap: func(s string, value *Map) []error {
-			var errors []error
-			if common.IsMap(this().GetObject()) {
-				temp_map, temp_map_errors := this().GetMap()
-				if temp_map_errors != nil {
-					return temp_map_errors
-				} else if common.IsNil(temp_map) {
-					errors = append(errors, fmt.Errorf("Value.SetMap map is nil"))
-				} else {
-					set_map_value := newValue(value)
-					(*temp_map).SetValue(s, set_map_value)
-				}
-			} else {
-				errors = append(errors, fmt.Errorf("Value.SetMap cannot set map on type %s", this().GetType()))
-			}
-		
-			if len(errors) > 0 {
-				return errors
-			}
-		
+		SetMap: func(value *Map) []error {
+			// todo only allow map
+			set_this(newValue(value))
+			setObject(value.GetObject())
 			return nil
 		},
 		IsEmptyString: func() bool {
@@ -241,6 +160,26 @@ func newValue(v interface{}) (*Value) {
 		
 			return result, nil
 		},
+		GetMapValue: func() (Map, []error) {
+			var errors []error
+			if common.IsNil(this().GetObject()) { 
+				errors = append(errors, fmt.Errorf("map is nil"))
+				return Map{}, errors
+			}
+	
+			var result Map
+			type_of := this().GetType()
+			if type_of == "*json.Map" {
+				result = (*this().GetObject().(*Map))
+			} else if type_of == "json.Map" {
+				result = this().GetObject().(Map)
+			} else {
+				errors = append(errors, fmt.Errorf("%s failed to unbox to json.Map", type_of))
+				return  Map{}, errors
+			}
+		
+			return result, nil
+		},
 		GetFunc: func() (func(Map) []error, []error) {
 			if common.IsNil(this().GetObject()) {
 				return nil, nil
@@ -248,7 +187,7 @@ func newValue(v interface{}) (*Value) {
 		
 			var errors []error
 			var result (func(Map) []error)
-			rep := common.GetType(get_internal_value())
+			rep := common.GetType(getObject())
 			switch rep {
 			case "func(json.Map) []error":
 				result = (this().GetObject()).(func(Map) []error)
@@ -272,7 +211,7 @@ func newValue(v interface{}) (*Value) {
 			var errors []error
 			var result []error
 			
-			rep := common.GetType(get_internal_value())
+			rep := common.GetType(getObject())
 			switch rep {
 			case "*[]error":
 				result = *(this().GetObject().(*[]error))
@@ -336,7 +275,7 @@ func newValue(v interface{}) (*Value) {
 			var errors []error
 			var result *Array
 		
-			rep := common.GetType(get_internal_value())
+			rep := common.GetType(getObject())
 			switch rep {
 			case "*json.Array":
 				result = this().GetObject().(*Array)
@@ -365,240 +304,6 @@ func newValue(v interface{}) (*Value) {
 
 			return *array, nil
 		},
-		GetArrayOfFloat32: func() (*[](*float32), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfFloat32()
-		},
-		GetArrayOfFloat32Value: func() ([](float32), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfFloat32Value()
-		},
-		GetArrayOfFloat64: func() (*[](*float64), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfFloat64()
-		},
-		GetArrayOfFloat64Value: func() ([](float64), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfFloat64Value()
-		},
-		GetArrayOfInt: func() (*[](*int), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfInt()
-		},
-		GetArrayOfInt8: func() (*[](*int8), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfInt8()
-		},
-		GetArrayOfInt16: func() (*[](*int16), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfInt16()
-		},
-		GetArrayOfInt32: func() (*[](*int32), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfInt32()
-		},
-		GetArrayOfInt64: func() (*[](*int64), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfInt64()
-		},
-		GetArrayOfIntValue: func() ([](int), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfIntValue()
-		},
-		GetArrayOfInt8Value: func() ([](int8), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfInt8Value()
-		},
-		GetArrayOfInt16Value: func() ([](int16), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfInt16Value()
-		},
-		GetArrayOfInt32Value: func() ([](int32), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfInt32Value()
-		},
-		GetArrayOfInt64Value: func() ([](int64), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfInt64Value()
-		},
-		GetArrayOfUInt: func() (*[](*uint), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfUInt()
-		},
-		GetArrayOfUInt8: func() (*[](*uint8), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfUInt8()
-		},
-		GetArrayOfUInt16: func() (*[](*uint16), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfUInt16()
-		},
-		GetArrayOfUInt32: func() (*[](*uint32), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfUInt32()
-		},
-		GetArrayOfUInt64: func() (*[](*uint64), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfUInt64()
-		},
-		GetArrayOfUIntValue: func() ([](uint), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfUIntValue()
-		},
-		GetArrayOfUInt8Value: func() ([](uint8), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfUInt8Value()
-		},
-		GetArrayOfUInt16Value: func() ([](uint16), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfUInt16Value()
-		},
-		GetArrayOfUInt32Value: func() ([](uint32), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfUInt32Value()
-		},
-		GetArrayOfUInt64Value: func() ([](uint64), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfUInt64Value()
-		},
-		GetArrayOfString: func() (*[](*string), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfString()
-		},
-		GetArrayOfStringValue: func() ([](string), []error) {
-			array, array_errors := this().GetArray()
-			if array_errors != nil {
-				return nil, array_errors
-			} else if common.IsNil(array) {
-				return nil, nil
-			}
-			return array.GetArrayOfStringValue()
-		},
 		GetString: func() (*string, []error) {
 			if common.IsNil(this().GetObject()){
 				return nil, nil
@@ -606,7 +311,7 @@ func newValue(v interface{}) (*Value) {
 		
 			var errors []error
 			var result *string
-			rep := common.GetType(get_internal_value())
+			rep := common.GetType(getObject())
 			switch rep {
 			case "string":
 				value := this().GetObject().(string)
@@ -676,7 +381,7 @@ func newValue(v interface{}) (*Value) {
 		
 			var errors []error
 			var result *float64
-			rep := common.GetType(get_internal_value())
+			rep := common.GetType(getObject())
 			switch rep {
 			case "float64":
 				value := this().GetObject().(float64)
@@ -786,7 +491,7 @@ func newValue(v interface{}) (*Value) {
 		
 			var errors []error
 			var result *string
-			rep := common.GetType(get_internal_value())
+			rep := common.GetType(getObject())
 			switch rep {
 			case "string":
 				value := this().GetObject().(string)
@@ -822,7 +527,7 @@ func newValue(v interface{}) (*Value) {
 			var result *bool
 			var errors []error
 		
-			rep := common.GetType(get_internal_value())
+			rep := common.GetType(getObject())
 			switch rep {
 			case "bool":
 				value := this().GetObject().(bool)
@@ -883,7 +588,7 @@ func newValue(v interface{}) (*Value) {
 				return nil, nil
 			}
 		
-			rep := common.GetType(get_internal_value())
+			rep := common.GetType(getObject())
 			switch rep {
 				case "json.Value":
 					string_value, convert_errors := ConvertInterfaceValueToStringValue(this().GetObject().(Value))
@@ -1013,7 +718,7 @@ func newValue(v interface{}) (*Value) {
 			}
 
 			var uint64_value uint64
-			rep := common.GetType(get_internal_value())
+			rep := common.GetType(getObject())
 			switch rep {
 			case "*int64":
 				x := *(this().GetObject().(*int64))
@@ -1569,47 +1274,6 @@ func newValue(v interface{}) (*Value) {
 		
 			return &result, nil
 		},
-		GetIntFromMap: func(key string) (*int, []error) {
-			var errors []error
-			map_value, map_value_errors := this().GetMap()
-			if map_value_errors != nil {
-				errors = append(errors, map_value_errors...)
-			} else if common.IsNil(map_value) {
-				errors = append(errors, fmt.Errorf("Value.GetIntFromMap map is nil"))
-			}
-			if len(errors) > 0 {
-				return nil, errors
-			}
-			return map_value.GetInt(key)
-		},
-		SetIntToMap: func(key string, int_value *int) ([]error) {
-			var errors []error
-			map_value, map_value_errors := this().GetMap()
-			if map_value_errors != nil {
-				errors = append(errors, map_value_errors...)
-			} else if common.IsNil(map_value) {
-				errors = append(errors, fmt.Errorf("Value.SetIntToMap map is nil"))
-			}
-			if len(errors) > 0 {
-				return errors
-			}
-			map_value.SetInt(key, int_value)
-			return nil
-		},
-		SetIntValueToMap: func(key string, int_value int) ([]error) {
-			var errors []error
-			map_value, map_value_errors := this().GetMap()
-			if map_value_errors != nil {
-				errors = append(errors, map_value_errors...)
-			} else if common.IsNil(map_value) {
-				errors = append(errors, fmt.Errorf("Value.SetIntToMap map is nil"))
-			}
-			if len(errors) > 0 {
-				return errors
-			}
-			map_value.SetIntValue(key, int_value)
-			return nil
-		},
 		GetIntValue: func() (int, []error) {
 			var errors []error
 			int_value, int_value_errors := this().GetInt()
@@ -1627,48 +1291,6 @@ func newValue(v interface{}) (*Value) {
 			result := int_conv
 		
 			return result, nil
-		},
-		AppendValue: func(add *Value) []error {
-			var errors []error
-			if common.IsArray(this().GetObject()) {	
-				array, array_errors := this().GetArray()
-				if array_errors != nil {
-					errors = append(errors, array_errors...)
-				} else if common.IsNil(array) {
-					errors = append(errors, fmt.Errorf("Value.AppendValue array is nil"))
-				} else {
-					(*array).AppendValue(add)
-				}
-			} else {
-				errors = append(errors, fmt.Errorf("Value.AppendValue not supported for type %s", this().GetType()))
-			}
-
-			if len(errors) > 0 {
-				return errors
-			}
-
-			return nil
-		},
-		AppendValueValue: func(add Value) []error {
-			var errors []error
-			if common.IsArray(this().GetObject()) {	
-				array, array_errors := this().GetArray()
-				if array_errors != nil {
-					errors = append(errors, array_errors...)
-				} else if common.IsNil(array) {
-					errors = append(errors, fmt.Errorf("Value.AppendValue array is nil"))
-				} else {
-					(*array).AppendValueValue(add)
-				}
-			} else {
-				errors = append(errors, fmt.Errorf("Value.AppendValue not supported for type %s", this().GetType()))
-			}
-		
-			if len(errors) > 0 {
-				return errors
-			}
-		
-			return nil
 		},
 		SetObject: func(value interface{}) () {
 			setObject(value)

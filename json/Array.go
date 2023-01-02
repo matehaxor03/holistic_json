@@ -74,10 +74,8 @@ type Array struct {
 	GetArrayOfFloat32Value func() ([]float32, []error)
 	GetArrayOfFloat64 func() (*[]*float64, []error)
 	GetArrayOfFloat64Value func() ([]float64, []error)
-
-
-	//GetObject func() (*[](*interface{}))
-	//SetObject func(object *[](*interface{})) 
+	GetObject func() (*[](*interface{}))
+	SetObject func(object *[](*interface{})) 
 	Values func() *[](*Value)
 }
 
@@ -89,6 +87,7 @@ func NewArray() (*Array) {
 func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 	var errors []error
 	var this_array *Array
+	interface_values := a
 	var internal_values *[](*Value)
 
 	if !common.IsNil(a) {
@@ -123,6 +122,14 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 
 	values := func() *[](*Value) {
 		return internal_values
+	}
+
+	setObject := func(a *[]*interface{}) {
+		interface_values = a
+	}
+
+	getObject :=  func() *[]*interface{} {
+		return interface_values
 	}
 
 	created_array := Array{
@@ -999,13 +1006,12 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 				
 				return result, nil
 		},
-		/*
 		SetObject: func(value *[](*interface{})) {
 			setObject(value)
 		},
 		GetObject: func() (*[](*interface{})) {
 			return getObject()
-		},*/
+		},
 	}
 	set_this(&created_array)
 	if len(errors) > 0 {

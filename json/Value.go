@@ -72,7 +72,7 @@ type Value struct {
 	AppendValueValue func(add Value) []error
 }
 
-func newValue(v interface{}) (*Value) {
+func NewValue(v interface{}) (*Value) {
 	var this_value *Value
 	internal_value := v
 

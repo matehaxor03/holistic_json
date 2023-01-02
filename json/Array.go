@@ -111,7 +111,7 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 				errors = append(errors, fmt.Errorf("cannot create array with non-primitive type %s", common.GetType(value)))
 			} else {
 				// todo: for now just assume it's a value... to do map array and maps etc
-				converted_value := newValue(value)
+				converted_value := NewValue(value)
 				(*internal_values)[index] = converted_value
 			}
 		}
@@ -180,152 +180,152 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 		},
 		AppendString: func(value *string) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendStringValue: func(value string) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt: func(value *uint) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUIntValue: func(value uint) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt8: func(value *uint8) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt8Value: func(value uint8) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt16: func(value *uint16) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt16Value: func(value uint16) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt32: func(value *uint32) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt32Value: func(value uint32) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt64: func(value *uint64) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendUInt64Value: func(value uint64) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt: func(value *int) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendIntValue: func(value int) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt8: func(value *int8) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt8Value: func(value int8) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt16: func(value *int16) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt16Value: func(value int16) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt32: func(value *int32) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt32Value: func(value int32) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt64: func(value *int64) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInt64Value: func(value int64) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendFloat32: func(value *float32) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendFloat32Value: func(value float32) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendFloat64: func(value *float64) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendFloat64Value: func(value float64) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendBool: func(value *bool) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendBoolValue: func(value bool) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInterface: func(value *interface{}) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendInterfaceValue: func(value interface{}) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendNil: func() {
@@ -334,22 +334,22 @@ func NewArrayOfValues(a *[]*interface{}) (*Array, []error) {
 		},
 		AppendMap: func(value *Map) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendMapValue: func(value Map) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendArray: func(value *Array) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendArrayValue: func(value Array) {
 			a := this().Values()
-			appended_value := newValue(value)
+			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
 		},
 		AppendValue: func(value *Value) {

@@ -320,11 +320,11 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 			return getValue(s)
 		},
 		SetMap: func(s string, zap *Map) {
-			set_map_value := newValue(zap)
+			set_map_value := NewValue(zap)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetMapValue: func(s string, zap Map) {
-			set_map_value := newValue(&zap)
+			set_map_value := NewValue(&zap)
 			set_internal_map_value(s, set_map_value)
 		},
 		IsNil: func(s string) bool {
@@ -385,15 +385,15 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 			return keys()
 		},
 		SetArray: func(s string, array *Array) {
-			set_map_value := newValue(array)
+			set_map_value := NewValue(array)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetArrayValue: func(s string, array Array) {
-			set_map_value := newValue(&array)
+			set_map_value := NewValue(&array)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetErrors: func(s string, errors []error) {
-			set_map_value := newValue(errors)
+			set_map_value := NewValue(errors)
 			set_internal_map_value(s, set_map_value)
 		},
 		GetErrors: func(s string) ([]error, []error) {
@@ -415,7 +415,7 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 			return getValue(s).GetFunc()
 		},
 		SetFunc: func(s string, function func(Map) []error) {
-			set_map_value := newValue(function)
+			set_map_value := NewValue(function)
 			set_internal_map_value(s, set_map_value)
 		},
 		GetArray: func(s string) (*Array, []error) {
@@ -616,7 +616,7 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 			return (*get_internal_map_value(s))
 		},
 		SetObjectForMap: func(s string, value interface{}) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		GetObject: func() *map[string]*interface{} {
@@ -635,23 +635,23 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 			return getValue(s).GetBool()
 		},
 		SetBool: func(s string, value *bool) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetBoolValue: func(s string, value bool) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetString: func(s string, value *string) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetStringValue: func(s string, value string) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetNil: func(s string) {
-			set_map_value := newValue(nil)
+			set_map_value := NewValue(nil)
 			set_internal_map_value(s, set_map_value)
 		},
 		HasKey: func(s string) (bool) {
@@ -800,99 +800,99 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 			return getValue(s).GetIntValue()
 		},
 		SetInt: func(s string, value *int) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetInt64: func(s string, value *int64) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetInt32: func(s string, value *int32) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetInt16: func(s string, value *int16) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetInt8: func(s string, value *int8) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetIntValue: func(s string, value int) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetInt64Value: func(s string, value int64) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetInt32Value: func(s string, value int32) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetInt16Value: func(s string, value int16) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetInt8Value: func(s string, value int8) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt: func(s string, value *uint) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt64: func(s string, value *uint64) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt32: func(s string, value *uint32) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt16: func(s string, value *uint16) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt8: func(s string, value *uint8) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUIntValue: func(s string, value uint) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt64Value: func(s string, value uint64) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt32Value: func(s string, value uint32) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt16Value: func(s string, value uint16) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt8Value: func(s string, value uint8) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetFloat64: func(s string, value *float64) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetFloat64Value: func(s string, value float64) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetFloat32: func(s string, value *float32) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetFloat32Value: func(s string, value float32) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		GetUInt64: func(s string) (*uint64, []error) {
@@ -902,7 +902,7 @@ func NewMapOfValues(m *map[string]*interface{}) *Map {
 			return getValue(s).GetUInt64()
 		},
 		SetTime: func (s string, value *time.Time) {
-			set_map_value := newValue(value)
+			set_map_value := NewValue(value)
 			set_internal_map_value(s, set_map_value)
 		},
 		GetTime: func(s string) (*time.Time, []error) {

@@ -58,7 +58,7 @@ func Parse(s string) (*Map, []error) {
 	metrics.SetIntValue("closing_quote", 0)
 	mode := "looking_for_keys"
 	parent_map := NewMap()
-	parent_map_value := newValue(parent_map)
+	parent_map_value := NewValue(parent_map)
 	list := [](*Value){parent_map_value}
 	
 	index := uint64(1)
@@ -258,7 +258,7 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 
 				current_mode = mode_looking_for_keys
 				new_map := NewMap()
-				new_map_value := newValue(new_map)
+				new_map_value := NewValue(new_map)
 
 				if ((*list)[len(*list)-1]).IsMap() {
 
@@ -313,7 +313,7 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 
 				current_mode = mode_looking_for_value
 				new_array := NewArray()
-				new_array_value := newValue(new_array)
+				new_array_value := NewValue(new_array)
 
 				if ((*list)[len(*list)-1]).IsMap() {
 

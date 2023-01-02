@@ -77,8 +77,8 @@ type Array struct {
 	GetArrayOfBool func() (*[]*bool, []error)
 	GetArrayOfBoolValue func() ([]bool, []error)
 
-	GetObject func() (*[](*interface{}))
-	SetObject func(object *[](*interface{})) 
+	GetObject func() (*[](interface{}))
+	SetObject func(object *[](interface{})) 
 	GetValues func() *[](*Value)
 }
 
@@ -90,7 +90,7 @@ func NewArray() (*Array) {
 	return  NewArrayOfValues(nil)
 }
 
-func NewArrayOfValues(a *[]*interface{}) (*Array) {
+func NewArrayOfValues(a *[]interface{}) (*Array) {
 	var this_array *Array
 	interface_values := a
 	var values *[](*Value)
@@ -106,15 +106,14 @@ func NewArrayOfValues(a *[]*interface{}) (*Array) {
 	if !common.IsNil(a) {
 		current_type := ""
 		for index, value := range *a {
-			current_type = common.GetType(*value)
+			current_type = common.GetType(value)
 			if current_type == "json.Value" {
-				temp_value := ((*value).(Value))
+				temp_value := ((value).(Value))
 				(*values)[index] = &temp_value
 			} else if current_type == "*json.Value" {
-				(*values)[index] = (*value).(*Value)
+				(*values)[index] = (value).(*Value)
 			} else {
-				// todo: for now just assume it's a value... to do map array and maps etc
-				converted_value := NewValue(*value)
+				converted_value := NewValue(value)
 				(*values)[index] = converted_value
 			}
 		}
@@ -124,11 +123,11 @@ func NewArrayOfValues(a *[]*interface{}) (*Array) {
 		return values
 	}
 
-	setObject := func(a *[]*interface{}) {
+	setObject := func(a *[]interface{}) {
 		interface_values = a
 	}
 
-	getObject := func() *[]*interface{} {
+	getObject := func() *[]interface{} {
 		return interface_values
 	}
 
@@ -1070,10 +1069,10 @@ func NewArrayOfValues(a *[]*interface{}) (*Array) {
 				
 				return result, nil
 		},
-		SetObject: func(value *[](*interface{})) {
+		SetObject: func(value *[](interface{})) {
 			setObject(value)
 		},
-		GetObject: func() (*[](*interface{})) {
+		GetObject: func() (*[](interface{})) {
 			return getObject()
 		},
 	}

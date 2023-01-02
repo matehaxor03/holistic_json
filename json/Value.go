@@ -25,8 +25,7 @@ type Value struct {
 	GetErrors func() ([]error, []error)
 	GetArray func() (*Array, []error)
 	GetArrayValue func() (Array, []error)
-	GetStringValue func() (string, []error) 
-	GetString func() (*string, []error) 
+	
 	GetBool func() (*bool, []error) 
 	GetBoolValue func() (bool, []error) 
 	IsArray func() bool
@@ -34,13 +33,19 @@ type Value struct {
 	GetObject func() (interface{})
 	SetObject func(value interface{})
 
+	IsString func() bool
+	IsValueEqualToStringValue func(s string) bool
+	IsValueEqualToString func(s *string) bool
+	GetStringValue func() (string, []error) 
+	GetString func() (*string, []error) 
+
 	IsNumber func() bool
 	IsFloat func() bool
 	IsBool func() bool
 	IsBoolTrue func() bool
 	IsBoolFalse func() bool
 	IsInteger func() bool
-	IsString func() bool
+	
 	GetFloat32 func() (*float32, []error) 
 	GetFloat32Value func() (float32, []error) 
 	GetFloat64 func() (*float64, []error) 
@@ -363,6 +368,44 @@ func NewValue(v interface{}) (*Value) {
 			}
 		
 			return common.IsString(this().GetObject())
+		},
+		IsValueEqualToString: func(s *string) (bool) {
+			this_nil := this().IsNil()
+			compare_nil := common.IsNil(s)
+			
+			if this_nil && compare_nil {
+				return true
+			}
+			
+			if this_nil != compare_nil {
+				return false
+			}
+
+			value, value_errors := this().GetStringValue()
+			if value_errors != nil {
+				return false
+			}
+
+			return value == *s			
+		},
+		IsValueEqualToStringValue: func(s string) (bool) {
+			this_nil := this().IsNil()
+			compare_nil := common.IsNil(s)
+			
+			if this_nil && compare_nil {
+				return true
+			}
+			
+			if this_nil != compare_nil {
+				return false
+			}
+
+			value, value_errors := this().GetStringValue()
+			if value_errors != nil {
+				return false
+			}
+
+			return value == s			
 		},
 		IsNil: func() bool {
 			return common.IsNil(this().GetObject())

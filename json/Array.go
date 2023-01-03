@@ -10,8 +10,6 @@ type Array struct {
 	ToJSONString func(json *strings.Builder) ([]error) 
 	AppendString func (value *string)
 	AppendStringValue func(value string)
-	AppendInterface func(value *interface{})
-	AppendInterfaceValue func(value interface{})
 	AppendUInt func(value *uint)
 	AppendUIntValue func(value uint)
 	AppendUInt8 func(value *uint8)
@@ -76,9 +74,6 @@ type Array struct {
 	GetArrayOfFloat64Value func() ([]float64, []error)
 	GetArrayOfBool func() (*[]*bool, []error)
 	GetArrayOfBoolValue func() ([]bool, []error)
-
-	GetObject func() (*[](interface{}))
-	SetObject func(object *[](interface{})) 
 	GetValues func() *[](*Value)
 }
 
@@ -91,8 +86,6 @@ func NewArray() (*Array) {
 }
 
 func NewArrayOfValues(a *[]interface{}) (*Array) {
-	//var this_array *Array
-	interface_values := a
 	var temp_values [](*Value)
 	var values *[](*Value)
 	values = &temp_values
@@ -120,24 +113,6 @@ func NewArrayOfValues(a *[]interface{}) (*Array) {
 	getValues := func() *[](*Value) {
 		return values
 	}
-
-	setObject := func(a *[]interface{}) {
-		interface_values = a
-	}
-
-	getObject := func() *[]interface{} {
-		return interface_values
-	}
-
-	/*
-	set_this := func(array *Array) {
-		this_array = array
-	}*/
-
-	/*
-	this := func() *Array {
-		return this_array
-	}*/
 
 	created_array := Array{
 		ToJSONString: func (json *strings.Builder) ([]error) {
@@ -311,16 +286,6 @@ func NewArrayOfValues(a *[]interface{}) (*Array) {
 			*a = append(*a, appended_value)
 		},
 		AppendBoolValue: func(value bool) {
-			a := getValues()
-			appended_value := NewValue(value)
-			*a = append(*a, appended_value)
-		},
-		AppendInterface: func(value *interface{}) {
-			a := getValues()
-			appended_value := NewValue(value)
-			*a = append(*a, appended_value)
-		},
-		AppendInterfaceValue: func(value interface{}) {
 			a := getValues()
 			appended_value := NewValue(value)
 			*a = append(*a, appended_value)
@@ -1070,14 +1035,7 @@ func NewArrayOfValues(a *[]interface{}) (*Array) {
 				
 				return result, nil
 		},
-		SetObject: func(value *[](interface{})) {
-			setObject(value)
-		},
-		GetObject: func() (*[](interface{})) {
-			return getObject()
-		},
 	}
-	//set_this(&created_array)
 	return &created_array
 }
 

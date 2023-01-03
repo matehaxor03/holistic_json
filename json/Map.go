@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strings"
 	"time"
-	"reflect"
 	common "github.com/matehaxor03/holistic_common/common"
 )
 
@@ -318,23 +317,6 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 
 	if !common.IsNil(m) {
 		current_type := ""
-		values := reflect.ValueOf(*internal_map_of_interfaces)
-		types := values.Type()
-		for i := 0; i < values.NumField(); i++ {
-			key := types.Field(i).Name
-			value := (*internal_map_of_interfaces)[key]
-			current_type = common.GetType(value)
-			if current_type == "json.Value" {
-				temp_value := ((value).(Value))
-				internal_map[key] = &temp_value
-			} else if current_type == "*json.Value" {
-				internal_map[key] = ((value).(*Value))
-			} else {
-				internal_map[key] = NewValue(value)
-			}
-		}
-
-		/*
 		for key, value := range *internal_map_of_interfaces {
 			current_type = common.GetType(value)
 			if current_type == "json.Value" {
@@ -345,7 +327,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			} else {
 				internal_map[key] = NewValue(value)
 			}
-		}*/
+		}
 	}
 
 	return &Map{

@@ -169,10 +169,6 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 		i := *index
 		value := (*runes)[*index]
 		
-		//fmt.Println(current_mode + " " + string(value))
-		//fmt.Println("key: " + string(temp_key_r) + " value: " + string(temp_value_r))
-
-		
 		if current_mode == mode_looking_for_next_value_or_end {
 
 			
@@ -772,8 +768,6 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 	}
 	
 	rep := common.GetType(value)
-	fmt.Println(fmt.Sprintf("%T", value))
-
 	var temp_value interface{}
 	if rep == "json.Value" {
 		temp_value = (value.(Value)).GetObject()
@@ -782,8 +776,6 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 	} else {
 		temp_value = value
 	}
-	fmt.Println(fmt.Sprintf("%T", temp_value))
-
 	rep = common.GetType(temp_value)
 	switch rep {
 	case "string":

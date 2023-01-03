@@ -103,10 +103,6 @@ func NewArrayOfValues(a *[]interface{}) (*Array) {
 				converted_value := NewValue(value)
 				*values = append(*values, converted_value)
 			}
-
-			fmt.Println(current_type)
-			fmt.Println(value)
-
 		}
 	} 
 

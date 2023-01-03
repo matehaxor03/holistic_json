@@ -93,28 +93,22 @@ func NewArray() (*Array) {
 func NewArrayOfValues(a *[]interface{}) (*Array) {
 	var this_array *Array
 	interface_values := a
+	var temp_values [](*Value)
 	var values *[](*Value)
-
-	if !common.IsNil(a) {
-		temp_array := make([](*Value), len(*a))
-		values = &temp_array
-	} else {
-		temp_array := make([](*Value), 0)
-		values = &temp_array
-	}
+	values = &temp_values
 	
 	if !common.IsNil(a) {
 		current_type := ""
-		for index, value := range *a {
+		for _, value := range *a {
 			current_type = common.GetType(value)
 			if current_type == "json.Value" {
 				temp_value := ((value).(Value))
-				(*values)[index] = &temp_value
+				*values = append(*values, &temp_value)
 			} else if current_type == "*json.Value" {
-				(*values)[index] = (value).(*Value)
+				*values = append(*values, (value).(*Value))
 			} else {
 				converted_value := NewValue(value)
-				(*values)[index] = converted_value
+				*values = append(*values, converted_value)
 			}
 		}
 	} 

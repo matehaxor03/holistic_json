@@ -319,7 +319,6 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 		current_type := ""
 		for key, value := range *internal_map_of_interfaces {
 			current_type = common.GetType(value)
-			fmt.Println("current type is " + current_type)
 			if current_type == "json.Value" {
 				temp_value := ((value).(Value))
 				internal_map[key] = &temp_value

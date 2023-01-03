@@ -8,7 +8,7 @@ import (
 )
 
 type Map struct {
-	Keys func() ([]string)
+	GetKeys func() ([]string)
 	HasKey func(s string) (bool)
 	GetMap func(s string) (*Map, []error)
 	Values func() *Array
@@ -198,7 +198,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 		return false
 	}
 
-	keys := func() ([]string) {
+	getKeys := func() ([]string) {
 		m := get_internal_map()
 		
 
@@ -211,7 +211,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 	}
 
 	hasKey := func(s string) (bool) {
-		keys := keys()
+		keys := getKeys()
 		for _, key := range keys {
 			if key == s {
 				return true
@@ -261,7 +261,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			return errors
 		}
 		
-		keys := keys()
+		keys := getKeys()
 		if common.IsNil(keys) {
 			json.WriteString("{}")
 			return nil
@@ -399,8 +399,8 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 		ToJSONString: func(json_payload_builder *strings.Builder) ([]error) {
 			return toJSONString(json_payload_builder)
 		},
-		Keys: func() ([]string) {
-			return keys()
+		GetKeys: func() ([]string) {
+			return getKeys()
 		},
 		SetArray: func(s string, array *Array) {
 			set_map_value := NewValue(array)

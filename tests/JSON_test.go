@@ -41,7 +41,7 @@ func PrintJSON(t *testing.T, json *json.Map) {
 func TestCanParseMinimal(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{}")
 
-	if len((json_obj.Keys())) != 0  {
+	if len((json_obj.GetKeys())) != 0  {
 		t.Errorf("keys is not zero")
 	}
 }

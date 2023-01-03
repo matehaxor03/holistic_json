@@ -9,7 +9,7 @@ func TestCanParseString(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"value\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {			
@@ -29,7 +29,7 @@ func TestCanParseStringWithLeadingTrailingLineBreaks(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\n\"key\":\"value\"\n}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {			
@@ -49,7 +49,7 @@ func TestCanParseStringWithLeadingTrailingLineBreakLiteral(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\\n\"key\":\"value\"\\n}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {			
@@ -69,7 +69,7 @@ func TestCanParseStringWithLeadingTrailingLineBreakLiteralAndReal(t *testing.T) 
 	json_obj := ParseJSONSuccessfully(t, "{\\\n\"key\":\"value\"\\\n}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {			
@@ -89,7 +89,7 @@ func TestCanParseNestedJSONString(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"{\\\"inner_key\\\":\\\"inner_value\\\"}\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {			
@@ -109,7 +109,7 @@ func TestCanParseEmptyString(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {			
@@ -129,7 +129,7 @@ func TestCanParseStringWithSpaceBeforeKey(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{ \"key\":\"value\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -149,7 +149,7 @@ func TestCanParseStringWithNewlineBeforeKey(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\n\"key\":\"value\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -169,7 +169,7 @@ func TestCanParseStringWithDosNewlineBeforeKey(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\r\n\"key\":\"value\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -189,7 +189,7 @@ func TestCanParseStringWithSpaceAfterKey(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\" :\"value\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -209,7 +209,7 @@ func TestCanParseStringWithNewlineAfterKey(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\"\n:\"value\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -229,7 +229,7 @@ func TestCanParseStringWithDosNewlineAfterKey(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\"\r\n:\"value\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -249,7 +249,7 @@ func TestCanParseStringWithSpaceBeforeValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\": \"value\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -269,7 +269,7 @@ func TestCanParseStringWithNewlineBeforeValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\n\"value\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -289,7 +289,7 @@ func TestCanParseStringWithDosNewlineBeforeValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\r\n\"value\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -309,7 +309,7 @@ func TestCanParseStringWithSpaceAfterValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"value\" }")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -329,7 +329,7 @@ func TestCanParseStringWithNewlineAfterValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"value\"\n}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -349,7 +349,7 @@ func TestCanParseStringWithNewlineBeforeAndAfterValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\n\"key\":\"value\"\n}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -369,7 +369,7 @@ func TestCanParseStringWithDosNewlineAfterValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"value\"\r\n}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -389,7 +389,7 @@ func TestCanParseStringWithQuoteKey(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"ke\\\"y\":\"value\"}")
 
 	if !json_obj.HasKey("ke\"y") {
-		t.Errorf("ke\"y not found available keys are %s", json_obj.Keys())
+		t.Errorf("ke\"y not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("ke\"y") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("ke\"y"))
 	} else {
@@ -409,7 +409,7 @@ func TestCanParseStringWithOpenBracketKey(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"ke{y\":\"value\"}")
 
 	if !json_obj.HasKey("ke{y") {
-		t.Errorf("ke{y not found available keys are %s", json_obj.Keys())
+		t.Errorf("ke{y not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("ke{y") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("ke{y"))
 	} else {
@@ -429,7 +429,7 @@ func TestCanParseStringWithCloseBracketKey(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"ke}y\":\"value\"}")
 
 	if !json_obj.HasKey("ke}y") {
-		t.Errorf("ke}y not found available keys are %s", json_obj.Keys())
+		t.Errorf("ke}y not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("ke}y") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("ke}y"))
 	} else {
@@ -449,7 +449,7 @@ func TestCanParseStringWithOpenSquareBracketKey(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"ke[y\":\"value\"}")
 
 	if !json_obj.HasKey("ke[y") {
-		t.Errorf("ke[y not found available keys are %s", json_obj.Keys())
+		t.Errorf("ke[y not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("ke[y") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("ke[y"))
 	} else {
@@ -469,7 +469,7 @@ func TestCanParseStringWithCloseSquareBracketKey(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"ke]y\":\"value\"}")
 
 	if !json_obj.HasKey("ke]y") {
-		t.Errorf("ke]y not found available keys are %s", json_obj.Keys())
+		t.Errorf("ke]y not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("ke]y") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("ke]y"))
 	} else {
@@ -489,7 +489,7 @@ func TestCanParseStringWithCommaKey(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"ke,y\":\"value\"}")
 
 	if !json_obj.HasKey("ke,y") {
-		t.Errorf("ke,y not found available keys are %s", json_obj.Keys())
+		t.Errorf("ke,y not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("ke,y") != "string" {
 		t.Errorf("ke,y is not a string: %s", json_obj.GetType("ke,y"))
 	} else {
@@ -510,7 +510,7 @@ func TestCanParseStringWithQuoteValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"val\\\"ue\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -530,7 +530,7 @@ func TestCanParseStringWithOpenBracketValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"val{ue\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -550,7 +550,7 @@ func TestCanParseStringWithCloseBracketValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"val}ue\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -570,7 +570,7 @@ func TestCanParseStringWithOpenSquareBracketValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"val[ue\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -590,7 +590,7 @@ func TestCanParseStringWithCloseSquareBracketValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"val]ue\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -610,7 +610,7 @@ func TestCanParseStringWithCommaValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":\"val,ue\"}")
 
 	if !json_obj.HasKey("key") {
-		t.Errorf("key not found available keys are %s", json_obj.Keys())
+		t.Errorf("key not found available keys are %s", json_obj.GetKeys())
 	} else if json_obj.GetType("key") != "string" {
 		t.Errorf("key is not a string: %s", json_obj.GetType("key"))
 	} else {
@@ -630,7 +630,7 @@ func TestCanParseStringWithQuoteKeyAndValue(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"ke\\\"y\":\"val\\\"ue\"}")
 
 	if !json_obj.HasKey("ke\"y") {
-		t.Errorf("ke\"y not found keys: %s", json_obj.Keys())
+		t.Errorf("ke\"y not found keys: %s", json_obj.GetKeys())
 	} else if json_obj.GetType("ke\"y") != "string" {
 		t.Errorf("ke\"y is not a string: %s", json_obj.GetType("ke\"y"))
 	} else {

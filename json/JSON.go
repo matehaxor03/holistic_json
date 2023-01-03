@@ -502,10 +502,6 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 		string_value = strings.ReplaceAll(string_value, "\r", "")
 		string_value = strings.ReplaceAll(string_value, "\\", "")
 
-		if string_value == "" {
-			string_value = "null"
-		}
-
 		if string_value == "true" {
 			data_type = "bool"
 			boolean_value_true := true 
@@ -515,7 +511,9 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 			boolean_value_false := false 
 			boolean_value = &boolean_value_false
 		} else if string_value == "null" {
-			data_type = "null"
+			data_type = "null"		
+		} else if string_value == "" {
+			data_type = "empty"		
 		} else {
 			var negative_number bool
 			negative_number_count := strings.Count(string_value, "-")
@@ -702,6 +700,8 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 			value_as_array.AppendUInt32(uint32_value)
 		} else if data_type == "uint64" {
 			value_as_array.AppendUInt64(uint64_value)
+		} else if data_type == "empty" {
+		
 		} else {
 			errors = append(errors, fmt.Errorf("json.PaseJSONValue type is not supported for Array %s", data_type))
 		}
@@ -743,6 +743,8 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 			(*value_as_map).SetUInt32Value(key_value, *uint32_value)
 		} else if data_type == "uint64" {
 			(*value_as_map).SetUInt64Value(key_value, *uint64_value)
+		} else if data_type == "empty" {
+		
 		} else {
 			errors = append(errors, fmt.Errorf("json.PaseJSONValue type is not supported for Map %s", data_type))
 		}

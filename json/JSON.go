@@ -780,6 +780,7 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 	} else {
 		temp_value = value
 	}
+	fmt.Println(fmt.Sprintf("%T", temp_value))
 
 	rep = common.GetType(temp_value)
 	switch rep {

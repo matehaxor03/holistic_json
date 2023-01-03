@@ -264,6 +264,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 		json.WriteString("{")
 		for i := 0; i < length; i++ {
 			key := (keys)[i]
+			fmt.Println(key)
 			key_clone := common.CloneString(&key)
 			escaped_key, escaped_key_error := common.EscapeString(*key_clone, "\"")
 			if escaped_key_error != nil {

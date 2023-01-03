@@ -327,7 +327,8 @@ func NewArrayOfValues(a *[]interface{}) (*Array) {
 		},
 		AppendNil: func() {
 			a := getValues()
-			*a = append(*a, nil)
+			appended_value := NewValue(nil)
+			*a = append(*a, appended_value)
 		},
 		AppendMap: func(value *Map) {
 			a := getValues()

@@ -808,15 +808,15 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 		json.WriteString("\"")
 	case "error":
 		json.WriteString("\"")
-		json.WriteString(strings.ReplaceAll(value.(error).Error(), "\"", "\\\""))
+		json.WriteString(strings.ReplaceAll(fmt.Sprintf("%s", value.(error)), "\"", "\\\""))
 		json.WriteString("\"")
 	case "*error":
 		json.WriteString("\"")
-		json.WriteString(strings.ReplaceAll((*(value.(*error))).Error(), "\"", "\\\""))
+		json.WriteString(strings.ReplaceAll(fmt.Sprintf("%s", *(value.(*error))), "\"", "\\\""))
 		json.WriteString("\"")
 	case "*url.Error":
 		json.WriteString("\"")
-		json.WriteString(strings.ReplaceAll((*(value.(*url.Error))).Error(), "\"", "\\\""))
+		json.WriteString(strings.ReplaceAll(fmt.Sprintf("%s", (*(value.(*url.Error))).Error()), "\"", "\\\""))
 		json.WriteString("\"")
 	case "exec.ExitError":
 		json.WriteString("\"")

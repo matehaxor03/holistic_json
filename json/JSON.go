@@ -770,6 +770,7 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 	}
 	
 	rep := common.GetType(value)
+	fmt.Println(fmt.Sprintf("%T", value))
 
 	var temp_value interface{}
 	if rep == "json.Value" {

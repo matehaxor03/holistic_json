@@ -12,13 +12,6 @@ type Value struct {
 
 	GetMap func() (*Map, []error) 
 	GetMapValue func() (Map, []error) 
-	SetMap func(value *Map) 
-	SetMapValue func(value Map) 
-	SetValue func(value *Value) 
-	GetValue func() *Value
-	SetValueValue func(value Value) 
-	SetArray func(value *Array)
-	SetArrayValue func(a Array) 
 	IsMap func() (bool) 
 	IsEmptyString func() bool
 	GetFunc func() (func(Map) []error, []error)
@@ -107,33 +100,8 @@ func NewValue(v interface{}) (*Value) {
 	}
 	
 	created_value := Value{
-		SetValue: func(value *Value) {
-			setObject(value.GetObject())
-			set_this(value)	
-		},
-		GetValue: func() *Value {
-			return this()
-		},
-		SetValueValue: func(value Value) {
-			setObject(value.GetObject())
-			set_this(&value)
-		},
-		SetArray: func(value *Array) {
-			setObject(value.GetObject())
-			set_this(NewValue(value))
-		},
-		SetArrayValue: func(value Array) {
-			setObject(value.GetObject())
-			set_this(NewValue(value))
-		},
 		IsMap: func() (bool) {
 			return common.IsMap(this().GetObject())
-		},
-		SetMap: func(value *Map) {
-			setObject(value.GetObject())
-		},
-		SetMapValue: func(value Map) {
-			setObject(value.GetObject())
 		},
 		IsEmptyString: func() bool {
 			if common.IsNil(this().GetObject()) {

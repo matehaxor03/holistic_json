@@ -764,18 +764,24 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 		return errors
 	}
 
-	rep := fmt.Sprintf("%T", value)
-
 	if common.IsNil(value) {
 		json.WriteString("null")
 		return nil
 	}
 
+
+	rep := common.GetType(value)
 	switch rep {
 	case "json.Value":
-		ConvertInterfaceValueToJSONStringValue(json, (value.(Value)).GetObject())
+		convert_errors := ConvertInterfaceValueToJSONStringValue(json, (value.(Value)).GetObject())
+		if convert_errors != nil {
+			errors = append(errors, convert_errors...)
+		}
 	case "*json.Value":
-		ConvertInterfaceValueToJSONStringValue(json, (*(value.(*Value))).GetObject())
+		convert_errors := ConvertInterfaceValueToJSONStringValue(json, (*(value.(*Value))).GetObject())
+		if convert_errors != nil {
+			errors = append(errors, convert_errors...)
+		}
 	case "string":
 		temp_value := value.(string)
 		clone_string := common.CloneString(&temp_value)

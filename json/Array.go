@@ -91,7 +91,7 @@ func NewArray() (*Array) {
 }
 
 func NewArrayOfValues(a *[]interface{}) (*Array) {
-	var this_array *Array
+	//var this_array *Array
 	interface_values := a
 	var temp_values [](*Value)
 	var values *[](*Value)
@@ -129,13 +129,15 @@ func NewArrayOfValues(a *[]interface{}) (*Array) {
 		return interface_values
 	}
 
+	/*
 	set_this := func(array *Array) {
 		this_array = array
-	}
+	}*/
 
+	/*
 	this := func() *Array {
 		return this_array
-	}
+	}*/
 
 	created_array := Array{
 		ToJSONString: func (json *strings.Builder) ([]error) {
@@ -146,7 +148,7 @@ func NewArrayOfValues(a *[]interface{}) (*Array) {
 				return errors
 			}
 			
-			a := this().GetValues()
+			a := getValues()
 			length := len(*a)
 		
 			if length == 0 {
@@ -1074,7 +1076,7 @@ func NewArrayOfValues(a *[]interface{}) (*Array) {
 			return getObject()
 		},
 	}
-	set_this(&created_array)
+	//set_this(&created_array)
 	return &created_array
 }
 

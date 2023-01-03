@@ -233,22 +233,12 @@ func NewValue(v interface{}) (*Value) {
 			case "*[]string":
 				string_array := this().GetObject().(*[]string)
 				for _, string_array_value := range *string_array {
-					converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
-					if converted_errors != nil {
-						errors = append(errors, converted_errors...)
-					} else {
-						result = append(result, fmt.Errorf("%s", *converted))
-					}
+					result = append(result, fmt.Errorf("%s", string_array_value))
 				}
 			case "[]string":
 				string_array := this().GetObject().([]string)
 				for _, string_array_value := range string_array {
-					converted, converted_errors := ConvertInterfaceValueToStringValue(string_array_value)
-					if converted_errors != nil {
-						errors = append(errors, converted_errors...)
-					} else {
-						result = append(result, fmt.Errorf("%s", *converted))
-					}
+					result = append(result, fmt.Errorf("%s", string_array_value))
 				}
 			case "json.Array":
 				string_array := this().GetObject().(Array)

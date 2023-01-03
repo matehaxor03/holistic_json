@@ -447,27 +447,14 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 	}
 
 	data_type := ""
-	//key_value = strings.TrimSpace(key_value)
-	//string_value = strings.TrimSpace(string_value)
-
 	key_value := string(key_rune)
 	string_value := string(string_rune)
-
-	//fmt.Println(fmt.Sprintf("before key: '%s'", key_value))
-	//fmt.Println(fmt.Sprintf("before value: '%s'", string_value))
 
 	key_value = strings.TrimSpace(key_value)
 	string_value = strings.TrimSpace(string_value)
 
 	key_value = strings.Replace(key_value, "\\\"", "\"", -1)
 	string_value = strings.Replace(string_value, "\\\"", "\"", -1)
-
-	
-
-	//fmt.Println(fmt.Sprintf("after key: '%s'", key_value))
-	///fmt.Println(fmt.Sprintf("after value: '%s'", string_value))
-
-
 
 	if ((*list)[len(*list)-1]).IsMap() {
 		if key_value == "" && string_value == "" {
@@ -685,8 +672,6 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 			errors = append(errors, fmt.Errorf("json.parseJSONValue array is nil"))
 		}
 
-		fmt.Println(fmt.Sprintf("%s",  value_as_array))
-
 		if len(errors) > 0 {
 			return errors
 		}
@@ -768,10 +753,6 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 	if len(errors) > 0 {
 		return errors
 	}
-
-	//fmt.Println(fmt.Sprintf("key value '%s'", *key_value))
-	//fmt.Println(fmt.Sprintf("string value '%s'", *string_value))
-
 
 	return nil
 }

@@ -107,7 +107,6 @@ func NewArrayOfValues(a *[]interface{}) (*Array) {
 		current_type := ""
 		for index, value := range *a {
 			current_type = common.GetType(value)
-			fmt.Println("current type array is " + current_type)
 			if current_type == "json.Value" {
 				temp_value := ((value).(Value))
 				(*values)[index] = &temp_value

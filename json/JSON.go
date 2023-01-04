@@ -834,8 +834,18 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 		if x_error != nil {
 			errors = append(errors, x_error...)
 		}
+	case "json.Map":
+		x_error := temp_value.(Map).ToJSONString(json)
+		if x_error != nil {
+			errors = append(errors, x_error...)
+		}
 	case "*json.Array":
 		x_error := (*(temp_value.(*Array))).ToJSONString(json)
+		if x_error != nil {
+			errors = append(errors, x_error...)
+		}
+	case "json.Array":
+		x_error := temp_value.(Array).ToJSONString(json)
 		if x_error != nil {
 			errors = append(errors, x_error...)
 		}
@@ -1076,7 +1086,7 @@ func ConvertInterfaceValueToStringValue(value interface{}) (*string, []error) {
 	case "*json.Value":
 		result = fmt.Sprintf("%s", (*(value.(*Value))).GetObject())
 	default:
-		errors = append(errors, fmt.Errorf("error: JSON.ConvertInterfaceValueToJSONStringValue: type %s is not supported please implement", rep))
+		errors = append(errors, fmt.Errorf("error: JSON.ConvertInterfaceValueToStringValue: type %s is not supported please implement", rep))
 	}
 
 	if len(errors) > 0 {

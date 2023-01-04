@@ -75,6 +75,7 @@ type Array struct {
 	GetArrayOfBool func() (*[]*bool, []error)
 	GetArrayOfBoolValue func() ([]bool, []error)
 	GetValues func() *[](*Value)
+	Len func() int
 }
 
 func NewArrayValue() (Array) {
@@ -111,6 +112,9 @@ func NewArrayOfValues(a *[]interface{}) (*Array) {
 	}
 
 	created_array := Array{
+		Len: func() int {
+			return len(*(getValues()))
+		},
 		ToJSONString: func (json *strings.Builder) ([]error) {
 			var errors []error
 			

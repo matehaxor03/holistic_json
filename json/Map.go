@@ -392,7 +392,8 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 						common.IsBool(self) || 
 						common.IsString(self) || 
 						common.IsArray(self) || 
-						common.IsMap(self))
+						common.IsMap(self) ||
+						common.IsFunc(self))
 		},
 		IsBool: func(s string) bool {
 			if isValueNilForMap(s) {

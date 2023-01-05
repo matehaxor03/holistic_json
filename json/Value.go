@@ -385,7 +385,8 @@ func NewValue(v interface{}) (*Value) {
 					common.IsBool(temp_value) || 
 					common.IsString(temp_value) || 
 					common.IsArray(temp_value) || 
-					common.IsMap(temp_value))
+					common.IsMap(temp_value) ||
+					common.IsFunc(temp_value))
 		},
 		IsBool: func() bool {
 			return common.IsBool(this().GetObject())

@@ -381,7 +381,8 @@ func NewValue(v interface{}) (*Value) {
 				return true
 			}
 			
-			return !(common.IsNumber(temp_value) || 
+			return !(common.IsValue(temp_value) ||
+					common.IsNumber(temp_value) || 
 					common.IsBool(temp_value) || 
 					common.IsString(temp_value) || 
 					common.IsArray(temp_value) || 

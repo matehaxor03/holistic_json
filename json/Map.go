@@ -388,12 +388,13 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				return true
 			}
 	
-			return !(common.IsNumber(self) || 
-						common.IsBool(self) || 
-						common.IsString(self) || 
-						common.IsArray(self) || 
-						common.IsMap(self) ||
-						common.IsFunc(self))
+			return !(common.IsValue(self) ||
+					common.IsNumber(self) || 
+					common.IsBool(self) || 
+					common.IsString(self) || 
+					common.IsArray(self) || 
+					common.IsMap(self) ||
+					common.IsFunc(self))
 		},
 		IsBool: func(s string) bool {
 			if isValueNilForMap(s) {

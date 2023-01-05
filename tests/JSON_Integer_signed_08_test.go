@@ -9,7 +9,7 @@ func TestCanParseNegativeInt8LowBoundary(t *testing.T) {
 	
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "int8" {
+	} else if !json_obj.IsInt8("key") {
 		t.Errorf("key is not a *int8: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetInt8("key") 
@@ -29,7 +29,7 @@ func TestCanParseNegativeInt8HighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "int8" {
+	} else if !json_obj.IsInt8("key") {
 		t.Errorf("key is not a *int8: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetInt8("key") 

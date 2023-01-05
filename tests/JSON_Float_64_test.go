@@ -11,7 +11,7 @@ func TestCanParseFloat64PositiveLowBoundary(t *testing.T) {
 	
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "float64" {
+	} else if !json_obj.IsFloat64("key") {
 		t.Errorf("key is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key") 
@@ -31,7 +31,7 @@ func TestCanParseFloat64NegativeLowBoundary(t *testing.T) {
 	
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "float64" {
+	} else if !json_obj.IsFloat64("key") { 
 		t.Errorf("key is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key") 
@@ -51,7 +51,7 @@ func TestCanParseFloat64MultiplePositiveLowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "float64" {
+	} else if !json_obj.IsFloat64("key") { 
 		t.Errorf("key is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key") 
@@ -67,7 +67,7 @@ func TestCanParseFloat64MultiplePositiveLowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key2") != "float64" {
+	} else if !json_obj.IsFloat64("key") { 
 		t.Errorf("key2 is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key2") 
@@ -87,7 +87,7 @@ func TestCanParseFloat64MultipleNegativeLowBoundary(t *testing.T) {
 	
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "float64" {
+	} else if !json_obj.IsFloat64("key") { 
 		t.Errorf("key is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key") 
@@ -103,7 +103,7 @@ func TestCanParseFloat64MultipleNegativeLowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key") != "float64" {
+	} else if !json_obj.IsFloat64("key2") { 
 		t.Errorf("key2 is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key2") 
@@ -123,7 +123,7 @@ func TestCanParseFloat64MultipleLowBoundary(t *testing.T) {
 	
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "float64" {
+	} else if !json_obj.IsFloat64("key") { 
 		t.Errorf("key is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key") 
@@ -139,7 +139,7 @@ func TestCanParseFloat64MultipleLowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key2") != "float64" {
+	} else if !json_obj.IsFloat64("key2") { 
 		t.Errorf("key2 is not a *float64: %s", json_obj.GetType("key2"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key2") 
@@ -159,7 +159,7 @@ func TestCanParseFloat64PositiveHighBoundary(t *testing.T) {
 	
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "float64" {
+	} else if !json_obj.IsFloat64("key") {
 		t.Errorf("key is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key") 
@@ -179,7 +179,7 @@ func TestCanParseFloat64NegativeHighBoundary(t *testing.T) {
 	
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "float64" {
+	} else if !json_obj.IsFloat64("key") {
 		t.Errorf("key is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key") 
@@ -199,7 +199,7 @@ func TestCanParseFloat64MultiplePositiveHighBoundary(t *testing.T) {
 	
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "float64" {
+	} else if !json_obj.IsFloat64("key") {
 		t.Errorf("key is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key") 
@@ -215,7 +215,7 @@ func TestCanParseFloat64MultiplePositiveHighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key2") != "float64" {
+	} else if !json_obj.IsFloat64("key2") {
 		t.Errorf("key2 is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key2") 
@@ -235,7 +235,7 @@ func TestCanParseFloat64MultipleNegativeHighBoundary(t *testing.T) {
 	
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "float64" {
+	} else if !json_obj.IsFloat64("key") {
 		t.Errorf("key is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key") 
@@ -251,7 +251,7 @@ func TestCanParseFloat64MultipleNegativeHighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key") != "float64" {
+	} else if !json_obj.IsFloat64("key"){
 		t.Errorf("key2 is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key2") 
@@ -267,11 +267,11 @@ func TestCanParseFloat64MultipleNegativeHighBoundary(t *testing.T) {
 }
 
 func TestCanParseFloat64MultipleHighBoundary(t *testing.T) {
-	json_obj := ParseJSONSuccessfully(t, "{\"key\":170000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.00, \"key2\":-170000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.00}")
+	json_obj := ParseJSONSuccessfully(t, "{\"key\":170000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.01, \"key2\":-170000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.01}")
 	
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "float64" {
+	} else if !json_obj.IsFloat64("key") {
 		t.Errorf("key is not a *float64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key") 
@@ -280,14 +280,14 @@ func TestCanParseFloat64MultipleHighBoundary(t *testing.T) {
 			t.Errorf("map GetFloat64 has errors")
 		} else if value == nil {
 			t.Errorf("GetFloat64 is nil")
-		} else if *value != 170000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.00 {
+		} else if *value != 170000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.01 {
 			t.Errorf("expected: value actual: %f", *value)
 		}
 	}
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key2") != "float64" {
+	} else if !json_obj.IsFloat64("key2") {
 		t.Errorf("key2 is not a *float64: %s", json_obj.GetType("key2"))
 	} else {
 		value, value_errors := json_obj.GetFloat64("key2") 
@@ -296,7 +296,7 @@ func TestCanParseFloat64MultipleHighBoundary(t *testing.T) {
 			t.Errorf("map GetFloat64 has errors")
 		} else if value == nil {
 			t.Errorf("GetFloat64 is nil")
-		} else if *value != -170000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.00 {
+		} else if *value != -170000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000.01 {
 			t.Errorf("expected: value actual: %f", *value)
 		}
 	}

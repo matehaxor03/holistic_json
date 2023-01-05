@@ -30,6 +30,16 @@ type Map struct {
 	
 	IsEmptyString func(s string) bool
 	IsInteger func(s string) bool 
+	IsInt func(s string) bool 
+	IsInt8 func(s string) bool 
+	IsInt16 func(s string) bool 
+	IsInt32 func(s string) bool 
+	IsInt64 func(s string) bool 
+	IsUInt func(s string) bool 
+	IsUInt8 func(s string) bool 
+	IsUInt16 func(s string) bool 
+	IsUInt32 func(s string) bool 
+	IsUInt64 func(s string) bool 
 	IsString func(s string) bool
 	IsMap func(s string) bool
 	IsBoolTrue func(s string) bool
@@ -56,6 +66,8 @@ type Map struct {
 	SetNil func(s string)
 	
 	IsFloat func(s string) bool
+	IsFloat32 func(s string) bool
+	IsFloat64 func(s string) bool
 	SetFloat32Value func(s string, v float32)
 	SetFloat32 func(s string, v *float32)
 	GetFloat32 func(s string) (*float32, []error)
@@ -374,6 +386,66 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			}
 			return getValue(s).IsInteger()
 		},
+		IsInt: func(s string) bool {
+			if isValueNilForMap(s) {
+				return false
+			}
+			return getValue(s).IsInt()
+		},
+		IsInt8: func(s string) bool {
+			if isValueNilForMap(s) {
+				return false
+			}
+			return getValue(s).IsInt8()
+		},
+		IsInt16: func(s string) bool {
+			if isValueNilForMap(s) {
+				return false
+			}
+			return getValue(s).IsInt16()
+		},
+		IsInt32: func(s string) bool {
+			if isValueNilForMap(s) {
+				return false
+			}
+			return getValue(s).IsInt32()
+		},
+		IsInt64: func(s string) bool {
+			if isValueNilForMap(s) {
+				return false
+			}
+			return getValue(s).IsInt64()
+		},
+		IsUInt: func(s string) bool {
+			if isValueNilForMap(s) {
+				return false
+			}
+			return getValue(s).IsUInt()
+		},
+		IsUInt8: func(s string) bool {
+			if isValueNilForMap(s) {
+				return false
+			}
+			return getValue(s).IsUInt8()
+		},
+		IsUInt16: func(s string) bool {
+			if isValueNilForMap(s) {
+				return false
+			}
+			return getValue(s).IsUInt16()
+		},
+		IsUInt32: func(s string) bool {
+			if isValueNilForMap(s) {
+				return false
+			}
+			return getValue(s).IsUInt32()
+		},
+		IsUInt64: func(s string) bool {
+			if isValueNilForMap(s) {
+				return false
+			}
+			return getValue(s).IsUInt64()
+		},
 		IsString: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
@@ -587,6 +659,18 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			}
 			return getValue(s).IsFloat()
 		},
+		IsFloat32: func(s string) (bool) {
+			if isValueNilForMap(s) {
+				return false
+			}
+			return getValue(s).IsFloat32()
+		},
+		IsFloat64: func(s string) (bool) {
+			if isValueNilForMap(s) {
+				return false
+			}
+			return getValue(s).IsFloat64()
+		},
 		GetStringValue: func(s string) (string, []error) {
 			if isValueNilForMap(s) {
 				var errors []error
@@ -650,7 +734,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			set_internal_map_value(s, set_map_value)
 		},
 		SetBoolValue: func(s string, value bool) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetString: func(s string, value *string) {
@@ -658,7 +742,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			set_internal_map_value(s, set_map_value)
 		},
 		SetStringValue: func(s string, value string) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetNil: func(s string) {
@@ -831,23 +915,23 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			set_internal_map_value(s, set_map_value)
 		},
 		SetIntValue: func(s string, value int) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetInt64Value: func(s string, value int64) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetInt32Value: func(s string, value int32) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetInt16Value: func(s string, value int16) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetInt8Value: func(s string, value int8) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt: func(s string, value *uint) {
@@ -871,23 +955,23 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUIntValue: func(s string, value uint) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt64Value: func(s string, value uint64) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt32Value: func(s string, value uint32) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt16Value: func(s string, value uint16) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetUInt8Value: func(s string, value uint8) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetFloat64: func(s string, value *float64) {
@@ -895,7 +979,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			set_internal_map_value(s, set_map_value)
 		},
 		SetFloat64Value: func(s string, value float64) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		SetFloat32: func(s string, value *float32) {
@@ -903,7 +987,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			set_internal_map_value(s, set_map_value)
 		},
 		SetFloat32Value: func(s string, value float32) {
-			set_map_value := NewValue(value)
+			set_map_value := NewValue(&value)
 			set_internal_map_value(s, set_map_value)
 		},
 		GetUInt64: func(s string) (*uint64, []error) {

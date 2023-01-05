@@ -9,7 +9,7 @@ func TestCanParseBoolTrue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key") {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -29,7 +29,7 @@ func TestCanParseBoolFalse(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key")  {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -49,7 +49,7 @@ func TestCanParseMultipleBools(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key")  {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -65,7 +65,7 @@ func TestCanParseMultipleBools(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key2") != "bool" {
+	} else if !json_obj.IsBool("key2")  {
 		t.Errorf("key2 is not a *bool: %s", json_obj.GetType("key2"))
 	} else {
 		value, value_errors := json_obj.GetBool("key2") 
@@ -85,7 +85,7 @@ func TestCanParseBoolSpaceBeforeKey(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key")  {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -105,7 +105,7 @@ func TestCanParseBoolNewlineBeforeKey(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key")  {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -125,7 +125,7 @@ func TestCanParseBoolDosNewlineBeforeKey(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key")  {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -145,7 +145,7 @@ func TestCanParseBoolSpaceAfterKey(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key")  {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -165,7 +165,7 @@ func TestCanParseBoolNewlineAfterKey(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key")  {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -185,7 +185,7 @@ func TestCanParseBoolDosNewlineAfterKey(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key")  {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -205,7 +205,7 @@ func TestCanParseBoolSpaceBeforeValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key")  {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -225,7 +225,7 @@ func TestCanParseBoolSpaceNewlineBeforeValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key")  {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -245,7 +245,7 @@ func TestCanParseBoolSpaceDosNewlineBeforeValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key") {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -265,7 +265,7 @@ func TestCanParseBoolSpaceAfterValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key") {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -285,7 +285,7 @@ func TestCanParseBoolNewlineAfterValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key") {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 
@@ -305,7 +305,7 @@ func TestCanParseBoolDosNewlineAfterValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "bool" {
+	} else if !json_obj.IsBool("key") {
 		t.Errorf("key is not a *bool: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetBool("key") 

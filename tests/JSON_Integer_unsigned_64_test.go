@@ -11,7 +11,7 @@ func TestCanParseUInt64LowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "uint64" {
+	} else if !json_obj.IsUInt64("key") {
 		t.Errorf("key is not a *uint64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt64("key") 
@@ -31,7 +31,7 @@ func TestCanParseUInt64HighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "uint64" {
+	} else if !json_obj.IsUInt64("key") {
 		t.Errorf("key is not a *uint64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt64("key") 
@@ -63,7 +63,7 @@ func TestCanParseUInt64PositiveMuitpleHighBondary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "uint64" {
+	} else if !json_obj.IsUInt64("key") {
 		t.Errorf("key is not a *uint64: %s", json_obj.GetType("key"))
 	} else {
 		value, value_errors := json_obj.GetUInt64("key") 
@@ -79,7 +79,7 @@ func TestCanParseUInt64PositiveMuitpleHighBondary(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("key2 not found")
-	} else if json_obj.GetType("key") != "uint64" {
+	} else if !json_obj.IsUInt64("key2") {
 		t.Errorf("key2 is not a *uint64: %s", json_obj.GetType("key2"))
 	} else {
 		value, value_errors := json_obj.GetUInt64("key2") 

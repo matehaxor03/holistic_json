@@ -34,10 +34,22 @@ type Value struct {
 
 	IsNumber func() bool
 	IsFloat func() bool
+	IsFloat32 func() bool
+	IsFloat64 func() bool
 	IsBool func() bool
 	IsBoolTrue func() bool
 	IsBoolFalse func() bool
 	IsInteger func() bool
+	IsInt func() bool
+	IsInt8 func() bool
+	IsInt16 func() bool
+	IsInt32 func() bool
+	IsInt64 func() bool
+	IsUInt func() bool
+	IsUInt8 func() bool
+	IsUInt16 func() bool
+	IsUInt32 func() bool
+	IsUInt64 func() bool
 	
 	GetFloat32 func() (*float32, []error) 
 	GetFloat32Value func() (float32, []error) 
@@ -316,6 +328,12 @@ func NewValue(v interface{}) (*Value) {
 		},
 		IsFloat: func() (bool) {
 			return common.IsFloat(this().GetObject())
+		},
+		IsFloat32: func() (bool) {
+			return common.IsFloat32(this().GetObject())
+		},
+		IsFloat64: func() (bool) {
+			return common.IsFloat64(this().GetObject())
 		},
 		IsNumber: func() (bool) {
 			return common.IsNumber(this().GetObject())
@@ -906,6 +924,36 @@ func NewValue(v interface{}) (*Value) {
 		},
 		IsInteger: func() bool {
 			return common.IsInteger(this().GetObject())
+		},
+		IsInt: func() bool {
+			return common.IsInt(this().GetObject())
+		},
+		IsInt8: func() bool {
+			return common.IsInt8(this().GetObject())
+		},
+		IsInt16: func() bool {
+			return common.IsInt16(this().GetObject())
+		},
+		IsInt32: func() bool {
+			return common.IsInt32(this().GetObject())
+		},
+		IsInt64: func() bool {
+			return common.IsInt64(this().GetObject())
+		},
+		IsUInt: func() bool {
+			return common.IsUInt(this().GetObject())
+		},
+		IsUInt8: func() bool {
+			return common.IsUInt8(this().GetObject())
+		},
+		IsUInt16: func() bool {
+			return common.IsUInt16(this().GetObject())
+		},
+		IsUInt32: func() bool {
+			return common.IsUInt32(this().GetObject())
+		},
+		IsUInt64: func() bool {
+			return common.IsUInt64(this().GetObject())
 		},
 		IsBoolTrue: func() bool {
 			return common.IsBoolTrue(this().GetObject())

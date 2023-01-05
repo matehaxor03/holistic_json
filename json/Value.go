@@ -100,10 +100,6 @@ func NewValue(v interface{}) (*Value) {
 	}
 
 	getObject := func() interface{} {
-		if common.IsNil(internal_value) {
-			return nil
-		}
-	
 		return internal_value
 	}
 
@@ -116,7 +112,7 @@ func NewValue(v interface{}) (*Value) {
 			return common.IsMap(this().GetObject())
 		},
 		IsEmptyString: func() bool {
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				return false
 			}
 
@@ -127,14 +123,14 @@ func NewValue(v interface{}) (*Value) {
 			string_value, string_value_errors := this().GetString()
 			if string_value_errors != nil{
 				return false
-			} else if common.IsNil(string_value) {
+			} else if this().IsNil() {
 				return false
 			}
 		
 			return *string_value == ""
 		},
 		GetMap: func() (*Map, []error) {
-			if common.IsNil(this().GetObject()) { 
+			if this().IsNil() { 
 				return nil, nil
 			}
 		
@@ -155,7 +151,7 @@ func NewValue(v interface{}) (*Value) {
 		},
 		GetMapValue: func() (Map, []error) {
 			var errors []error
-			if common.IsNil(this().GetObject()) { 
+			if this().IsNil() { 
 				errors = append(errors, fmt.Errorf("map is nil"))
 				return Map{}, errors
 			}
@@ -174,7 +170,7 @@ func NewValue(v interface{}) (*Value) {
 			return result, nil
 		},
 		GetFunc: func() (func(Map) []error, []error) {
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				return nil, nil
 			}
 		
@@ -197,7 +193,7 @@ func NewValue(v interface{}) (*Value) {
 			return result, nil
 		},
 		GetErrors: func() ([]error, []error) {
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				return nil, nil
 			}
 		
@@ -251,7 +247,7 @@ func NewValue(v interface{}) (*Value) {
 			return result, nil
 		},
 		GetArray: func() (*Array, []error) {
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				return nil, nil
 			}
 		
@@ -279,7 +275,7 @@ func NewValue(v interface{}) (*Value) {
 			array, array_errors := this().GetArray()
 			if array_errors != nil {
 				return Array{}, array_errors
-			} else if common.IsNil(array) {
+			} else if this().IsNil() {
 				var errors []error
 				errors = append(errors, fmt.Errorf("Value.GetArrayValue array is nil"))
 				return Array{}, errors
@@ -288,7 +284,7 @@ func NewValue(v interface{}) (*Value) {
 			return *array, nil
 		},
 		GetString: func() (*string, []error) {
-			if common.IsNil(this().GetObject()){
+			if this().IsNil() {
 				return nil, nil
 			}
 		
@@ -339,10 +335,6 @@ func NewValue(v interface{}) (*Value) {
 			return common.IsNumber(this().GetObject())
 		},
 		IsString: func() (bool) {
-			if common.IsNil(this().GetObject()) {
-				return false
-			}
-		
 			return common.IsString(this().GetObject())
 		},
 		IsValueEqualToString: func(s *string) (bool) {
@@ -384,7 +376,16 @@ func NewValue(v interface{}) (*Value) {
 			return value == s			
 		},
 		IsNil: func() bool {
-			return common.IsNil(this().GetObject())
+			temp_value := this().GetObject()
+			if common.IsNil(temp_value) {
+				return true
+			}
+			
+			return !(common.IsNumber(temp_value) || 
+					common.IsBool(temp_value) || 
+					common.IsString(temp_value) || 
+					common.IsArray(temp_value) || 
+					common.IsMap(temp_value))
 		},
 		IsBool: func() bool {
 			return common.IsBool(this().GetObject())
@@ -393,7 +394,7 @@ func NewValue(v interface{}) (*Value) {
 			return common.IsArray(this().GetObject())
 		},
 		GetFloat64: func() (*float64, []error) {
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				return nil, nil
 			}
 		
@@ -438,7 +439,7 @@ func NewValue(v interface{}) (*Value) {
 			return result, nil
 		},
 		GetFloat32: func() (*float32, []error) {
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				return nil, nil
 			}
 		
@@ -503,7 +504,7 @@ func NewValue(v interface{}) (*Value) {
 			return *float64_value, nil
 		},
 		GetRunes: func() (*[]*rune, []error) {
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				return nil, nil
 			}
 		
@@ -538,7 +539,7 @@ func NewValue(v interface{}) (*Value) {
 			return &runes, nil
 		},
 		GetBool: func() (*bool, []error) {
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				return nil, nil
 			}
 		
@@ -589,7 +590,7 @@ func NewValue(v interface{}) (*Value) {
 		},
 		GetBoolValue: func() (bool, []error) {
 			var errors []error
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				errors = append(errors, fmt.Errorf("value is nil"))
 				return false, errors
 			}
@@ -637,7 +638,7 @@ func NewValue(v interface{}) (*Value) {
 			var errors []error
 			var temp_value int64
 		
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				return nil, nil
 			}
 		
@@ -766,7 +767,7 @@ func NewValue(v interface{}) (*Value) {
 		},
 		GetUInt64: func() (*uint64, []error) {
 			var errors []error
-			if common.IsNil(this().GetObject()){
+			if this().IsNil() {
 				return nil, nil
 			}
 
@@ -906,14 +907,14 @@ func NewValue(v interface{}) (*Value) {
 			return &uint64_value, nil
 		},
 		GetTimeWithDecimalPlaces: func(decimal_places int) (*time.Time, []error) {
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				return nil, nil
 			}
 		
 			return common.GetTimeWithDecimalPlaces(this().GetObject(), decimal_places)
 		},
 		GetTime: func() (*time.Time, []error) {
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				return nil, nil
 			}
 		
@@ -962,7 +963,7 @@ func NewValue(v interface{}) (*Value) {
 			return common.IsBoolFalse(this().GetObject())
 		},
 		GetInt8: func() (*int8, []error) {
-			if common.IsNil(this().GetObject()) {
+			if this().IsNil() {
 				return nil, nil
 			}
 			
@@ -1174,7 +1175,7 @@ func NewValue(v interface{}) (*Value) {
 			return result, nil
 		},
 		GetInt32: func() (*int32, []error) {
-			if common.IsNil(this().GetObject()) {	
+			if this().IsNil() {	
 				return nil, nil
 			}
 			

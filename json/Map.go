@@ -169,21 +169,6 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 		get_internal_map()[s] = value
 	}
 
-	isValueNilForMap := func(s string) (bool) {
-		m := get_internal_map()
-		
-		value, found := m[s]
-		if !found {
-			return true
-		}
-
-		if common.IsNil(value) {
-			return true
-		}
-
-		return false
-	}
-
 	getKeys := func() ([]string) {
 		m := get_internal_map()
 		
@@ -203,6 +188,24 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				return true
 			}
 		}
+		return false
+	}
+
+	isValueNilForMap := func(s string) (bool) {
+		m := get_internal_map()
+		if !hasKey(s) {
+			return true
+		}
+		
+		value, found := m[s]
+		if !found {
+			return true
+		}
+
+		if common.IsNil(value) {
+			return true
+		}
+
 		return false
 	}
 

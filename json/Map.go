@@ -25,7 +25,8 @@ type Map struct {
 
 	RemoveKey func(key string) (*bool, []error)
 
-	IsNil func(s string) bool
+	IsNil func() bool
+	IsNull func(s string) bool
 	IsBool func(s string) bool
 	
 	IsEmptyString func(s string) bool
@@ -205,6 +206,11 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 
 	isValueNilForMap := func(s string) (bool) {
 		m := get_internal_map()
+
+		if m == nil {
+			return true
+		}
+
 		if !hasKey(s) {
 			return true
 		}
@@ -216,6 +222,19 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 
 		if common.IsNil(value) {
 			return true
+		}
+
+		type_of := common.GetType(value)
+		if type_of == "*json.Value" {
+			temp_object := value.GetObject()
+			if common.IsNil(temp_object) {
+				return true
+			}
+		} else if type_of == "json.Value" {
+			temp_object := value.GetObject()
+			if common.IsNil(temp_object) {
+				return true
+			}
 		}
 
 		return false
@@ -359,8 +378,21 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			set_map_value := NewValue(&zap)
 			set_internal_map_value(s, set_map_value)
 		},
-		IsNil: func(s string) bool {
+		IsNull: func(s string) bool {
 			return isValueNilForMap(s)
+		},
+		IsNil: func() bool {
+			self := get_internal_map()
+			
+			if common.IsNil(self) {
+				return true
+			}
+	
+			return !(common.IsNumber(self) || 
+						common.IsBool(self) || 
+						common.IsString(self) || 
+						common.IsArray(self) || 
+						common.IsMap(self))
 		},
 		IsBool: func(s string) bool {
 			if isValueNilForMap(s) {

@@ -50,12 +50,18 @@ func Parse(s string) (*Map, []error) {
 
 	runes := []rune(s)
 	metrics := NewMap()
-	metrics.SetIntValue("{", 1)
-	metrics.SetIntValue("}", 0)
-	metrics.SetIntValue("[", 0)
-	metrics.SetIntValue("]", 0)
-	metrics.SetIntValue("opening_quote", 0)
-	metrics.SetIntValue("closing_quote", 0)
+	opening_bracket_value := 1
+	metrics.SetInt("{", &opening_bracket_value)
+	closing_bracket_value := 0
+	metrics.SetInt("}", &closing_bracket_value)
+	opening_square_bracket_value := 0
+	metrics.SetInt("[", &opening_square_bracket_value)
+	closing_square_bracket_value := 0
+	metrics.SetInt("]", &closing_square_bracket_value)
+	opening_quote_value := 0
+	metrics.SetInt("opening_quote", &opening_quote_value)
+	closing_quote_value := 0
+	metrics.SetInt("closing_quote", &closing_quote_value)
 	mode := "looking_for_keys"
 	parent_map := NewMap()
 	parent_map_value := NewValue(parent_map)

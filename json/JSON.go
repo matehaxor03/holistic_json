@@ -906,7 +906,9 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 		}
 		json.WriteString("]")
 	case "func(string, *string, string, string) []error", "func(json.Map) []error", "*func(json.Map) []error":
+		json.WriteString("\"")
 		json.WriteString(strings.ReplaceAll(fmt.Sprintf("%s", rep), "\"", "\\\""))
+		json.WriteString("\"")
 	case "*time.Time":
 		json.WriteString("\"")
 		json.WriteString((*(temp_value.(*time.Time))).Format("2006-01-02 15:04:05.000000"))

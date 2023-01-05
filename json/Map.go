@@ -11,6 +11,7 @@ type Map struct {
 	GetKeys func() ([]string)
 	HasKey func(s string) (bool)
 	GetMap func(s string) (*Map, []error)
+	GetMapValue func(s string) (Map, []error)
 	Values func() *Array
 	SetMap func(s string, zap *Map) 
 	SetMapValue func(s string, zap Map)
@@ -239,6 +240,16 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 		return (*get_internal_map_value(s)).GetMap()
 	}
 
+	getMapValue := func(s string) (Map, []error) {
+		value := getValue(s)
+		if common.IsNil(value) {
+			var errors []error
+			errors = append(errors, fmt.Errorf("value is nil"))
+			return Map{}, errors
+		}
+		return (*get_internal_map_value(s)).GetMapValue()
+	}
+
 	toJSONString := func(json *strings.Builder) ([]error) {
 		if json == nil {
 			var errors []error
@@ -318,6 +329,9 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 	return &Map{
 		GetMap: func(s string) (*Map, []error) {
 			return getMap(s)
+		},
+		GetMapValue: func(s string) (Map, []error) {
+			return getMapValue(s)
 		},
 		GetValue: func(s string) (*Value) {
 			return getValue(s)

@@ -144,7 +144,6 @@ func NewValue(v interface{}) (*Value) {
 				temp := this().GetObject().(Map)
 				result = &temp
 			} else {
-				panic("something went wrong")
 				errors = append(errors, fmt.Errorf("%s failed to unbox to json.Map", type_of))
 				return nil, errors
 			}
@@ -165,7 +164,6 @@ func NewValue(v interface{}) (*Value) {
 			} else if type_of == "json.Map" {
 				result = this().GetObject().(Map)
 			} else {
-				panic("something went wrong")
 				errors = append(errors, fmt.Errorf("%s failed to unbox to json.Map", type_of))
 				return NewMapValue(), errors
 			}
@@ -226,7 +224,7 @@ func NewValue(v interface{}) (*Value) {
 					if converted_errors != nil {
 						errors = append(errors, converted_errors...)
 					} else {
-						result = append(result, fmt.Errorf("%s", *converted))
+						result = append(result, fmt.Errorf("%s", converted))
 					}
 				}
 			case "*json.Array":
@@ -236,7 +234,7 @@ func NewValue(v interface{}) (*Value) {
 					if converted_errors != nil {
 						errors = append(errors, converted_errors...)
 					} else {
-						result = append(result, fmt.Errorf("%s", *converted))
+						result = append(result, fmt.Errorf("%s", converted))
 					}
 				}
 			default:
@@ -656,7 +654,7 @@ func NewValue(v interface{}) (*Value) {
 					} else if common.IsNil(string_value) {
 						return nil, nil
 					} else {
-						value, value_error := strconv.ParseInt(*string_value, 10, 64)
+						value, value_error := strconv.ParseInt(string_value, 10, 64)
 						if value_error != nil {
 							errors = append(errors, fmt.Errorf("error: Map.GetInt64: cannot convert json.Value to int64 %s", value_error))
 						} else {
@@ -670,7 +668,7 @@ func NewValue(v interface{}) (*Value) {
 					} else if common.IsNil(string_value) {
 						return nil, nil
 					} else {
-						value, value_error := strconv.ParseInt(*string_value, 10, 64)
+						value, value_error := strconv.ParseInt(string_value, 10, 64)
 						if value_error != nil {
 							errors = append(errors, fmt.Errorf("error: Map.GetInt64: cannot convert json.Value to int64 %s", value_error))
 						} else {

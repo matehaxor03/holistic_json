@@ -32,7 +32,6 @@ func Parse(s string) (*Map, []error) {
 	}
 
 	if !strings.HasPrefix(s, "{") {
-		panic("break here")
 		errors = append(errors, fmt.Errorf("error: json does not start with {"))
 	}
 
@@ -783,6 +782,7 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 	} else {
 		temp_value = value
 	}
+
 	rep = common.GetType(temp_value)
 	switch rep {
 	case "string":
@@ -984,29 +984,25 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 	return nil
 }
 
-func ConvertInterfaceValueToStringValue(value interface{}) (*string, []error) {
+func ConvertInterfaceValueToStringValue(value interface{}) (string, []error) {
 	var errors []error
 	var result string
-	
-	if value == nil {
-		result = "null"
-		return &result, nil
-	}
 
-	string_value := fmt.Sprintf("%s", value)
-
-	if string_value == "<nil>" {
-		result = "null"
-		return &result, nil
-	}
-
-	rep := fmt.Sprintf("%T", value)
-
-	if string_value == "%!s("+rep+"=<nil>)" {
-		result = "null"
-		return &result, nil
+	if common.IsNil(value) {
+		return "null", nil
 	}
 	
+	rep := common.GetType(value)
+	var temp_value interface{}
+	if rep == "json.Value" {
+		temp_value = (value.(Value)).GetObject()
+	} else if rep == "*json.Value" {
+		temp_value = (*(value.(*Value))).GetObject()
+	} else {
+		temp_value = value
+	}
+	
+	rep = common.GetType(temp_value)
 	switch rep {
 	case "string":
 		result = value.(string)
@@ -1099,8 +1095,8 @@ func ConvertInterfaceValueToStringValue(value interface{}) (*string, []error) {
 	}
 
 	if len(errors) > 0 {
-		return nil, errors
+		return "", errors
 	}
 
-	return &result, nil
+	return result, nil
 }

@@ -593,7 +593,7 @@ func NewValue(v interface{}) (*Value) {
 		GetBoolValue: func() (bool, []error) {
 			var errors []error
 			if this().IsNil() {
-				errors = append(errors, fmt.Errorf("value is nil"))
+				errors = append(errors, fmt.Errorf("Value.GetBoolValue value is nil"))
 				return false, errors
 			}
 		

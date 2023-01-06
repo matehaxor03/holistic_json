@@ -278,7 +278,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 		value := getValue(s)
 		if common.IsNil(value) {
 			var errors []error
-			errors = append(errors, fmt.Errorf("value is nil"))
+			errors = append(errors, fmt.Errorf("Map.getMapValue value is nil"))
 			return Map{}, errors
 		}
 		return (*get_internal_map_value(s)).GetMapValue()

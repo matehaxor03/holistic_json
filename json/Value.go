@@ -153,7 +153,7 @@ func NewValue(v interface{}) (*Value) {
 			var errors []error
 			if this().IsNil() { 
 				errors = append(errors, fmt.Errorf("map is nil"))
-				return Map{}, errors
+				return  NewMapValue(), errors
 			}
 	
 			var result Map
@@ -164,7 +164,7 @@ func NewValue(v interface{}) (*Value) {
 				result = this().GetObject().(Map)
 			} else {
 				errors = append(errors, fmt.Errorf("%s failed to unbox to json.Map", type_of))
-				return  Map{}, errors
+				return NewMapValue(), errors
 			}
 		
 			return result, nil
@@ -274,11 +274,11 @@ func NewValue(v interface{}) (*Value) {
 		GetArrayValue: func() (Array, []error) {
 			array, array_errors := this().GetArray()
 			if array_errors != nil {
-				return Array{}, array_errors
+				return NewArrayValue(), array_errors
 			} else if this().IsNil() {
 				var errors []error
 				errors = append(errors, fmt.Errorf("Value.GetArrayValue array is nil"))
-				return Array{}, errors
+				return NewArrayValue(), errors
 			}
 
 			return *array, nil

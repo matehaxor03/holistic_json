@@ -257,11 +257,11 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 	getArrayValue := func(s string) (Array, []error) {
 		array, array_errors := getArray(s)
 		if array_errors != nil {
-			return Array{}, array_errors
+			return NewArrayValue(), array_errors
 		} else if common.IsNil(array) {
 			var errors []error
 			errors = append(errors, fmt.Errorf("json.Map.GetArrayValue array is nil"))
-			return Array{}, errors
+			return  NewArrayValue(), errors
 		}
 		return *array, nil
 	}
@@ -279,7 +279,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 		if common.IsNil(value) {
 			var errors []error
 			errors = append(errors, fmt.Errorf("Map.getMapValue value is nil"))
-			return Map{}, errors
+			return NewMapValue(), errors
 		}
 		return (*get_internal_map_value(s)).GetMapValue()
 	}

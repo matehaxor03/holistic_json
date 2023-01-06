@@ -32,6 +32,7 @@ func Parse(s string) (*Map, []error) {
 	}
 
 	if !strings.HasPrefix(s, "{") {
+		panic("break here")
 		errors = append(errors, fmt.Errorf("error: json does not start with {"))
 	}
 

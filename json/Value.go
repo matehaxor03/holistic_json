@@ -78,6 +78,7 @@ type Value struct {
 	GetRunes func() (*[]*rune, []error)
 	GetTimeWithDecimalPlaces func(decimal_places int) (*time.Time, []error)
 	GetTime func() (*time.Time, []error)
+	GetTimeValue func() (time.Time, []error)
 	IsNil func() bool
 	AppendValueValue func(add Value) []error
 }
@@ -921,6 +922,15 @@ func NewValue(v interface{}) (*Value) {
 			}
 		
 			return common.GetTime(this().GetObject())
+		},
+		GetTimeValue: func() (time.Time, []error) {
+			temp_time, temp_time_errors := common.GetTime(this().GetObject())
+			if temp_time_errors != nil {
+				return (*common.GetTimeZero()), temp_time_errors
+			} else if common.IsNil(temp_time) {
+				return (*common.GetTimeZero()), temp_time_errors
+			}
+			return *temp_time, nil
 		},
 		GetType: func() string {
 			return common.GetType(this().GetObject())

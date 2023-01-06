@@ -1005,91 +1005,91 @@ func ConvertInterfaceValueToStringValue(value interface{}) (string, []error) {
 	rep = common.GetType(temp_value)
 	switch rep {
 	case "string":
-		result = value.(string)
+		result = temp_value.(string)
 	case "*string":
-		result = *(value.(*string))
+		result = *(temp_value.(*string))
 	case "error":
-		result = fmt.Sprintf("%s",  value.(error).Error())
+		result = fmt.Sprintf("%s",  temp_value.(error).Error())
 	case "*error":
-		result = fmt.Sprintf("%s", (*(value.(*error))).Error())
+		result = fmt.Sprintf("%s", (*(temp_value.(*error))).Error())
 	case "*url.Error":
-		result = fmt.Sprintf("%s", (*(value.(*url.Error))).Error()) 
+		result = fmt.Sprintf("%s", (*(temp_value.(*url.Error))).Error()) 
 	case "exec.ExitError":
-		result = fmt.Sprintf("%s", value.(exec.ExitError))
+		result = fmt.Sprintf("%s", temp_value.(exec.ExitError))
 	case "*exec.ExitError":
-		result = fmt.Sprintf("%s", *(value.(*exec.ExitError)))
+		result = fmt.Sprintf("%s", *(temp_value.(*exec.ExitError)))
 	case "errors.errorString":
-		result = fmt.Sprintf("%s", value)
+		result = fmt.Sprintf("%s", temp_value)
 	case "*errors.errorString":
-		result = fmt.Sprintf("%s", value)
+		result = fmt.Sprintf("%s", temp_value)
 	case "bool":
-		if value.(bool) {
+		if temp_value.(bool) {
 			result = "true"
 		} else {
 			result = "false"
 		}
 	case "*bool":
-		if *(value.(*bool)) {
+		if *(temp_value.(*bool)) {
 			result = "true"
 		} else {
 			result = "false"
 		}
 	case "*time.Time":
-		result = (*(value.(*time.Time))).Format("2006-01-02 15:04:05.000000")
+		result = (*(temp_value.(*time.Time))).Format("2006-01-02 15:04:05.000000")
 	case "map[string]map[string][][]string":
 		result = "map[string]map[string][][]string"
 	case "*uint64":
-		result = strconv.FormatUint(*(value.(*uint64)), 10)
+		result = strconv.FormatUint(*(temp_value.(*uint64)), 10)
 	case "uint64":
-		result = strconv.FormatUint(value.(uint64), 10)
+		result = strconv.FormatUint(temp_value.(uint64), 10)
 	case "*uint32":
-		result = strconv.FormatUint(uint64(*(value.(*uint32))), 10)
+		result = strconv.FormatUint(uint64(*(temp_value.(*uint32))), 10)
 	case "uint32":
-		result = strconv.FormatUint(uint64(value.(uint32)), 10)
+		result = strconv.FormatUint(uint64(temp_value.(uint32)), 10)
 	case "*uint16":
-		result = strconv.FormatUint(uint64(*(value.(*uint16))), 10)
+		result = strconv.FormatUint(uint64(*(temp_value.(*uint16))), 10)
 	case "uint16":
-		result = strconv.FormatUint(uint64(value.(uint16)), 10)
+		result = strconv.FormatUint(uint64(temp_value.(uint16)), 10)
 	case "*uint8":
-		result = strconv.FormatUint(uint64(*(value.(*uint8))), 10)
+		result = strconv.FormatUint(uint64(*(temp_value.(*uint8))), 10)
 	case "uint8":
-		result = strconv.FormatUint(uint64(value.(uint8)), 10)
+		result = strconv.FormatUint(uint64(temp_value.(uint8)), 10)
 	case "*uint":
-		result = strconv.FormatUint(uint64(*(value.(*uint))), 10)
+		result = strconv.FormatUint(uint64(*(temp_value.(*uint))), 10)
 	case "uint":
-		result = strconv.FormatUint(uint64(value.(uint)), 10)
+		result = strconv.FormatUint(uint64(temp_value.(uint)), 10)
 	case "*int64":
-		result = strconv.FormatInt(*(value.(*int64)), 10)
+		result = strconv.FormatInt(*(temp_value.(*int64)), 10)
 	case "int64":
-		result = strconv.FormatInt(value.(int64), 10)
+		result = strconv.FormatInt(temp_value.(int64), 10)
 	case "*int32":
-		result = strconv.FormatInt(int64(*(value.(*int32))), 10)
+		result = strconv.FormatInt(int64(*(temp_value.(*int32))), 10)
 	case "int32":
-		result = strconv.FormatInt(int64((value.(int32))), 10)
+		result = strconv.FormatInt(int64((temp_value.(int32))), 10)
 	case "*int16":
-		result = strconv.FormatInt(int64(*(value.(*int16))), 10)
+		result = strconv.FormatInt(int64(*(temp_value.(*int16))), 10)
 	case "int16":
-		result = strconv.FormatInt(int64((value.(int16))), 10)
+		result = strconv.FormatInt(int64((temp_value.(int16))), 10)
 	case "*int8":
-		result = strconv.FormatInt(int64(*(value.(*int8))), 10)
+		result = strconv.FormatInt(int64(*(temp_value.(*int8))), 10)
 	case "int8":
-		result = strconv.FormatInt(int64((value.(int8))), 10)
+		result = strconv.FormatInt(int64((temp_value.(int8))), 10)
 	case "*int":
-		result = strconv.FormatInt(int64(*(value.(*int))), 10)
+		result = strconv.FormatInt(int64(*(temp_value.(*int))), 10)
 	case "int":
-		result = strconv.FormatInt(int64(value.(int)), 10)
+		result = strconv.FormatInt(int64(temp_value.(int)), 10)
 	case "*float64":
-		result = fmt.Sprintf("%f", *(value.(*float64)))
+		result = fmt.Sprintf("%f", *(temp_value.(*float64)))
 	case "float64":
-		result = fmt.Sprintf("%f", (value.(float64)))
+		result = fmt.Sprintf("%f", (temp_value.(float64)))
 	case "*float32":
-		result = fmt.Sprintf("%f", *(value.(*float32)))
+		result = fmt.Sprintf("%f", *(temp_value.(*float32)))
 	case "float32":
-		result = fmt.Sprintf("%f", (value.(float32)))
+		result = fmt.Sprintf("%f", (temp_value.(float32)))
 	case "json.Value":
-		result = fmt.Sprintf("%s", (value.(Value)).GetObject())
+		result = fmt.Sprintf("%s", (temp_value.(Value)).GetObject())
 	case "*json.Value":
-		result = fmt.Sprintf("%s", (*(value.(*Value))).GetObject())
+		result = fmt.Sprintf("%s", (*(temp_value.(*Value))).GetObject())
 	default:
 		errors = append(errors, fmt.Errorf("error: JSON.ConvertInterfaceValueToStringValue: type %s is not supported please implement", rep))
 	}

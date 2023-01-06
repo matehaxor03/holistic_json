@@ -144,6 +144,7 @@ func NewValue(v interface{}) (*Value) {
 				temp := this().GetObject().(Map)
 				result = &temp
 			} else {
+				panic("something went wrong")
 				errors = append(errors, fmt.Errorf("%s failed to unbox to json.Map", type_of))
 				return nil, errors
 			}
@@ -164,6 +165,7 @@ func NewValue(v interface{}) (*Value) {
 			} else if type_of == "json.Map" {
 				result = this().GetObject().(Map)
 			} else {
+				panic("something went wrong")
 				errors = append(errors, fmt.Errorf("%s failed to unbox to json.Map", type_of))
 				return NewMapValue(), errors
 			}

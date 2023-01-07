@@ -14,7 +14,7 @@ type Value struct {
 	GetMapValue func() (Map, []error) 
 	IsMap func() (bool) 
 	IsEmptyString func() bool
-	GetFunc func() (func(*Map) []error, []error)
+	GetFunc func() (*func(*Map) []error, []error)
 	GetErrors func() ([]error, []error)
 	GetArray func() (*Array, []error)
 	GetArrayValue func() (Array, []error)
@@ -170,7 +170,7 @@ func NewValue(v interface{}) (*Value) {
 		
 			return result, nil
 		},
-		GetFunc: func() (func(*Map) []error, []error) {
+		GetFunc: func() (*func(*Map) []error, []error) {
 			if this().IsNil() {
 				return nil, nil
 			}
@@ -191,7 +191,7 @@ func NewValue(v interface{}) (*Value) {
 				return nil, errors
 			}
 		
-			return result, nil
+			return &result, nil
 		},
 		GetErrors: func() ([]error, []error) {
 			if this().IsNil() {

@@ -34,7 +34,6 @@ func PrintJSON(t *testing.T, json *json.Map) {
 			t.FailNow()
 		} else {
 			fmt.Println(json_string.String())
-			fmt.Println(json.GetKeys())
 		}
 	}
 }

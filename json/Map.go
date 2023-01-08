@@ -171,7 +171,7 @@ func NewMap() *Map {
 func NewMapOfValues(m *map[string]interface{}) *Map {
 	internal_map := make(map[string]*Value)
 	internal_keys_obj := NewArray()
-	internal_keys := make([]string, 0)
+	internal_keys := []string{}
 
 	findIndexOfKey := func(key string) int {
 		for i, k := range internal_keys {
@@ -199,11 +199,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 
 	hasKey := func(s string) (bool) {
 		_, found := internal_map[s]
-		if found {
-			return true
-		} else {
-			return false
-		}
+		return found
 	}
 
 	isValueNilForMap := func(s string) (bool) {
@@ -241,7 +237,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 	}
 
 	setInternalValue := func(s string, v *Value) {
-		if found := hasKey(s); !found {
+		if found := hasKey(s); !found || len(getKeys()) == 0 {
 			internal_keys = append(internal_keys, s)
 			internal_keys_obj.AppendValue(v)
 		} else if index := findIndexOfKey(s); index > -1 {

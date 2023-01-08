@@ -170,7 +170,7 @@ func parseJSONMap(json_string string, index *uint64, mode *string, metrics *Map)
 		rune_values := []rune(value)
 		rune_value := rune_values[0]
 
-		fmt.Println("key: " + string(temp_key_r) + " value: " + string(temp_value_r) + " '" + string(value) + "' " + current_mode + "parsing string: " + fmt.Sprintf("%s",parsing_string))
+		//fmt.Println("key: " + string(temp_key_r) + " value: " + string(temp_value_r) + " '" + string(value) + "' " + current_mode + "parsing string: " + fmt.Sprintf("%s",parsing_string))
 
 
 		if !parsing_string {
@@ -284,9 +284,6 @@ func parseJSONMap(json_string string, index *uint64, mode *string, metrics *Map)
 		}
 
 		if current_mode == mode_looking_for_key_name {
-			//fmt.Println("value: " + value)
-			//fmt.Println("previous value: " + previous_value)
-
 			if value == "\"" && previous_value != "\\" {
 				current_mode = mode_looking_for_key_name_column	
 			} 
@@ -305,52 +302,6 @@ func parseJSONMap(json_string string, index *uint64, mode *string, metrics *Map)
 		}
 
 		if !parsing_string {
-			/*if string(value) == "\"" && string((*runes)[i-1]) != "\\"{
-				parsing_string = true
-			} */
-			/*if string(value) == "\"" && string((*runes)[i-1]) != "\\"{
-
-				
-				parsing_string = true
-
-				opention_quote, opention_quote_errors := metrics.GetInt("opening_quote")
-				if opention_quote_errors != nil {
-					return opention_quote_errors
-				}
-				*opention_quote++
-				metrics.SetInt("opening_quote", opention_quote)
-			} 
-
-
-			if string(value) == "{" {
-
-				opening_count, _ := metrics.GetInt("{")
-				*opening_count++
-				metrics.SetInt("{", opening_count)
-			}
-
-			if string(value) == "}" {
-
-				closing_count, _ := metrics.GetInt("}")
-				*closing_count++
-				metrics.SetInt("}", closing_count)
-			}
-
-			if string(value) == "[" {
-
-				opening_count, _ := metrics.GetInt("[")
-				*opening_count++
-				metrics.SetInt("[", opening_count)
-			}
-
-			if string(value) == "]" {
-
-				closing_count, _ := metrics.GetInt("]")
-				*closing_count++
-				metrics.SetInt("]", closing_count)
-			}*/
-
-
 			if value == "{" {
 				new_map := NewMapValue()
 				new_map_value := NewValue(new_map)
@@ -492,27 +443,6 @@ func parseJSONMap(json_string string, index *uint64, mode *string, metrics *Map)
 			}	
 		} else {
 			temp_value_r += value
-			
-			/*if value == "\"" && previous_value != "\\" {
-				parse_errors := parseJSONValue(temp_key_r, temp_value_r, list)
-
-				if parse_errors != nil {
-					errors = append(errors, parse_errors...)
-				}
-				
-				temp_key_r = ""
-				temp_value_r = ""
-
-				if len(*list) >= 1 {
-					if ((*list)[len(*list)-1]).IsMap() {
-						current_mode = mode_looking_for_keys
-					} else {
-						current_mode = mode_looking_for_next_value_or_end
-					} 
-				}	
-				*index++
-				continue
-			}*/
 		}
 		*index++
 	}
@@ -551,7 +481,6 @@ func parseJSONValue(key_value string, string_value string, list *([](*Value))) [
 			dequoted_value := (key_value)[1:(len(key_value)-1)]
 			key_value = dequoted_value	
 		} else {
-			panic("die")
 			errors = append(errors, fmt.Errorf("error: key does not start with  \" and/or end with \" key: '%s'", key_value))
 		}
 	}
@@ -560,10 +489,6 @@ func parseJSONValue(key_value string, string_value string, list *([](*Value))) [
 		if strings.HasPrefix(string_value, "\"") && strings.HasSuffix(string_value, "\"") {
 			data_type = "string"
 			dequoted_value := (string_value)[1:(len(string_value)-1)]
-			string_value = dequoted_value	
-		} else if strings.HasPrefix(string_value, "\"") && strings.HasSuffix(string_value, "\"\\") {
-			data_type = "string"
-			dequoted_value := (string_value)[1:(len(string_value)-2)]
 			string_value = dequoted_value	
 		} else {
 			errors = append(errors, fmt.Errorf("error: value does not start with  \" and/or end with \" value: '%s'", string_value))
@@ -809,7 +734,6 @@ func parseJSONValue(key_value string, string_value string, list *([](*Value))) [
 		}
 
 		if data_type == "string" {
-			fmt.Println(key_value + " " + string_value)
 			(*value_as_map).SetStringValue(key_value, string_value)
 		} else if data_type == "bool" {
 			(*value_as_map).SetBoolValue(key_value, *boolean_value)

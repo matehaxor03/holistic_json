@@ -75,6 +75,9 @@ type Array struct {
 	GetArrayOfBool func() (*[]*bool, []error)
 	GetArrayOfBoolValue func() ([]bool, []error)
 	GetValues func() *[](*Value)
+	SetValueAtIndex func(index int, value *Value) (bool, error) 
+	RemoveValueAtIndex func(index int) (bool, error) 
+
 	Len func() int
 }
 
@@ -111,9 +114,37 @@ func NewArrayOfValues(a *[]interface{}) (*Array) {
 		return values
 	}
 
+	getLen := func() int {
+		return len(*(getValues()))
+	}
+
 	created_array := Array{
 		Len: func() int {
-			return len(*(getValues()))
+			return getLen()
+		},
+		SetValueAtIndex: func(index int, value *Value) (bool, error) {
+			if index < 0 {
+				return false, fmt.Errorf("index must be non-zero")
+			}
+
+			if index > (getLen() - 1) {
+				return false, fmt.Errorf("index out of range")
+			}
+
+			(*values)[index] = value
+			return true, nil
+		},
+		RemoveValueAtIndex: func(index int) (bool, error) {
+			if index < 0 {
+				return false, fmt.Errorf("index must be non-zero")
+			}
+
+			if index > (getLen() - 1) {
+				return false, fmt.Errorf("index out of range")
+			}
+
+			(*values) = append((*values)[:index], (*values)[index+1:]...)
+			return true, nil
 		},
 		ToJSONString: func (json *strings.Builder) ([]error) {
 			var errors []error

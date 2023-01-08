@@ -10,7 +10,7 @@ func TestCanParseEmptyMap(t *testing.T) {
 
 	if !(json_obj.HasKey("key")) {
 		t.Errorf("key not found available keys are %s", json_obj.GetKeys()[0])
-	} else if json_obj.GetType("key") != "*json.Map" {
+	} else if! json_obj.IsMap("key") {
 		t.Errorf("key is not a *json.Map: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetMap("key") 
@@ -30,7 +30,7 @@ func TestCanParseNestedMapWithStringValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Map" {
+	} else if! json_obj.IsMap("key") {
 		t.Errorf("key is not a *json.Map: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetMap("key") 
@@ -58,7 +58,7 @@ func TestCanParseNestedMapWithMultipleStringValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Map" {
+	} else if! json_obj.IsMap("key") {
 		t.Errorf("key is not a *json.Map: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetMap("key") 
@@ -95,7 +95,7 @@ func TestCanParseDoubleNestedMapWithStringValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Map" {
+	} else if! json_obj.IsMap("key") {
 		t.Errorf("key is not a *json.Map: %s", json_obj.GetType("key"))
 	} else {			
 		value, value_errors := json_obj.GetMap("key") 
@@ -111,7 +111,7 @@ func TestCanParseDoubleNestedMapWithStringValue(t *testing.T) {
 				t.Errorf(fmt.Sprintf("%s", inner_value_errors))
 			} else if inner_value == nil {
 				t.Errorf("key2 has nil value")
-			} else if value.GetType("key2") != "*json.Map" {
+			} else if !value.IsMap("key2") {
 				t.Errorf("key2 is not a *json.Map: %s", inner_value.GetType("key2"))
 			} else {
 				inner_value2, inner_value2_errors := inner_value.GetString("key3")
@@ -132,8 +132,8 @@ func TestCanParseDoubleNestedMapWithStringValueAndStringValueAtRootLevelAfter(t 
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if json_obj.GetType("key") != "*json.Map" {
-		t.Errorf("key is not a *json.Map: %s", json_obj.GetType("key"))
+	} else if !json_obj.IsMap("key") {
+		t.Errorf("key is not a Map: %s", json_obj.GetType("key"))
 	} else {		
 		value, value_errors := json_obj.GetMap("key") 
 		if value_errors != nil {
@@ -148,7 +148,7 @@ func TestCanParseDoubleNestedMapWithStringValueAndStringValueAtRootLevelAfter(t 
 				t.Errorf(fmt.Sprintf("%s", inner_value_errors))
 			} else if inner_value == nil {
 				t.Errorf("key2 has nil value")
-			} else if value.GetType("key2") != "*json.Map" {
+			} else if !value.IsMap("key2") {
 				t.Errorf("key2 is not a *json.Map: %s", inner_value.GetType("key2"))
 			} else {
 				inner_value2, inner_value2_errors := inner_value.GetString("key3")

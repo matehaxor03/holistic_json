@@ -23,7 +23,7 @@ type Map struct {
 	Clone func() (*Map, []error)
 
 
-	RemoveKey func(key string) (*bool, []error)
+	RemoveKey func(key string) (bool, error)
 
 	IsNil func() bool
 	IsNull func(s string) bool
@@ -160,7 +160,8 @@ type Map struct {
 }
 
 func NewMapValue() Map {
-	return *(NewMapOfValues(nil))
+	var temp_map = NewMap()
+	return *temp_map
 }
 
 func NewMap() *Map {
@@ -169,45 +170,44 @@ func NewMap() *Map {
 
 func NewMapOfValues(m *map[string]interface{}) *Map {
 	internal_map := make(map[string]*Value)
+	internal_keys_obj := NewArray()
+	internal_keys := make([]string, 0)
 
-	get_internal_map := func() (map[string]*Value)  {
-		return internal_map
+	findIndexOfKey := func(key string) int {
+		for i, k := range internal_keys {
+			if k == key {
+				return i
+			}
+		}
+		return -1
 	}
 
-	get_internal_map_value := func(s string) *Value {
-		return get_internal_map()[s]
-	}
+	removeKey := func(key string) (bool, error) {
+		i := findIndexOfKey(key)
+		if i == -1 {
+			return false, fmt.Errorf("key not found in array keys")
+		}
 
-	set_internal_map_value := func(s string, value *Value) {
-		get_internal_map()[s] = value
+		internal_keys = append(internal_keys[:i], internal_keys[i+1:]...)
+		internal_keys_obj.RemoveValueAtIndex(i)
+		return true, nil
 	}
 
 	getKeys := func() ([]string) {
-		m := get_internal_map()
-		
-
-		var keys []string
-		for key, _ := range m {
-			keys = append(keys, key)
-		}
-		
-		return keys
+		return internal_keys
 	}
 
 	hasKey := func(s string) (bool) {
-		keys := getKeys()
-		for _, key := range keys {
-			if key == s {
-				return true
-			}
+		_, found := internal_map[s]
+		if found {
+			return true
+		} else {
+			return false
 		}
-		return false
 	}
 
 	isValueNilForMap := func(s string) (bool) {
-		m := get_internal_map()
-
-		if m == nil {
+		if internal_map == nil {
 			return true
 		}
 
@@ -215,7 +215,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			return true
 		}
 		
-		value, found := m[s]
+		value, found := internal_map[s]
 		if !found {
 			return true
 		}
@@ -240,18 +240,28 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 		return false
 	}
 
-	getValue := func(s string) (*Value) {
-		if isValueNilForMap(s) {
+	setInternalValue := func(s string, v *Value) {
+		if found := hasKey(s); !found {
+			internal_keys = append(internal_keys, s)
+			internal_keys_obj.AppendValue(v)
+		} else if index := findIndexOfKey(s); index > -1 {
+			internal_keys_obj.SetValueAtIndex(index, v)
+		}
+		internal_map[s] = v
+	}
+
+	getInternalValue := func(s string) *Value {
+		if !hasKey(s) {
 			return nil
 		}
-		return get_internal_map_value(s)
+		return internal_map[s]
 	}
 
 	getArray := func(s string) (*Array, []error) {
 		if isValueNilForMap(s) {
 			return  nil, nil
 		}
-		return getValue(s).GetArray()
+		return getInternalValue(s).GetArray()
 	}
 
 	getArrayValue := func(s string) (Array, []error) {
@@ -267,21 +277,21 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 	}
 
 	getMap := func(s string) (*Map, []error) {
-		value := getValue(s)
+		value := getInternalValue(s)
 		if common.IsNil(value) {
 			return nil, nil
 		}
-		return (*get_internal_map_value(s)).GetMap()
+		return value.GetMap()
 	}
 
 	getMapValue := func(s string) (Map, []error) {
-		value := getValue(s)
+		value := getInternalValue(s)
 		if common.IsNil(value) {
 			var errors []error
 			errors = append(errors, fmt.Errorf("Map.getMapValue value is nil"))
 			return NewMapValue(), errors
 		}
-		return (*get_internal_map_value(s)).GetMapValue()
+		return value.GetMapValue()
 	}
 
 	toJSONString := func(json *strings.Builder) ([]error) {
@@ -291,24 +301,22 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			return errors
 		}
 		
-		keys := getKeys()
-		if common.IsNil(keys) {
+		temp_keys := getKeys()
+		if common.IsNil(temp_keys) {
 			json.WriteString("{}")
 			return nil
 		}
 		
-		length := len(keys)
-
-		if length == 0 || cap(keys) == 0 {
+		length := len(temp_keys)
+		if length == 0 {
 			json.WriteString("{}")
 			return nil
 		}
 
 		var errors []error
-		m := get_internal_map()
 		json.WriteString("{")
 		for i := 0; i < length; i++ {
-			key := (keys)[i]
+			key := (temp_keys)[i]
 			key_clone := common.CloneString(&key)
 			escaped_key, escaped_key_error := common.EscapeString(*key_clone, "\"")
 			if escaped_key_error != nil {
@@ -318,7 +326,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			json.WriteString("\"")
 			json.WriteString(escaped_key)
 			json.WriteString("\":")
-			string_conversion_errors := ConvertInterfaceValueToJSONStringValue(json, m[key])
+			string_conversion_errors := ConvertInterfaceValueToJSONStringValue(json, internal_map[key])
 			if string_conversion_errors != nil {
 				errors = append(errors, string_conversion_errors...)
 			}
@@ -351,11 +359,11 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			current_type = common.GetType(value)
 			if current_type == "json.Value" {
 				temp_value := ((value).(Value))
-				internal_map[key] = &temp_value
+				setInternalValue(key, &temp_value)
 			} else if current_type == "*json.Value" {
-				internal_map[key] = ((value).(*Value))
+				setInternalValue(key,((value).(*Value)))
 			} else {
-				internal_map[key] = NewValue(value)
+				setInternalValue(key, NewValue(value))
 			}
 		}
 	}
@@ -368,141 +376,139 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			return getMapValue(s)
 		},
 		GetValue: func(s string) (*Value) {
-			return getValue(s)
+			return getInternalValue(s)
 		},
 		SetMap: func(s string, zap *Map) {
 			set_map_value := NewValue(zap)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetMapValue: func(s string, zap Map) {
 			set_map_value := NewValue(&zap)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		IsNull: func(s string) bool {
 			return isValueNilForMap(s)
 		},
-		IsNil: func() bool {
-			self := get_internal_map()
-			
-			if common.IsNil(self) {
+		IsNil: func() bool {			
+			if common.IsNil(internal_map) {
 				return true
 			}
 	
-			return !(common.IsValue(self) ||
-					common.IsNumber(self) || 
-					common.IsBool(self) || 
-					common.IsString(self) || 
-					common.IsArray(self) || 
-					common.IsMap(self) ||
-					common.IsFunc(self))
+			return !(common.IsValue(internal_map) ||
+					common.IsNumber(internal_map) || 
+					common.IsBool(internal_map) || 
+					common.IsString(internal_map) || 
+					common.IsArray(internal_map) || 
+					common.IsMap(internal_map) ||
+					common.IsFunc(internal_map))
 		},
 		IsBool: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsBool()
+			return getInternalValue(s).IsBool()
 		},
 		IsArray: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsArray()
+			return getInternalValue(s).IsArray()
 		},
 		IsEmptyString: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsEmptyString()
+			return getInternalValue(s).IsEmptyString()
 		},
 		IsInteger: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsInteger()
+			return getInternalValue(s).IsInteger()
 		},
 		IsInt: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsInt()
+			return getInternalValue(s).IsInt()
 		},
 		IsInt8: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsInt8()
+			return getInternalValue(s).IsInt8()
 		},
 		IsInt16: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsInt16()
+			return getInternalValue(s).IsInt16()
 		},
 		IsInt32: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsInt32()
+			return getInternalValue(s).IsInt32()
 		},
 		IsInt64: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsInt64()
+			return getInternalValue(s).IsInt64()
 		},
 		IsUInt: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsUInt()
+			return getInternalValue(s).IsUInt()
 		},
 		IsUInt8: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsUInt8()
+			return getInternalValue(s).IsUInt8()
 		},
 		IsUInt16: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsUInt16()
+			return getInternalValue(s).IsUInt16()
 		},
 		IsUInt32: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsUInt32()
+			return getInternalValue(s).IsUInt32()
 		},
 		IsUInt64: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsUInt64()
+			return getInternalValue(s).IsUInt64()
 		},
 		IsString: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsString()
+			return getInternalValue(s).IsString()
 		},
 		IsMap: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsMap()
+			return getInternalValue(s).IsMap()
 		},
 		IsBoolTrue: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsBoolTrue()
+			return getInternalValue(s).IsBoolTrue()
 		},
 		IsBoolFalse: func(s string) bool {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsBoolFalse()
+			return getInternalValue(s).IsBoolFalse()
 		},
 		ToJSONString: func(json_payload_builder *strings.Builder) ([]error) {
 			return toJSONString(json_payload_builder)
@@ -512,37 +518,37 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 		},
 		SetArray: func(s string, array *Array) {
 			set_map_value := NewValue(array)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetArrayValue: func(s string, array Array) {
 			set_map_value := NewValue(&array)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetErrors: func(s string, errors []error) {
 			set_map_value := NewValue(errors)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		GetErrors: func(s string) ([]error, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetErrors()
+			return getInternalValue(s).GetErrors()
 		},
 		GetType: func(s string) string {
 			if isValueNilForMap(s) {
 				return "nil"
 			}
-			return getValue(s).GetType()
+			return getInternalValue(s).GetType()
 		},
 		GetFunc: func(s string) (*func(Map) []error, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetFunc()
+			return getInternalValue(s).GetFunc()
 		},
 		SetFunc: func(s string, function *func(Map) []error) {
 			set_map_value := NewValue(function)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		GetArray: func(s string) (*Array, []error) {
 			return getArray(s)
@@ -685,25 +691,25 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetString()
+			return getInternalValue(s).GetString()
 		},
 		IsFloat: func(s string) (bool) {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsFloat()
+			return getInternalValue(s).IsFloat()
 		},
 		IsFloat32: func(s string) (bool) {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsFloat32()
+			return getInternalValue(s).IsFloat32()
 		},
 		IsFloat64: func(s string) (bool) {
 			if isValueNilForMap(s) {
 				return false
 			}
-			return getValue(s).IsFloat64()
+			return getInternalValue(s).IsFloat64()
 		},
 		GetStringValue: func(s string) (string, []error) {
 			if isValueNilForMap(s) {
@@ -711,13 +717,13 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				errors = append(errors, fmt.Errorf("json.Map.GetStringValue value is nil"))
 				return "", errors
 			}
-			return getValue(s).GetStringValue()
+			return getInternalValue(s).GetStringValue()
 		},
 		GetFloat32: func(s string) (*float32, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetFloat32()
+			return getInternalValue(s).GetFloat32()
 		},
 		GetFloat32Value: func(s string) (float32, []error) {
 			if isValueNilForMap(s) {
@@ -725,7 +731,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				errors = append(errors, fmt.Errorf("json.Map.GetFloat32Value value is nil"))
 				return 0, errors
 			}
-			return getValue(s).GetFloat32Value()
+			return getInternalValue(s).GetFloat32Value()
 		},
 		GetFloat64Value: func(s string) (float64, []error) {
 			if isValueNilForMap(s) {
@@ -733,91 +739,79 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				errors = append(errors, fmt.Errorf("json.Map.GetFloat64Value value is nil"))
 				return 0, errors
 			}
-			return getValue(s).GetFloat64Value()
+			return getInternalValue(s).GetFloat64Value()
 		},
 		GetFloat64: func (s string) (*float64, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetFloat64()
+			return getInternalValue(s).GetFloat64()
 		},
 		GetRunes: func(s string) (*[]*rune, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetRunes()
+			return getInternalValue(s).GetRunes()
 		},
 		GetObjectForMap: func(s string) interface{} {
 			if isValueNilForMap(s) {
 				return nil
 			}
-			return (*get_internal_map_value(s))
+			return internal_map[s]
 		},
 		SetObjectForMap: func(s string, value interface{}) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		GetBool: func(s string) (*bool, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetBool()
+			return getInternalValue(s).GetBool()
 		},
 		SetBool: func(s string, value *bool) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetBoolValue: func(s string, value bool) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetString: func(s string, value *string) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetStringValue: func(s string, value string) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetNil: func(s string) {
 			set_map_value := NewValue(nil)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		HasKey: func(s string) (bool) {
 			return hasKey(s)
 		},
-		RemoveKey: func(s string) (*bool, []error) {
-			var result bool
-			if isValueNilForMap(s) {
-				var errors []error
-				result = false
-				errors = append(errors, fmt.Errorf("error: key %s not found", s))
-				return &result, errors
-			}	
-
+		RemoveKey: func(s string) (bool, error) {
 			if !hasKey(s) {
-				var errors []error
-				result = false
-				errors = append(errors, fmt.Errorf("error: key %s not found", s))
-				return &result, errors
+				return false, fmt.Errorf("key not found in map")
+			} else {
+				delete(internal_map, s)
 			}
-
-			result = true
-			m := get_internal_map()		
-			delete(m, s)
-			return &result, nil 
+			_, remove_key_error := removeKey(s)
+			return true, remove_key_error
 		},
 		GetInt64: func(s string) (*int64, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetInt64()
+			return getInternalValue(s).GetInt64()
 		},
 		GetInt8: func(s string) (*int8, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetInt8()
+			return getInternalValue(s).GetInt8()
 		},
 		GetInt8Value: func(s string) (int8, []error) {
 			if isValueNilForMap(s) {
@@ -825,13 +819,13 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				errors = append(errors, fmt.Errorf("Map.GetInt8Value was nil"))
 				return 0, errors
 			}
-			return getValue(s).GetInt8Value()
+			return getInternalValue(s).GetInt8Value()
 		},
 		GetUInt8: func(s string) (*uint8, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetUInt8()
+			return getInternalValue(s).GetUInt8()
 		},
 		GetUInt8Value: func(s string) (uint8, []error) {
 			if isValueNilForMap(s) {
@@ -839,13 +833,13 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				errors = append(errors, fmt.Errorf("json.Map.GetUInt8Value value is nil"))
 				return 0, errors
 			}
-			return getValue(s).GetUInt8Value()
+			return getInternalValue(s).GetUInt8Value()
 		},
 		GetInt16: func(s string) (*int16, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetInt16()
+			return getInternalValue(s).GetInt16()
 		},
 		GetInt16Value: func(s string) (int16, []error) {
 			if isValueNilForMap(s) {
@@ -853,13 +847,13 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				errors = append(errors, fmt.Errorf("json.Map.GetInt16Value value is nil"))
 				return 0, errors
 			}
-			return getValue(s).GetInt16Value()
+			return getInternalValue(s).GetInt16Value()
 		},
 		GetUInt16: func(s string) (*uint16, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetUInt16()
+			return getInternalValue(s).GetUInt16()
 		},
 		GetUInt16Value: func (s string) (uint16, []error) {
 			if isValueNilForMap(s) {
@@ -867,13 +861,13 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				errors = append(errors, fmt.Errorf("json.Map.GetUInt16Value value is nil"))
 				return 0, errors
 			}
-			return getValue(s).GetUInt16Value()
+			return getInternalValue(s).GetUInt16Value()
 		},
 		GetInt32: func(s string) (*int32, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetInt32()
+			return getInternalValue(s).GetInt32()
 		},	
 		GetInt32Value: func(s string) (int32, []error) {
 			if isValueNilForMap(s) {
@@ -881,7 +875,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				errors = append(errors, fmt.Errorf("json.Map.GetInt32Value value is nil"))
 				return 0, errors
 			}
-			return getValue(s).GetInt32Value()
+			return getInternalValue(s).GetInt32Value()
 		},
 		GetInt64Value: func(s string) (int64, []error) {
 			if isValueNilForMap(s) {
@@ -889,13 +883,13 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				errors = append(errors, fmt.Errorf("json.Map.GetInt64Value value is nil"))
 				return 0, errors
 			}
-			return getValue(s).GetInt64Value()
+			return getInternalValue(s).GetInt64Value()
 		},
 		GetUInt32: func(s string) (*uint32, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetUInt32()
+			return getInternalValue(s).GetUInt32()
 		},
 		GetUInt32Value: func(s string) (uint32, []error) {
 			if isValueNilForMap(s) {
@@ -903,7 +897,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				errors = append(errors, fmt.Errorf("json.Map.GetUInt32Value value is nil"))
 				return 0, errors
 			}
-			return getValue(s).GetUInt32Value()
+			return getInternalValue(s).GetUInt32Value()
 		},
 		GetUInt64Value: func(s string) (uint64, []error) {
 			if isValueNilForMap(s) {
@@ -911,14 +905,14 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				errors = append(errors, fmt.Errorf("json.Map.GetUInt64Value value is nil"))
 				return 0, errors
 			}
-			return getValue(s).GetUInt64Value()
+			return getInternalValue(s).GetUInt64Value()
 		},
 		GetInt: func(s string) (*int, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
 
-			return getValue(s).GetInt()
+			return getInternalValue(s).GetInt()
 		},
 		GetIntValue: func(s string) (int, []error) {
 			if isValueNilForMap(s) {
@@ -926,139 +920,134 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 				errors = append(errors, fmt.Errorf("json.Map.GetIntValue value is nil"))
 				return 0, errors
 			}
-			return getValue(s).GetIntValue()
+			return getInternalValue(s).GetIntValue()
 		},
 		SetInt: func(s string, value *int) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetInt64: func(s string, value *int64) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetInt32: func(s string, value *int32) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetInt16: func(s string, value *int16) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetInt8: func(s string, value *int8) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetIntValue: func(s string, value int) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetInt64Value: func(s string, value int64) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetInt32Value: func(s string, value int32) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetInt16Value: func(s string, value int16) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetInt8Value: func(s string, value int8) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetUInt: func(s string, value *uint) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetUInt64: func(s string, value *uint64) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetUInt32: func(s string, value *uint32) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetUInt16: func(s string, value *uint16) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetUInt8: func(s string, value *uint8) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetUIntValue: func(s string, value uint) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetUInt64Value: func(s string, value uint64) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetUInt32Value: func(s string, value uint32) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetUInt16Value: func(s string, value uint16) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetUInt8Value: func(s string, value uint8) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetFloat64: func(s string, value *float64) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetFloat64Value: func(s string, value float64) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetFloat32: func(s string, value *float32) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		SetFloat32Value: func(s string, value float32) {
 			set_map_value := NewValue(&value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		GetUInt64: func(s string) (*uint64, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetUInt64()
+			return getInternalValue(s).GetUInt64()
 		},
 		SetTime: func (s string, value *time.Time) {
 			set_map_value := NewValue(value)
-			set_internal_map_value(s, set_map_value)
+			setInternalValue(s, set_map_value)
 		},
 		GetTime: func(s string) (*time.Time, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetTime()
+			return getInternalValue(s).GetTime()
 		},
 		GetTimeWithDecimalPlaces: func(s string, decimal_places int) (*time.Time, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
-			return getValue(s).GetTimeWithDecimalPlaces(decimal_places)
+			return getInternalValue(s).GetTimeWithDecimalPlaces(decimal_places)
 		},
 		Values: func() *Array {
-			m := get_internal_map()
-			values := NewArray()
-			for _, f := range m {
-				values.AppendValue(f)
-			}
-			return values
+			return internal_keys_obj
 		},
 		Clone: func() (*Map, []error) {
 			return clone()
 		},
 		SetValue: func(s string, value *Value)  {
-			set_internal_map_value(s, value)
+			setInternalValue(s, value)
 		},
 	}
 }

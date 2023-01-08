@@ -44,13 +44,12 @@ func Parse(s string) (*Map, []error) {
 	}
 
 	if s == "{}" {
-		empty_map := NewMap()
-		return empty_map, nil
+		empty_map := NewMapValue()
+		return &empty_map, nil
 	}
 
-	runes := []rune(s)
 	metrics := NewMap()
-	opening_bracket_value := 1
+	opening_bracket_value := 0
 	metrics.SetInt("{", &opening_bracket_value)
 	closing_bracket_value := 0
 	metrics.SetInt("}", &closing_bracket_value)
@@ -62,13 +61,10 @@ func Parse(s string) (*Map, []error) {
 	metrics.SetInt("opening_quote", &opening_quote_value)
 	closing_quote_value := 0
 	metrics.SetInt("closing_quote", &closing_quote_value)
-	mode := "looking_for_keys"
-	parent_map := NewMap()
-	parent_map_value := NewValue(parent_map)
-	list := [](*Value){parent_map_value}
+	mode := "looking_for_value"
 	
-	index := uint64(1)
-	result_error := parseJSONMap(&runes, &index, &mode, &list, metrics)
+	index := uint64(0)
+	parent_map, result_error := parseJSONMap(s, &index, &mode, metrics)
 
 	opening_bracket_count, opening_bracket_count_errors := metrics.GetInt("{")
 	closing_bracket_count, closing_bracket_count_errors := metrics.GetInt("}")
@@ -146,17 +142,10 @@ func unquote_key_value(key string) (string, []error) {
 
 
 
-func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value)), metrics *Map) ([]error) {
+func parseJSONMap(json_string string, index *uint64, mode *string, metrics *Map) (*Map, []error) {
 	var errors []error
-	if list == nil {
-		errors = append(errors, fmt.Errorf("error: list is nil"))
-	} else if len((*list)) == 0 {
-		errors = append(errors, fmt.Errorf("error: list is empty"))
-	}
-
-	if len(errors) > 0 {
-		return errors
-	}
+	array_list := [](*Value){}
+	list := &array_list
 	
 	mode_looking_for_keys := "looking_for_keys"
 	mode_looking_for_key_name := "looking_for_key_name"
@@ -164,56 +153,162 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 	mode_looking_for_value := "looking_for_value"
 	mode_looking_for_next_value_or_end := "mode_looking_for_next_value_or_end"
 	
-	var temp_key_r []rune
-	var temp_value_r []rune
+	var temp_key_r string
+	var temp_value_r string
 	parsing_string := false
 	temp_mode := cloneString(mode)
 	current_mode := *temp_mode
+	var parent_map *Map = nil
 
-
-	for *index < uint64(len(*runes)) {
+	for *index < uint64(len(json_string)) {
 		i := *index
-		value := (*runes)[*index]
-		
-		if current_mode == mode_looking_for_next_value_or_end {
+		previous_value := ""
+		if *index > 0 {
+			previous_value = string(json_string[i-1])
+		}
+		value := string(json_string[i])
+		rune_values := []rune(value)
+		rune_value := rune_values[0]
 
+		fmt.Println("key: " + string(temp_key_r) + " value: " + string(temp_value_r) + " '" + string(value) + "' " + current_mode + "parsing string: " + fmt.Sprintf("%s",parsing_string))
+
+
+		if !parsing_string {
+			if value == "\"" && previous_value != "\\"{
+				parsing_string = true
+				opention_quote, opention_quote_errors := metrics.GetInt("opening_quote")
+				if opention_quote_errors != nil {
+					return nil, opention_quote_errors
+				}
+				*opention_quote++
+				metrics.SetInt("opening_quote", opention_quote)
+			} else {
+				if value == "{" {
+
+					opening_count, _ := metrics.GetInt("{")
+					*opening_count++
+					metrics.SetInt("{", opening_count)
+				}
+	
+				if value == "}" {
+	
+					closing_count, _ := metrics.GetInt("}")
+					*closing_count++
+					metrics.SetInt("}", closing_count)
+				}
+	
+				if value == "[" {
+	
+					opening_count, _ := metrics.GetInt("[")
+					*opening_count++
+					metrics.SetInt("[", opening_count)
+				}
+	
+				if value == "]" {
+	
+					closing_count, _ := metrics.GetInt("]")
+					*closing_count++
+					metrics.SetInt("]", closing_count)
+				}
+			}
+		} else {
+			if value == "\"" && previous_value != "\\" {
+				parsing_string = false
+				closing_quote, closing_quote_errors := metrics.GetInt("closing_quote")
+				if closing_quote_errors != nil {
+					return nil,  closing_quote_errors
+				}
+				*closing_quote++
+				metrics.SetInt("closing_quote", closing_quote)
+				
 			
-			if value == ' '  ||
-			   value == '\n' ||
-			   value == 'n' ||
-			   value == '\r' ||
-			   string(value) == "\\" ||
-			   value == '\t' ||
-			   value == ',' ||
-			   value == '\\' {
-				if value == ',' {
+				if current_mode == mode_looking_for_value ||
+				   current_mode == mode_looking_for_next_value_or_end {
+					temp_value_r += value
 					parse_errors := parseJSONValue(temp_key_r, temp_value_r, list)
 
 					if parse_errors != nil {
 						errors = append(errors, parse_errors...)
 					}
 					
-					temp_key_r = temp_key_r[:0]
-					temp_value_r = temp_value_r[:0]
+					temp_key_r = ""
+					temp_value_r = ""
+					
+					if len(*list) >= 1 {
+						if ((*list)[len(*list)-1]).IsMap() {
+							current_mode = mode_looking_for_keys
+						} else {
+							current_mode = mode_looking_for_next_value_or_end
+						} 
+					}
 
+					*index++
+					continue
+				}
+			} 
+		}
+		
+		if current_mode == mode_looking_for_next_value_or_end {
+			if value == " "   ||
+			   value == "\n" ||
+			   value == "\r" ||
+			   rune_value == '\\' ||
+			   value == "\t" ||
+			   value == "\\" {
+				*index++
+				continue
+			}  
+	
+			current_mode = mode_looking_for_value
+		}
+
+		if current_mode == mode_looking_for_keys {	
+			if value == "}" {
+				temp_key_r = ""
+				temp_value_r = ""
+
+				*list = (*list)[:len(*list)-1]
+				if len(*list) >= 1 {
 					if ((*list)[len(*list)-1]).IsMap() {
 						current_mode = mode_looking_for_keys
 					} else {
-						current_mode = mode_looking_for_value
+						current_mode = mode_looking_for_next_value_or_end
 					} 
 				}
-				*index++
-				continue
-			} else {
-				current_mode = mode_looking_for_value
+			} else if value == "\"" && previous_value != "\\" {
+				current_mode = mode_looking_for_key_name
+				temp_key_r += value
 			}
+			*index++
+			continue
+		}
+
+		if current_mode == mode_looking_for_key_name {
+			//fmt.Println("value: " + value)
+			//fmt.Println("previous value: " + previous_value)
+
+			if value == "\"" && previous_value != "\\" {
+				current_mode = mode_looking_for_key_name_column	
+			} 
+			temp_key_r += value
+			*index++
+			continue
+		} 
+
+
+		if current_mode == mode_looking_for_key_name_column {
+			if string(value) == ":" {
+				current_mode = mode_looking_for_next_value_or_end
+			}
+			*index++
+			continue
 		}
 
 		if !parsing_string {
-
-			
-
-			if string(value) == "\"" && string((*runes)[i-1]) != "\\"{
+			/*if string(value) == "\"" && string((*runes)[i-1]) != "\\"{
+				parsing_string = true
+			} */
+			/*if string(value) == "\"" && string((*runes)[i-1]) != "\\"{
 
 				
 				parsing_string = true
@@ -253,86 +348,88 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 				closing_count, _ := metrics.GetInt("]")
 				*closing_count++
 				metrics.SetInt("]", closing_count)
-			}
+			}*/
 
 
-			if string(value) == "{" {
-
-				current_mode = mode_looking_for_keys
-				new_map := NewMap()
+			if value == "{" {
+				new_map := NewMapValue()
 				new_map_value := NewValue(new_map)
 
-				if ((*list)[len(*list)-1]).IsMap() {
-
-					unquoted_key_name, unquoted_key_name_errors := unquote_key_value(string(temp_key_r))
-					if unquoted_key_name_errors != nil {
-						errors = append(errors, unquoted_key_name_errors...)
-					} else {
-						get_map, get_map_errors := ((*list)[len(*list)-1]).GetMapValue()
-						if get_map_errors != nil {
-							errors = append(errors, get_map_errors...)
+				if len(*list) > 0 {
+					if ((*list)[len(*list)-1]).IsMap() {
+						unquoted_key_name, unquoted_key_name_errors := unquote_key_value(string(temp_key_r))
+						if unquoted_key_name_errors != nil {
+							errors = append(errors, unquoted_key_name_errors...)
 						} else {
-							get_map.SetValue(unquoted_key_name, new_map_value)	
+							get_map, get_map_errors := ((*list)[len(*list)-1]).GetMap()
+							if get_map_errors != nil {
+								errors = append(errors, get_map_errors...)
+							} else {
+								get_map.SetValue(unquoted_key_name, new_map_value)	
+							}
 						}
-						//((*list)[len(*list)-1]).SetValue(unquoted_key_name, new_map_value)	
-					}
-				} else {
-					get_array, get_array_errors := ((*list)[len(*list)-1]).GetArrayValue()
-					if get_array_errors != nil {
-						errors = append(errors, get_array_errors...)
 					} else {
-						get_array.AppendValue(new_map_value)
-					}
+						get_array, get_array_errors := ((*list)[len(*list)-1]).GetArray()
+						if get_array_errors != nil {
+							errors = append(errors, get_array_errors...)
+						} else {
+							get_array.AppendValue(new_map_value)
+						}
+					} 
 				} 
 
-				temp_key_r = temp_key_r[:0]
-				temp_value_r = temp_value_r[:0]
+				if parent_map == nil {
+					parent_map = &new_map
+				}
 
+				temp_key_r = ""
+				temp_value_r = ""
 
 				*list = append(*list, new_map_value)
-			} else if string(value) == "}" {
-
+				if ((*list)[len(*list)-1]).IsMap() {
+					current_mode = mode_looking_for_keys
+				} else {
+					current_mode = mode_looking_for_next_value_or_end
+				} 
+				*index++
+			   continue
+			} else if value == "}" {
 				parse_errors := parseJSONValue(temp_key_r, temp_value_r, list)
 				if parse_errors != nil {
 					errors = append(errors, parse_errors...)
 				}
 				
-				temp_key_r = temp_key_r[:0]
-				temp_value_r = temp_value_r[:0]
+				temp_key_r = ""
+				temp_value_r = ""
 
-
-				if len(*list) > 1 {
-					*list = (*list)[:len(*list)-1]
+				*list = (*list)[:len(*list)-1]
+				if len(*list) >= 1 {
 					if ((*list)[len(*list)-1]).IsMap() {
-
 						current_mode = mode_looking_for_keys
 					} else {
-
-						current_mode = mode_looking_for_value
+						current_mode = mode_looking_for_next_value_or_end
 					} 
 				}	
-			} else if string(value) == "[" {
-
-				current_mode = mode_looking_for_value
-				new_array := NewArray()
+				*index++
+			   continue
+			} else if value == "[" {
+				new_array := NewArrayValue()
 				new_array_value := NewValue(new_array)
 
 				if ((*list)[len(*list)-1]).IsMap() {
-
 					unquoted_key_name, unquoted_key_name_errors := unquote_key_value(string(temp_key_r))
 					if unquoted_key_name_errors != nil {
 						errors = append(errors, unquoted_key_name_errors...)
 					} else {
-						get_map, get_map_errors := ((*list)[len(*list)-1]).GetMapValue()
+						get_map, get_map_errors := ((*list)[len(*list)-1]).GetMap()
 						if get_map_errors != nil {
 							errors = append(errors, get_map_errors...)
 						} else {
-							get_map.SetArray(unquoted_key_name, new_array)	
+							get_map.SetArrayValue(unquoted_key_name, new_array)	
 						}
-						//((*list)[len(*list)-1]).SetValue(unquoted_key_name, new_array_value)	
 					}
 				} else {
-					get_array, get_array_errors := ((*list)[len(*list)-1]).GetArrayValue()
+					get_array, get_array_errors := ((*list)[len(*list)-1]).GetArray()
 					if get_array_errors != nil {
 						errors = append(errors, get_array_errors...)
 					} else {
@@ -340,102 +437,95 @@ func parseJSONMap(runes *[]rune, index *uint64, mode *string, list *([](*Value))
 					}
 				} 
 
-				temp_key_r = temp_key_r[:0]
-				temp_value_r = temp_value_r[:0]
+				temp_key_r = ""
+				temp_value_r = ""
 
 				*list = append(*list, new_array_value)
-			} else if string(value) == "]" {
-
+				if ((*list)[len(*list)-1]).IsMap() {
+					current_mode = mode_looking_for_keys
+				} else {
+					current_mode = mode_looking_for_next_value_or_end
+				} 
+				*index++
+			   	continue
+			} else if value == "]" {
 				parse_errors := parseJSONValue(temp_key_r, temp_value_r, list)
 
 				if parse_errors != nil {
 					errors = append(errors, parse_errors...)
 				}
 				
-				temp_key_r = temp_key_r[:0]
-				temp_value_r = temp_value_r[:0]
-
+				temp_key_r = ""
+				temp_value_r = ""
 
 				*list = (*list)[:len(*list)-1]
-
-				if ((*list)[len(*list)-1]).IsMap() {
-					current_mode = mode_looking_for_keys
-				} else {
-					current_mode = mode_looking_for_value
-				} 
-			} else if string(value) == "," {
-
-				parse_errors := parseJSONValue(temp_key_r, temp_value_r, list)
+				if len(*list) >= 1 {
+					if ((*list)[len(*list)-1]).IsMap() {
+						current_mode = mode_looking_for_keys
+					} else {
+						current_mode = mode_looking_for_next_value_or_end
+					} 
+				}	
+				*index++
+			   continue
+			} else if value == "," {
+			   parse_errors := parseJSONValue(temp_key_r, temp_value_r, list)
 
 			   if parse_errors != nil {
 				   errors = append(errors, parse_errors...)
 			   }
 			   
-			   temp_key_r = temp_key_r[:0]
-			   temp_value_r = temp_value_r[:0]
+			   temp_key_r = ""
+			   temp_value_r = ""
 
-
-			   if ((*list)[len(*list)-1]).IsMap() {
-				   current_mode = mode_looking_for_keys
-			   } else {
-				   current_mode = mode_looking_for_value
-			   } 
-		   } else if current_mode == mode_looking_for_value {
-				temp_value_r = append(temp_value_r, value)
-		   }   
+			   if len(*list) >= 1 {
+					if ((*list)[len(*list)-1]).IsMap() {
+						current_mode = mode_looking_for_keys
+					} else {
+						current_mode = mode_looking_for_next_value_or_end
+					} 
+				}	
+			   *index++
+			   continue
+			} else {
+				temp_value_r += value
+			}	
 		} else {
-			if string(value) == "\"" && string((*runes)[i-1]) != "\\" {
-				parsing_string = false
+			temp_value_r += value
+			
+			/*if value == "\"" && previous_value != "\\" {
+				parse_errors := parseJSONValue(temp_key_r, temp_value_r, list)
 
-				closing_count, _ := metrics.GetInt("closing_quote")
-				*closing_count++
-				metrics.SetInt("closing_quote", closing_count)
-
-				if current_mode == mode_looking_for_value {
-					current_mode = mode_looking_for_next_value_or_end
-					temp_value_r = append(temp_value_r, value)
+				if parse_errors != nil {
+					errors = append(errors, parse_errors...)
 				}
-			} else if current_mode == mode_looking_for_value {
-				temp_value_r = append(temp_value_r, value)
-			}
+				
+				temp_key_r = ""
+				temp_value_r = ""
+
+				if len(*list) >= 1 {
+					if ((*list)[len(*list)-1]).IsMap() {
+						current_mode = mode_looking_for_keys
+					} else {
+						current_mode = mode_looking_for_next_value_or_end
+					} 
+				}	
+				*index++
+				continue
+			}*/
 		}
-
-
-		if current_mode == mode_looking_for_keys {	
-			if string(value) == "\"" && string((*runes)[i-1]) != "\\"{
-				current_mode = mode_looking_for_key_name
-				temp_key_r = append(temp_key_r, value)
-				parsing_string = true
-			} 
-		} else if current_mode == mode_looking_for_key_name {
-			if string(value) == "\"" && string((*runes)[i-1]) != "\\" {
-				current_mode = mode_looking_for_key_name_column	
-				parsing_string = false
-			} 
-			temp_key_r = append(temp_key_r, value)
-		} else if current_mode == mode_looking_for_key_name_column {
-			if string(value) == ":" {
-				current_mode = mode_looking_for_value
-			}
-		} else if current_mode == mode_looking_for_value {
-			//temp_value_r = append(temp_value_r, value)
-		} else if current_mode == mode_looking_for_next_value_or_end {
-
-		} 
-		
-
 		*index++
 	}
 
 	if len(errors) > 0 {
-		return errors
+		return nil, errors
 	}
 
-	return nil
+	return parent_map, nil
 }
 
 
-func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []error {
+func parseJSONValue(key_value string, string_value string, list *([](*Value))) []error {
 	var errors []error
 
 	if list == nil {
@@ -449,8 +539,6 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 	}
 
 	data_type := ""
-	key_value := string(key_rune)
-	string_value := string(string_rune)
 
 	key_value = strings.TrimSpace(key_value)
 	string_value = strings.TrimSpace(string_value)
@@ -459,15 +547,12 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 	string_value = strings.Replace(string_value, "\\\"", "\"", -1)
 
 	if ((*list)[len(*list)-1]).IsMap() {
-		if key_value == "" && string_value == "" {
-			return nil
+		if strings.HasPrefix(key_value, "\"") && strings.HasSuffix(key_value, "\"") {
+			dequoted_value := (key_value)[1:(len(key_value)-1)]
+			key_value = dequoted_value	
 		} else {
-			if strings.HasPrefix(key_value, "\"") && strings.HasSuffix(key_value, "\"") {
-				dequoted_value := (key_value)[1:(len(key_value)-1)]
-				key_value = dequoted_value	
-			} else {
-				errors = append(errors, fmt.Errorf("error: key does not start with  \" and/or end with \" key: '%s'", key_value))
-			}
+			panic("die")
+			errors = append(errors, fmt.Errorf("error: key does not start with  \" and/or end with \" key: '%s'", key_value))
 		}
 	}
 
@@ -475,6 +560,10 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 		if strings.HasPrefix(string_value, "\"") && strings.HasSuffix(string_value, "\"") {
 			data_type = "string"
 			dequoted_value := (string_value)[1:(len(string_value)-1)]
+			string_value = dequoted_value	
+		} else if strings.HasPrefix(string_value, "\"") && strings.HasSuffix(string_value, "\"\\") {
+			data_type = "string"
+			dequoted_value := (string_value)[1:(len(string_value)-2)]
 			string_value = dequoted_value	
 		} else {
 			errors = append(errors, fmt.Errorf("error: value does not start with  \" and/or end with \" value: '%s'", string_value))
@@ -610,7 +699,7 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 					data_type = "uint64"
 					uint64_temp, uint64_temp_error := strconv.ParseUint(string_value, 10, 64)
 					if uint64_temp_error != nil {
-						errors = append(errors, fmt.Errorf("error: strconv.ParseUint(*string_value, 10, 64) error"))
+						errors = append(errors, fmt.Errorf("error: strconv.ParseUint(*string_value, 10, 64) error %s", uint64_temp_error))
 					} else {
 						uint64_value = &uint64_temp
 						if *uint64_value >= 0 && *uint64_value <= 255 {
@@ -677,31 +766,31 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 		}
 
 		if data_type == "string" {
-			value_as_array.AppendString(&string_value)
+			value_as_array.AppendStringValue(string_value)
 		} else if data_type == "bool" {
-			value_as_array.AppendBool(boolean_value)
+			value_as_array.AppendBoolValue(*boolean_value)
 		} else if data_type == "null" {
 			value_as_array.AppendNil()
 		} else if data_type == "float32" {
-			value_as_array.AppendFloat32(float32_value)
+			value_as_array.AppendFloat32Value(*float32_value)
 		} else if data_type == "float64" {
-			value_as_array.AppendFloat64(float64_value)
+			value_as_array.AppendFloat64Value(*float64_value)
 		} else if data_type == "int8" {
-			value_as_array.AppendInt8(int8_value)
+			value_as_array.AppendInt8Value(*int8_value)
 		} else if data_type == "int16" {
-			value_as_array.AppendInt16(int16_value)
+			value_as_array.AppendInt16Value(*int16_value)
 		} else if data_type == "int32" {
-			value_as_array.AppendInt32(int32_value)
+			value_as_array.AppendInt32Value(*int32_value)
 		}  else if data_type == "int64" {
-			value_as_array.AppendInt64(int64_value)
+			value_as_array.AppendInt64Value(*int64_value)
 		} else if data_type == "uint8" {
-			value_as_array.AppendUInt8(uint8_value)
+			value_as_array.AppendUInt8Value(*uint8_value)
 		} else if data_type == "uint16" {
-			value_as_array.AppendUInt16(uint16_value)
+			value_as_array.AppendUInt16Value(*uint16_value)
 		} else if data_type == "uint32" {
-			value_as_array.AppendUInt32(uint32_value)
+			value_as_array.AppendUInt32Value(*uint32_value)
 		} else if data_type == "uint64" {
-			value_as_array.AppendUInt64(uint64_value)
+			value_as_array.AppendUInt64Value(*uint64_value)
 		} else if data_type == "empty" {
 		
 		} else {
@@ -720,6 +809,7 @@ func parseJSONValue(key_rune []rune, string_rune []rune, list *([](*Value))) []e
 		}
 
 		if data_type == "string" {
+			fmt.Println(key_value + " " + string_value)
 			(*value_as_map).SetStringValue(key_value, string_value)
 		} else if data_type == "bool" {
 			(*value_as_map).SetBoolValue(key_value, *boolean_value)

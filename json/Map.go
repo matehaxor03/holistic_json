@@ -50,8 +50,8 @@ type Map struct {
 	SetErrors func(s string, errors []error)
 	GetErrors func(s string) ([]error, []error)
 	GetType func(s string) string
-	GetFunc func(s string) (*func(Map) []error, []error)
-	SetFunc func(s string, function *func(Map) []error)
+	GetFunc func(s string) (*func(string) []error, []error)
+	SetFunc func(s string, function *func(string) []error)
 	
 	
 	SetStringValue func(s string, v string)
@@ -536,13 +536,13 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			}
 			return getInternalValue(s).GetType()
 		},
-		GetFunc: func(s string) (*func(Map) []error, []error) {
+		GetFunc: func(s string) (*func(string) []error, []error) {
 			if isValueNilForMap(s) {
 				return nil, nil
 			}
 			return getInternalValue(s).GetFunc()
 		},
-		SetFunc: func(s string, function *func(Map) []error) {
+		SetFunc: func(s string, function *func(string) []error) {
 			set_map_value := NewValue(function)
 			setInternalValue(s, set_map_value)
 		},

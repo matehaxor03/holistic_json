@@ -14,7 +14,7 @@ type Value struct {
 	GetMapValue func() (Map, []error) 
 	IsMap func() (bool) 
 	IsEmptyString func() bool
-	GetFunc func() (*func(Map) []error, []error)
+	GetFunc func() (*func(string) []error, []error)
 	GetErrors func() ([]error, []error)
 	GetArray func() (*Array, []error)
 	GetArrayValue func() (Array, []error)
@@ -170,19 +170,19 @@ func NewValue(v interface{}) (*Value) {
 		
 			return result, nil
 		},
-		GetFunc: func() (*func(Map) []error, []error) {
+		GetFunc: func() (*func(string) []error, []error) {
 			if this().IsNil() {
 				return nil, nil
 			}
 		
 			var errors []error
-			var result (func(Map) []error)
+			var result (func(string) []error)
 			rep := common.GetType(getObject())
 			switch rep {
-			case "func(json.Map) []error":
-				result = (this().GetObject()).(func(Map) []error)
-			case "*func(json.Map) []error":
-				result = *(this().GetObject().(*func(Map) []error))
+			case "func(string) []error":
+				result = (this().GetObject()).(func(string) []error)
+			case "*func(string) []error":
+				result = *(this().GetObject().(*func(string) []error))
 			default:
 				errors = append(errors, fmt.Errorf("error: Map.Func: type %s is not supported please implement", rep))
 			}

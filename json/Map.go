@@ -753,7 +753,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			if isValueNilForMap(s) {
 				return nil
 			}
-			return internal_map[s]
+			return getInternalValue(s).GetObject()
 		},
 		SetObjectForMap: func(s string, value interface{}) {
 			set_map_value := NewValue(value)

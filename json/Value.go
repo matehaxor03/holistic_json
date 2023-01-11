@@ -411,6 +411,92 @@ func NewValue(v interface{}) (*Value) {
 			case "*float64":
 				value := *(this().GetObject().(*float64))
 				result = &value
+			case "float32":
+				value := float64(this().GetObject().(float32))
+				result = &value
+			case "*float32":
+				value := float64(*(this().GetObject().(*float32)))
+				result = &value
+			case "int":
+				int_value := this().GetObject().(int)
+				float_value := float64(int_value)
+				result = &float_value
+			case "*int":
+				int_value := *(this().GetObject().(*int))
+				float_value := float64(int_value)
+				result = &float_value
+			case "int8":
+				int_value := this().GetObject().(int8)
+				float_value := float64(int_value)
+				result = &float_value
+			case "*int8":
+				int_value := *(this().GetObject().(*int8))
+				float_value := float64(int_value)
+				result = &float_value
+			case "int16":
+				int_value := this().GetObject().(int16)
+				float_value := float64(int_value)
+				result = &float_value
+			case "*int16":
+				int_value := *(this().GetObject().(*int16))
+				float_value := float64(int_value)
+				result = &float_value
+			case "int32":
+				int_value := this().GetObject().(int32)
+				float_value := float64(int_value)
+				result = &float_value
+			case "*int32":
+				int_value := *(this().GetObject().(*int32))
+				float_value := float64(int_value)
+				result = &float_value
+			case "int64":
+				int_value := this().GetObject().(int64)
+				float_value := float64(int_value)
+				result = &float_value
+			case "*int64":
+				int_value := *(this().GetObject().(*int64))
+				float_value := float64(int_value)
+				result = &float_value
+			case "uint":
+				int_value := this().GetObject().(uint)
+				float_value := float64(int_value)
+				result = &float_value
+			case "*uint":
+				int_value := *(this().GetObject().(*uint))
+				float_value := float64(int_value)
+				result = &float_value
+			case "uint8":
+				int_value := this().GetObject().(uint8)
+				float_value := float64(int_value)
+				result = &float_value
+			case "*uint8":
+				int_value := *(this().GetObject().(*uint8))
+				float_value := float64(int_value)
+				result = &float_value
+			case "uint16":
+				int_value := this().GetObject().(uint16)
+				float_value := float64(int_value)
+				result = &float_value
+			case "*uint16":
+				int_value := *(this().GetObject().(*uint16))
+				float_value := float64(int_value)
+				result = &float_value
+			case "uint32":
+				int_value := this().GetObject().(uint32)
+				float_value := float64(int_value)
+				result = &float_value
+			case "*uint32":
+				int_value := *(this().GetObject().(*uint32))
+				float_value := float64(int_value)
+				result = &float_value
+			case "uint64":
+				int_value := this().GetObject().(uint64)
+				float_value := float64(int_value)
+				result = &float_value
+			case "*uint64":
+				int_value := *(this().GetObject().(*uint64))
+				float_value := float64(int_value)
+				result = &float_value
 			case "*string":
 				value, value_error := strconv.ParseFloat(*(this().GetObject().(*string)),64)
 				if value_error != nil {
@@ -425,12 +511,6 @@ func NewValue(v interface{}) (*Value) {
 				} else {
 					result = &value
 				}
-			case "float32":
-				value := float64(this().GetObject().(float32))
-				result = &value
-			case "*float32":
-				value := float64(*(this().GetObject().(*float32)))
-				result = &value
 			default:
 				errors = append(errors, fmt.Errorf("error: Value.GetFloat64: type %s is not supported please implement for attribute: %s", rep))
 			}

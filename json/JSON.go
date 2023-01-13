@@ -926,7 +926,7 @@ func ConvertInterfaceValueToJSONStringValue(json *strings.Builder, value interfa
 			}
 		}
 		json.WriteString("]")
-	case "func(string, *string, string, string) []error", "func(json.Map) []error", "*func(json.Map) []error":
+	case "func(string, *string, string, string) []error", "func(json.Map) []error", "*func(json.Map) []error", "*func(string) []error", "func(string) []error":
 		json.WriteString("\"")
 		json.WriteString(strings.ReplaceAll(fmt.Sprintf("%s", rep), "\"", "\\\""))
 		json.WriteString("\"")

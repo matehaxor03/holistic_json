@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	//"container/list"
 	"net/url"
 	"time"
 	"os/exec"

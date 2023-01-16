@@ -77,7 +77,7 @@ type Array struct {
 	GetValues func() *[](*Value)
 	SetValueAtIndex func(index int, value *Value) (bool, error) 
 	RemoveValueAtIndex func(index int) (bool, error) 
-
+	Clone func() (*Array, []error)
 	Len func() int
 }
 
@@ -118,7 +118,70 @@ func NewArrayOfValues(a *[]interface{}) (*Array) {
 		return len(*(getValues()))
 	}
 
+	clone := func() (*Array, []error) {
+		var errors []error
+		temp_values := getValues()
+		cloned := NewArray()
+		for _, temp_value := range *temp_values {
+			if temp_value.IsMap() {
+				temp_map, temp_map_errors := temp_value.GetMap()
+				if temp_map_errors != nil {
+					errors = append(errors, temp_map_errors...)
+				} else if common.IsNil(temp_map) {
+					errors = append(errors, fmt.Errorf("Array.Clone map is nil"))
+				} else {
+					cloned_map, cloned_map_errors := temp_map.Clone()
+					if cloned_map_errors != nil {
+						errors = append(errors, cloned_map_errors...)
+					} else if common.IsNil(cloned_map) {
+						errors = append(errors, fmt.Errorf("Array.Clone cloned map is nil"))
+					} else {
+						cloned.AppendMap(cloned_map)
+					}
+				}
+			} else if temp_value.IsArray() {
+				temp_array, temp_array_errors := temp_value.GetArray()
+				if temp_array_errors != nil {
+					errors = append(errors, temp_array_errors...)
+				} else if common.IsNil(temp_array) {
+					errors = append(errors, fmt.Errorf("Array.Clone array is nil"))
+				} else {
+					cloned_array, cloned_array_errors := temp_array.Clone()
+					if cloned_array_errors != nil {
+						errors = append(errors, cloned_array_errors...)
+					} else if common.IsNil(cloned_array) {
+						errors = append(errors, fmt.Errorf("Array.Clone cloned array is nil"))
+					} else {
+						cloned.AppendArray(cloned_array)
+					}
+				}
+			} else {
+				if common.IsNil(temp_value) {
+					cloned.AppendNil()
+				} else {
+					cloned_value, cloned_value_errors := temp_value.Clone()
+					if cloned_value_errors != nil {
+						errors = append(errors, cloned_value_errors...)
+					} else if common.IsNil(cloned_value) {
+						errors = append(errors, fmt.Errorf("Array.Clone cloned value is nil"))
+					} else {
+						cloned.AppendValue(cloned_value)
+					}
+				}
+			}
+		}
+
+		if len(errors) > 0 {
+			return nil, errors
+		}
+
+		return cloned, nil
+	}
+
 	created_array := Array{
+		Clone: func() (*Array, []error) {
+			return clone()
+		},
 		Len: func() int {
 			return getLen()
 		},

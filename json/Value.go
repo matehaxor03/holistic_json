@@ -6,21 +6,34 @@ import (
 	"time"
 	"strings"
 	"strconv"
+	"net/url"
+	"os/exec"
 )
 
 type Value struct {
 
 	GetMap func() (*Map, []error) 
+	SetMap func(*Map)
+	SetMapValue func(Map)
 	GetMapValue func() (Map, []error) 
 	IsMap func() (bool) 
 	IsEmptyString func() bool
 	GetFunc func() (*func(string) []error, []error)
 	GetErrors func() ([]error, []error)
+	SetErrors func(*[]error)
+	SetErrorsValue func([]error)
+	SetError func(*error)
+	SetErrorValue func(error)
 	GetArray func() (*Array, []error)
 	GetArrayValue func() (Array, []error)
+	SetArray func(*Array)
+	SetArrayValue func(Array)
+	
 	
 	GetBool func() (*bool, []error) 
 	GetBoolValue func() (bool, []error) 
+	SetBool func(*bool)
+	SetBoolValue func(bool)
 	IsArray func() bool
 	GetType func() string
 	GetObject func() (interface{})
@@ -31,6 +44,8 @@ type Value struct {
 	IsValueEqualToString func(s *string) bool
 	GetStringValue func() (string, []error) 
 	GetString func() (*string, []error) 
+	SetStringValue func(string)
+	SetString func(*string)
 
 	IsNumber func() bool
 	IsFloat func() bool
@@ -51,10 +66,15 @@ type Value struct {
 	IsUInt32 func() bool
 	IsUInt64 func() bool
 	
+	SetNil func()
 	GetFloat32 func() (*float32, []error) 
 	GetFloat32Value func() (float32, []error) 
+	SetFloat32 func(*float32)
+	SetFloat32Value func(float32)
 	GetFloat64 func() (*float64, []error) 
 	GetFloat64Value func() (float64, []error) 
+	SetFloat64 func(*float64)
+	SetFloat64Value func(float64)
 	GetInt func() (*int, []error) 
 	GetIntValue func() (int, []error) 
 	GetInt8 func() (*int8, []error) 
@@ -75,12 +95,36 @@ type Value struct {
 	GetUInt32Value func() (uint32, []error) 
 	GetUInt64 func() (*uint64, []error) 
 	GetUInt64Value func() (uint64, []error) 
+	//
+	SetInt func(*int)
+	SetIntValue func(int)
+	SetInt8 func(*int8)
+	SetInt8Value func(int8)
+	SetInt16 func(*int16)
+	SetInt16Value func(int16)
+	SetInt32 func(*int32)
+	SetInt32Value func(int32)
+	SetInt64 func(*int64)
+	SetInt64Value func(int64)
+	SetUInt func(*uint)
+	SetUIntValue func(uint)
+	SetUInt8 func(*uint8)
+	SetUInt8Value func(uint8)
+	SetUInt16 func(*uint16)
+	SetUInt16Value func(uint16)
+	SetUInt32 func(*uint32)
+	SetUInt32Value func(uint32)
+	SetUInt64 func(*uint64)
+	SetUInt64Value func(uint64)
+
 	GetRunes func() (*[]*rune, []error)
 	GetTimeWithDecimalPlaces func(decimal_places int) (*time.Time, []error)
 	GetTime func() (*time.Time, []error)
 	GetTimeValue func() (time.Time, []error)
+	SetTime func(*time.Time)
+	SetTimeValue func(time.Time)
 	IsNil func() bool
-	AppendValueValue func(add Value) []error
+	Clone func() (*Value, []error)
 }
 
 func NewValueValue(v interface{}) (Value) {
@@ -107,8 +151,219 @@ func NewValue(v interface{}) (*Value) {
 	setObject := func(value interface{}) {
 		internal_value = value
 	}
+
+	clone := func() (*Value, []error) {
+		var errors []error
+		temp_value := this()
+		cloned_value := NewValue(nil)
+		if temp_value.IsMap() {
+			temp_map, temp_map_errors := temp_value.GetMap()
+			if temp_map_errors != nil {
+				errors = append(errors, temp_map_errors...)
+			} else if common.IsNil(temp_map) {
+				errors = append(errors, fmt.Errorf("Value.Clone map is nil"))
+			} else {
+				cloned_map, cloned_map_errors := temp_map.Clone()
+				if cloned_map_errors != nil {
+					errors = append(errors, cloned_map_errors...)
+				} else if common.IsNil(cloned_map) {
+					errors = append(errors, fmt.Errorf("Value.Clone cloned map is nil"))
+				} else {
+					cloned_value.SetMap(cloned_map)
+				}
+			}
+		} else if temp_value.IsArray() {
+			temp_array, temp_array_errors := temp_value.GetArray()
+			if temp_array_errors != nil {
+				errors = append(errors, temp_array_errors...)
+			} else if common.IsNil(temp_array) {
+				errors = append(errors, fmt.Errorf("Value.Clone array is nil"))
+			} else {
+				cloned_array, cloned_array_errors := temp_array.Clone()
+				if cloned_array_errors != nil {
+					errors = append(errors, cloned_array_errors...)
+				} else if common.IsNil(cloned_array) {
+					errors = append(errors, fmt.Errorf("Value.Clone cloned array is nil"))
+				} else {
+					cloned_value.SetArray(cloned_array)
+				}
+			}
+		} else {
+			if common.IsNil(temp_value) {
+				cloned_value.SetNil()
+			} else {
+				rep := temp_value.GetType()
+				temp_object := temp_value.GetObject()
+				switch rep {
+					case "string":
+						result := temp_object.(string)
+						cloned_value.SetStringValue(result)
+					case "*string":
+						result := *(temp_object.(*string))
+						cloned_value.SetString(&result)
+					case "error":
+						result := fmt.Sprintf("%s",  temp_object.(error).Error())
+						cloned_value.SetErrorValue(fmt.Errorf(result))
+					case "*error":
+						result := fmt.Sprintf("%s", (*(temp_object.(*error))).Error())
+						cloned_error := fmt.Errorf(result)
+						cloned_value.SetError(&cloned_error)
+					case "*url.Error":
+						result := fmt.Sprintf("%s", (*(temp_object.(*url.Error))).Error()) 
+						cloned_error := fmt.Errorf(result)
+						cloned_value.SetError(&cloned_error)
+					case "exec.ExitError":
+						result := fmt.Sprintf("%s", temp_object.(exec.ExitError))
+						cloned_error := fmt.Errorf(result)
+						cloned_value.SetErrorValue(cloned_error)
+					case "*exec.ExitError":
+						result := fmt.Sprintf("%s", *(temp_object.(*exec.ExitError)))
+						cloned_error := fmt.Errorf(result)
+						cloned_value.SetError(&cloned_error)
+					case "errors.errorString":
+						result := fmt.Sprintf("%s", temp_object)
+						cloned_error := fmt.Errorf(result)
+						cloned_value.SetErrorValue(cloned_error)
+					case "*errors.errorString":
+						result := fmt.Sprintf("%s", temp_object)
+						cloned_error := fmt.Errorf(result)
+						cloned_value.SetError(&cloned_error)
+					case "bool":
+						if temp_object.(bool) {
+							cloned_value.SetBoolValue(true)
+						} else {
+							cloned_value.SetBoolValue(false)
+						}
+					case "*bool":
+						if *(temp_object.(*bool)) {
+							cloned_bool := true
+							cloned_value.SetBool(&cloned_bool)
+						} else {
+							cloned_bool := false
+							cloned_value.SetBool(&cloned_bool)
+						}
+					case "*time.Time":
+						result := (*(temp_object.(*time.Time)))
+						cloned_time, cloned_time_errors := common.GetTime(result)
+						if cloned_time_errors != nil {
+							errors = append(errors, cloned_time_errors...)
+						} else if common.IsNil(cloned_time) {
+							errors = append(errors, fmt.Errorf("Value.Clone time is nil"))
+						} else {
+							cloned_value.SetTime(cloned_time)
+						}
+					case "time.Time":
+						result := ((temp_object.(time.Time)))
+						cloned_time, cloned_time_errors := common.GetTime(result)
+						if cloned_time_errors != nil {
+							errors = append(errors, cloned_time_errors...)
+						} else if common.IsNil(cloned_time) {
+							errors = append(errors, fmt.Errorf("Value.Clone time is nil"))
+						} else {
+							cloned_value.SetTime(cloned_time)
+						}
+					case "map[string]map[string][][]string":
+						result := "map[string]map[string][][]string"
+						cloned_value.SetStringValue(result)
+					case "*uint64":
+						result := *(temp_object.(*uint64))
+						cloned_value.SetUInt64(&result)
+					case "uint64":
+						result := (temp_object.(uint64))
+						cloned_value.SetUInt64Value(result)
+					case "*uint32":
+						result := *(temp_object.(*uint32))
+						cloned_value.SetUInt32(&result)
+					case "uint32":
+						result := (temp_object.(uint32))
+						cloned_value.SetUInt32Value(result)
+					case "*uint16":
+						result := *(temp_object.(*uint16))
+						cloned_value.SetUInt16(&result)
+					case "uint16":
+						result := (temp_object.(uint16))
+						cloned_value.SetUInt16Value(result)
+					case "*uint8":
+						result := *(temp_object.(*uint8))
+						cloned_value.SetUInt8(&result)
+					case "uint8":
+						result := (temp_object.(uint8))
+						cloned_value.SetUInt8Value(result)
+					case "*uint":
+						result := *(temp_object.(*uint))
+						cloned_value.SetUInt(&result)
+					case "uint":
+						result := (temp_object.(uint))
+						cloned_value.SetUIntValue(result)
+					case "*int64":
+						result := *(temp_object.(*int64))
+						cloned_value.SetInt64(&result)
+					case "int64":
+						result := (temp_object.(int64))
+						cloned_value.SetInt64Value(result)
+					case "*int32":
+						result := *(temp_object.(*int32))
+						cloned_value.SetInt32(&result)
+					case "int32":
+						result := (temp_object.(int32))
+						cloned_value.SetInt32Value(result)
+					case "*int16":
+						result := *(temp_object.(*int16))
+						cloned_value.SetInt16(&result)
+					case "int16":
+						result := (temp_object.(int16))
+						cloned_value.SetInt16Value(result)
+					case "*int8":
+						result := *(temp_object.(*int8))
+						cloned_value.SetInt8(&result)
+					case "int8":
+						result := (temp_object.(int8))
+						cloned_value.SetInt8Value(result)
+					case "*int":
+						result := *(temp_object.(*int))
+						cloned_value.SetInt(&result)
+					case "int":
+						result := (temp_object.(int))
+						cloned_value.SetIntValue(result)
+					case "*float64":
+						result := *(temp_object.(*float64))
+						cloned_value.SetFloat64(&result)
+					case "float64":
+						result := (temp_object.(float64))
+						cloned_value.SetFloat64Value(result)
+					case "*float32":
+						result := *(temp_object.(*float32))
+						cloned_value.SetFloat32(&result)
+					case "float32":
+						result := (temp_object.(float32))
+						cloned_value.SetFloat32Value(result)
+					default:
+						errors = append(errors, fmt.Errorf("error: Value.Clone: type %s is not supported please implement", rep))
+				}
+			}
+		}
+		
+
+		if len(errors) > 0 {
+			return nil, errors
+		}
+
+		return cloned_value, nil
+	}
 	
 	created_value := Value{
+		SetMap: func(value *Map) {
+			internal_value = value
+		},
+		SetMapValue: func(value Map) {
+			internal_value = value
+		},
+		SetArray: func(value *Array) {
+			internal_value = value
+		},
+		SetArrayValue: func(value Array) {
+			internal_value = value
+		},
 		IsMap: func() (bool) {
 			return common.IsMap(this().GetObject())
 		},
@@ -307,6 +562,12 @@ func NewValue(v interface{}) (*Value) {
 			}
 		
 			return result, nil
+		},
+		SetString: func(value *string) {
+			setObject(value)
+		},
+		SetStringValue: func(value string) {
+			setObject(value)
 		},
 		GetStringValue: func() (string, []error) {
 			var errors []error
@@ -521,6 +782,12 @@ func NewValue(v interface{}) (*Value) {
 		
 			return result, nil
 		},
+		SetFloat64: func(value *float64) {
+			setObject(value)
+		},
+		SetFloat64Value: func(value float64) {
+			setObject(value)
+		},
 		GetFloat32: func() (*float32, []error) {
 			if this().IsNil() {
 				return nil, nil
@@ -571,6 +838,24 @@ func NewValue(v interface{}) (*Value) {
 			float_32_value := float32(value)
 			return float_32_value, nil
 		},
+		SetFloat32: func(value *float32) {
+			setObject(value)
+		},
+		SetFloat32Value: func(value float32) {
+			setObject(value)
+		},
+		SetError: func(value *error) {
+			setObject(value)
+		},
+		SetErrorValue: func(value error) {
+			setObject(value)
+		},
+		SetErrors: func(value *[]error) {
+			setObject(value)
+		},
+		SetErrorsValue: func(value []error) {
+			setObject(value)
+		},
 		GetFloat64Value: func() (float64, []error) {
 			var errors []error
 			float64_value, float64_value_errors := this().GetFloat64()
@@ -620,6 +905,12 @@ func NewValue(v interface{}) (*Value) {
 			}
 		
 			return &runes, nil
+		},
+		SetBool: func(value *bool) {
+			setObject(value)
+		},
+		SetBoolValue: func(value bool) {
+			setObject(value)
 		},
 		GetBool: func() (*bool, []error) {
 			if this().IsNil() {
@@ -848,6 +1139,66 @@ func NewValue(v interface{}) (*Value) {
 			result := &temp_value
 			return result, nil
 		},
+		SetInt64: func(value *int64) {
+			setObject(value)
+		},
+		SetInt64Value: func(value int64) {
+			setObject(value)
+		},
+		SetInt32: func(value *int32) {
+			setObject(value)
+		},
+		SetInt32Value: func(value int32) {
+			setObject(value)
+		},
+		SetInt16: func(value *int16) {
+			setObject(value)
+		},
+		SetInt16Value: func(value int16) {
+			setObject(value)
+		},
+		SetInt8: func(value *int8) {
+			setObject(value)
+		},
+		SetInt8Value: func(value int8) {
+			setObject(value)
+		},
+		SetInt: func(value *int) {
+			setObject(value)
+		},
+		SetIntValue: func(value int) {
+			setObject(value)
+		},
+		SetUInt64: func(value *uint64) {
+			setObject(value)
+		},
+		SetUInt64Value: func(value uint64) {
+			setObject(value)
+		},
+		SetUInt32: func(value *uint32) {
+			setObject(value)
+		},
+		SetUInt32Value: func(value uint32) {
+			setObject(value)
+		},
+		SetUInt16: func(value *uint16) {
+			setObject(value)
+		},
+		SetUInt16Value: func(value uint16) {
+			setObject(value)
+		},
+		SetUInt8: func(value *uint8) {
+			setObject(value)
+		},
+		SetUInt8Value: func(value uint8) {
+			setObject(value)
+		},
+		SetUInt: func(value *uint) {
+			setObject(value)
+		},
+		SetUIntValue: func(value uint) {
+			setObject(value)
+		},
 		GetUInt64: func() (*uint64, []error) {
 			var errors []error
 			if this().IsNil() {
@@ -1011,6 +1362,12 @@ func NewValue(v interface{}) (*Value) {
 				return (*common.GetTimeZero()), temp_time_errors
 			}
 			return *temp_time, nil
+		},
+		SetTime: func(value *time.Time) {
+			setObject(value)
+		},
+		SetTimeValue: func(value time.Time) {
+			setObject(value)
 		},
 		GetType: func() string {
 			return common.GetType(this().GetObject())
@@ -1473,6 +1830,9 @@ func NewValue(v interface{}) (*Value) {
 		},
 		GetObject: func() (interface{}) {
 			return getObject()
+		},
+		Clone: func() (*Value, []error) {
+			return clone()
 		},
 	}
 	set_this( &created_value)

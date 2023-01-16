@@ -290,6 +290,24 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 		return value.GetMapValue()
 	}
 
+	isMap := func(s string) bool {
+		if isValueNilForMap(s) {
+			return false
+		}
+		return getInternalValue(s).IsMap()
+	}
+
+	isArray := func(s string) bool {
+		if isValueNilForMap(s) {
+			return false
+		}
+		return getInternalValue(s).IsArray()
+	}
+
+	getValue := func(s string) (*Value) {
+		return getInternalValue(s)
+	}
+
 	toJSONString := func(json *strings.Builder) ([]error) {
 		if json == nil {
 			var errors []error
@@ -340,13 +358,64 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 	}
 
 	clone := func() (*Map, []error) {
-		var json_payload_builder strings.Builder
-		request_payload_as_string_errors := toJSONString(&json_payload_builder)
-		if request_payload_as_string_errors != nil {
-			return nil, request_payload_as_string_errors
+		var errors []error
+		cloned := NewMap()
+		keys := getKeys()
+		for _, key := range keys {
+			if isMap(key) {
+				temp_map, temp_map_errors := getMap(key)
+				if temp_map_errors != nil {
+					errors = append(errors, temp_map_errors...)
+				} else if common.IsNil(temp_map) {
+					errors = append(errors, fmt.Errorf("Map.Clone map is nil"))
+				} else {
+					cloned_map, cloned_map_errors := temp_map.Clone()
+					if cloned_map_errors != nil {
+						errors = append(errors, cloned_map_errors...)
+					} else if common.IsNil(cloned_map) {
+						errors = append(errors, fmt.Errorf("Map.Clone cloned map is nil"))
+					} else {
+						cloned.SetMap(key, cloned_map)
+					}
+				}
+			} else if isArray(key) {
+				temp_array, temp_array_errors := getArray(key)
+				if temp_array_errors != nil {
+					errors = append(errors, temp_array_errors...)
+				} else if common.IsNil(temp_array) {
+					errors = append(errors, fmt.Errorf("Map.Clone array is nil"))
+				} else {
+					cloned_array, cloned_array_errors := temp_array.Clone()
+					if cloned_array_errors != nil {
+						errors = append(errors, cloned_array_errors...)
+					} else if common.IsNil(cloned_array) {
+						errors = append(errors, fmt.Errorf("Map.Clone cloned array is nil"))
+					} else {
+						cloned.SetArray(key, cloned_array)
+					}
+				}
+			} else {
+				temp_value := getValue(key)
+				if common.IsNil(temp_value) {
+					cloned.SetNil(key)
+				} else {
+					cloned_value, cloned_value_errors := temp_value.Clone()
+					if cloned_value_errors != nil {
+						errors = append(errors, cloned_value_errors...)
+					} else if common.IsNil(cloned_value) {
+						errors = append(errors, fmt.Errorf("Map.Clone cloned value is nil"))
+					} else {
+						cloned.SetValue(key, cloned_value)
+					}
+				}
+			}
 		}
-	
-		return Parse(json_payload_builder.String())
+
+		if len(errors) > 0 {
+			return nil, errors
+		}
+
+		return cloned, nil
 	}
 
 	if !common.IsNil(m) {
@@ -372,7 +441,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			return getMapValue(s)
 		},
 		GetValue: func(s string) (*Value) {
-			return getInternalValue(s)
+			return getValue(s)
 		},
 		SetMap: func(s string, zap *Map) {
 			set_map_value := NewValue(zap)
@@ -405,10 +474,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			return getInternalValue(s).IsBool()
 		},
 		IsArray: func(s string) bool {
-			if isValueNilForMap(s) {
-				return false
-			}
-			return getInternalValue(s).IsArray()
+			return isArray(s)
 		},
 		IsEmptyString: func(s string) bool {
 			if isValueNilForMap(s) {
@@ -489,10 +555,7 @@ func NewMapOfValues(m *map[string]interface{}) *Map {
 			return getInternalValue(s).IsString()
 		},
 		IsMap: func(s string) bool {
-			if isValueNilForMap(s) {
-				return false
-			}
-			return getInternalValue(s).IsMap()
+			return isMap(s)
 		},
 		IsBoolTrue: func(s string) bool {
 			if isValueNilForMap(s) {

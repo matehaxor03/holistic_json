@@ -189,158 +189,157 @@ func NewValue(v interface{}) (*Value) {
 				}
 			}
 		} else {
-			if common.IsNil(temp_value) {
-				cloned_value.SetNil()
-			} else {
-				rep := temp_value.GetType()
-				temp_object := temp_value.GetObject()
-				switch rep {
-					case "string":
-						result := temp_object.(string)
-						cloned_value.SetStringValue(result)
-					case "*string":
-						result := *(temp_object.(*string))
-						cloned_value.SetString(&result)
-					case "error":
-						result := fmt.Sprintf("%s",  temp_object.(error).Error())
-						cloned_value.SetErrorValue(fmt.Errorf(result))
-					case "*error":
-						result := fmt.Sprintf("%s", (*(temp_object.(*error))).Error())
-						cloned_error := fmt.Errorf(result)
-						cloned_value.SetError(&cloned_error)
-					case "*url.Error":
-						result := fmt.Sprintf("%s", (*(temp_object.(*url.Error))).Error()) 
-						cloned_error := fmt.Errorf(result)
-						cloned_value.SetError(&cloned_error)
-					case "exec.ExitError":
-						result := fmt.Sprintf("%s", temp_object.(exec.ExitError))
-						cloned_error := fmt.Errorf(result)
-						cloned_value.SetErrorValue(cloned_error)
-					case "*exec.ExitError":
-						result := fmt.Sprintf("%s", *(temp_object.(*exec.ExitError)))
-						cloned_error := fmt.Errorf(result)
-						cloned_value.SetError(&cloned_error)
-					case "errors.errorString":
-						result := fmt.Sprintf("%s", temp_object)
-						cloned_error := fmt.Errorf(result)
-						cloned_value.SetErrorValue(cloned_error)
-					case "*errors.errorString":
-						result := fmt.Sprintf("%s", temp_object)
-						cloned_error := fmt.Errorf(result)
-						cloned_value.SetError(&cloned_error)
-					case "bool":
-						if temp_object.(bool) {
-							cloned_value.SetBoolValue(true)
-						} else {
-							cloned_value.SetBoolValue(false)
-						}
-					case "*bool":
-						if *(temp_object.(*bool)) {
-							cloned_bool := true
-							cloned_value.SetBool(&cloned_bool)
-						} else {
-							cloned_bool := false
-							cloned_value.SetBool(&cloned_bool)
-						}
-					case "*time.Time":
-						result := (*(temp_object.(*time.Time)))
-						cloned_time, cloned_time_errors := common.GetTime(result)
-						if cloned_time_errors != nil {
-							errors = append(errors, cloned_time_errors...)
-						} else if common.IsNil(cloned_time) {
-							errors = append(errors, fmt.Errorf("Value.Clone time is nil"))
-						} else {
-							cloned_value.SetTime(cloned_time)
-						}
-					case "time.Time":
-						result := ((temp_object.(time.Time)))
-						cloned_time, cloned_time_errors := common.GetTime(result)
-						if cloned_time_errors != nil {
-							errors = append(errors, cloned_time_errors...)
-						} else if common.IsNil(cloned_time) {
-							errors = append(errors, fmt.Errorf("Value.Clone time is nil"))
-						} else {
-							cloned_value.SetTime(cloned_time)
-						}
-					case "map[string]map[string][][]string":
-						result := "map[string]map[string][][]string"
-						cloned_value.SetStringValue(result)
-					case "*uint64":
-						result := *(temp_object.(*uint64))
-						cloned_value.SetUInt64(&result)
-					case "uint64":
-						result := (temp_object.(uint64))
-						cloned_value.SetUInt64Value(result)
-					case "*uint32":
-						result := *(temp_object.(*uint32))
-						cloned_value.SetUInt32(&result)
-					case "uint32":
-						result := (temp_object.(uint32))
-						cloned_value.SetUInt32Value(result)
-					case "*uint16":
-						result := *(temp_object.(*uint16))
-						cloned_value.SetUInt16(&result)
-					case "uint16":
-						result := (temp_object.(uint16))
-						cloned_value.SetUInt16Value(result)
-					case "*uint8":
-						result := *(temp_object.(*uint8))
-						cloned_value.SetUInt8(&result)
-					case "uint8":
-						result := (temp_object.(uint8))
-						cloned_value.SetUInt8Value(result)
-					case "*uint":
-						result := *(temp_object.(*uint))
-						cloned_value.SetUInt(&result)
-					case "uint":
-						result := (temp_object.(uint))
-						cloned_value.SetUIntValue(result)
-					case "*int64":
-						result := *(temp_object.(*int64))
-						cloned_value.SetInt64(&result)
-					case "int64":
-						result := (temp_object.(int64))
-						cloned_value.SetInt64Value(result)
-					case "*int32":
-						result := *(temp_object.(*int32))
-						cloned_value.SetInt32(&result)
-					case "int32":
-						result := (temp_object.(int32))
-						cloned_value.SetInt32Value(result)
-					case "*int16":
-						result := *(temp_object.(*int16))
-						cloned_value.SetInt16(&result)
-					case "int16":
-						result := (temp_object.(int16))
-						cloned_value.SetInt16Value(result)
-					case "*int8":
-						result := *(temp_object.(*int8))
-						cloned_value.SetInt8(&result)
-					case "int8":
-						result := (temp_object.(int8))
-						cloned_value.SetInt8Value(result)
-					case "*int":
-						result := *(temp_object.(*int))
-						cloned_value.SetInt(&result)
-					case "int":
-						result := (temp_object.(int))
-						cloned_value.SetIntValue(result)
-					case "*float64":
-						result := *(temp_object.(*float64))
-						cloned_value.SetFloat64(&result)
-					case "float64":
-						result := (temp_object.(float64))
-						cloned_value.SetFloat64Value(result)
-					case "*float32":
-						result := *(temp_object.(*float32))
-						cloned_value.SetFloat32(&result)
-					case "float32":
-						result := (temp_object.(float32))
-						cloned_value.SetFloat32Value(result)
-					default:
-						errors = append(errors, fmt.Errorf("error: Value.Clone: type %s is not supported please implement", rep))
-				}
+			rep := temp_value.GetType()
+			temp_object := temp_value.GetObject()
+			switch rep {
+				case "nil":
+					cloned_value.SetNil()
+				case "string":
+					result := temp_object.(string)
+					cloned_value.SetStringValue(result)
+				case "*string":
+					result := *(temp_object.(*string))
+					cloned_value.SetString(&result)
+				case "error":
+					result := fmt.Sprintf("%s",  temp_object.(error).Error())
+					cloned_value.SetErrorValue(fmt.Errorf(result))
+				case "*error":
+					result := fmt.Sprintf("%s", (*(temp_object.(*error))).Error())
+					cloned_error := fmt.Errorf(result)
+					cloned_value.SetError(&cloned_error)
+				case "*url.Error":
+					result := fmt.Sprintf("%s", (*(temp_object.(*url.Error))).Error()) 
+					cloned_error := fmt.Errorf(result)
+					cloned_value.SetError(&cloned_error)
+				case "exec.ExitError":
+					result := fmt.Sprintf("%s", temp_object.(exec.ExitError))
+					cloned_error := fmt.Errorf(result)
+					cloned_value.SetErrorValue(cloned_error)
+				case "*exec.ExitError":
+					result := fmt.Sprintf("%s", *(temp_object.(*exec.ExitError)))
+					cloned_error := fmt.Errorf(result)
+					cloned_value.SetError(&cloned_error)
+				case "errors.errorString":
+					result := fmt.Sprintf("%s", temp_object)
+					cloned_error := fmt.Errorf(result)
+					cloned_value.SetErrorValue(cloned_error)
+				case "*errors.errorString":
+					result := fmt.Sprintf("%s", temp_object)
+					cloned_error := fmt.Errorf(result)
+					cloned_value.SetError(&cloned_error)
+				case "bool":
+					if temp_object.(bool) {
+						cloned_value.SetBoolValue(true)
+					} else {
+						cloned_value.SetBoolValue(false)
+					}
+				case "*bool":
+					if *(temp_object.(*bool)) {
+						cloned_bool := true
+						cloned_value.SetBool(&cloned_bool)
+					} else {
+						cloned_bool := false
+						cloned_value.SetBool(&cloned_bool)
+					}
+				case "*time.Time":
+					result := (*(temp_object.(*time.Time)))
+					cloned_time, cloned_time_errors := common.GetTime(result)
+					if cloned_time_errors != nil {
+						errors = append(errors, cloned_time_errors...)
+					} else if common.IsNil(cloned_time) {
+						errors = append(errors, fmt.Errorf("Value.Clone time is nil"))
+					} else {
+						cloned_value.SetTime(cloned_time)
+					}
+				case "time.Time":
+					result := ((temp_object.(time.Time)))
+					cloned_time, cloned_time_errors := common.GetTime(result)
+					if cloned_time_errors != nil {
+						errors = append(errors, cloned_time_errors...)
+					} else if common.IsNil(cloned_time) {
+						errors = append(errors, fmt.Errorf("Value.Clone time is nil"))
+					} else {
+						cloned_value.SetTime(cloned_time)
+					}
+				case "map[string]map[string][][]string":
+					result := "map[string]map[string][][]string"
+					cloned_value.SetStringValue(result)
+				case "*uint64":
+					result := *(temp_object.(*uint64))
+					cloned_value.SetUInt64(&result)
+				case "uint64":
+					result := (temp_object.(uint64))
+					cloned_value.SetUInt64Value(result)
+				case "*uint32":
+					result := *(temp_object.(*uint32))
+					cloned_value.SetUInt32(&result)
+				case "uint32":
+					result := (temp_object.(uint32))
+					cloned_value.SetUInt32Value(result)
+				case "*uint16":
+					result := *(temp_object.(*uint16))
+					cloned_value.SetUInt16(&result)
+				case "uint16":
+					result := (temp_object.(uint16))
+					cloned_value.SetUInt16Value(result)
+				case "*uint8":
+					result := *(temp_object.(*uint8))
+					cloned_value.SetUInt8(&result)
+				case "uint8":
+					result := (temp_object.(uint8))
+					cloned_value.SetUInt8Value(result)
+				case "*uint":
+					result := *(temp_object.(*uint))
+					cloned_value.SetUInt(&result)
+				case "uint":
+					result := (temp_object.(uint))
+					cloned_value.SetUIntValue(result)
+				case "*int64":
+					result := *(temp_object.(*int64))
+					cloned_value.SetInt64(&result)
+				case "int64":
+					result := (temp_object.(int64))
+					cloned_value.SetInt64Value(result)
+				case "*int32":
+					result := *(temp_object.(*int32))
+					cloned_value.SetInt32(&result)
+				case "int32":
+					result := (temp_object.(int32))
+					cloned_value.SetInt32Value(result)
+				case "*int16":
+					result := *(temp_object.(*int16))
+					cloned_value.SetInt16(&result)
+				case "int16":
+					result := (temp_object.(int16))
+					cloned_value.SetInt16Value(result)
+				case "*int8":
+					result := *(temp_object.(*int8))
+					cloned_value.SetInt8(&result)
+				case "int8":
+					result := (temp_object.(int8))
+					cloned_value.SetInt8Value(result)
+				case "*int":
+					result := *(temp_object.(*int))
+					cloned_value.SetInt(&result)
+				case "int":
+					result := (temp_object.(int))
+					cloned_value.SetIntValue(result)
+				case "*float64":
+					result := *(temp_object.(*float64))
+					cloned_value.SetFloat64(&result)
+				case "float64":
+					result := (temp_object.(float64))
+					cloned_value.SetFloat64Value(result)
+				case "*float32":
+					result := *(temp_object.(*float32))
+					cloned_value.SetFloat32(&result)
+				case "float32":
+					result := (temp_object.(float32))
+					cloned_value.SetFloat32Value(result)
+				default:
+					errors = append(errors, fmt.Errorf("error: Value.Clone: type %s is not supported please implement", rep))
 			}
+			
 		}
 		
 
@@ -1007,6 +1006,9 @@ func NewValue(v interface{}) (*Value) {
 			}
 		
 			return result, nil
+		},
+		SetNil: func() {
+			setObject(nil)
 		},
 		GetInt64: func() (*int64, []error) {
 			var errors []error

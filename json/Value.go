@@ -553,7 +553,8 @@ func NewValue(v interface{}) (*Value) {
 			case "*string":
 				result = this().GetObject().(*string)
 			default:
-				errors = append(errors, fmt.Errorf("error: Map.GetString: type %s is not supported please implement for attribute: %s", rep))
+				panic("debug")
+				errors = append(errors, fmt.Errorf("error Value.GetString: type %s is not supported please implement for attribute", rep))
 			}
 		
 			if len(errors) > 0 {

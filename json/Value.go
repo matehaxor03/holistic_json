@@ -261,9 +261,6 @@ func NewValue(v interface{}) (*Value) {
 					} else {
 						cloned_value.SetTime(cloned_time)
 					}
-				case "map[string]map[string][][]string":
-					result := "map[string]map[string][][]string"
-					cloned_value.SetStringValue(result)
 				case "*uint64":
 					result := *(temp_object.(*uint64))
 					cloned_value.SetUInt64(&result)
@@ -336,6 +333,12 @@ func NewValue(v interface{}) (*Value) {
 				case "float32":
 					result := (temp_object.(float32))
 					cloned_value.SetFloat32Value(result)
+				case "map[string]map[string][][]string":
+					result := "map[string]map[string][][]string"
+					cloned_value.SetStringValue(result)
+				case "*func(string) []error":
+					result := "*func(string) []error"
+					cloned_value.SetStringValue(result)
 				default:
 					errors = append(errors, fmt.Errorf("error: Value.Clone: type %s is not supported please implement", rep))
 			}

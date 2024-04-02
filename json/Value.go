@@ -203,6 +203,14 @@ func NewValue(v interface{}) (*Value) {
 				case "error":
 					result := fmt.Sprintf("%s",  temp_object.(error).Error())
 					cloned_value.SetErrorValue(fmt.Errorf(result))
+				case "[]error": 
+					result := temp_object.([]error)
+					var result_array []error
+					for _, result_array_value := range result {
+						e := fmt.Errorf(fmt.Sprintf("%s", result_array_value.Error()))
+						result_array = append(result_array, e)
+					}	
+					cloned_value.SetErrorsValue(result_array)				
 				case "*error":
 					result := fmt.Sprintf("%s", (*(temp_object.(*error))).Error())
 					cloned_error := fmt.Errorf(result)

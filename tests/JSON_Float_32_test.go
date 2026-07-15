@@ -1,7 +1,7 @@
 package tests
- 
+
 import (
-    "testing"
+	"testing"
 )
 
 func TestCanParseFloat32Zero(t *testing.T) {
@@ -12,7 +12,7 @@ func TestCanParseFloat32Zero(t *testing.T) {
 	} else if !json_obj.IsFloat32("key") {
 		t.Errorf("error: key is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key") 
+		value, value_errors := json_obj.GetFloat32("key")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -32,7 +32,7 @@ func TestCanParseFloat32PositiveLowBoundary(t *testing.T) {
 	} else if !json_obj.IsFloat32("key") {
 		t.Errorf("error: key is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key") 
+		value, value_errors := json_obj.GetFloat32("key")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -46,13 +46,13 @@ func TestCanParseFloat32PositiveLowBoundary(t *testing.T) {
 
 func TestCanParseFloat32NegativeLowBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":-0.123457}")
-	
+
 	if !json_obj.HasKey("key") {
 		t.Errorf("error: key not found")
 	} else if !json_obj.IsFloat32("key") {
 		t.Errorf("error: key is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key") 
+		value, value_errors := json_obj.GetFloat32("key")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -69,10 +69,10 @@ func TestCanParseFloat32MultiplePositiveLowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("error: key not found")
-	} else if !json_obj.IsFloat32("key")  {
+	} else if !json_obj.IsFloat32("key") {
 		t.Errorf("error: key is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key") 
+		value, value_errors := json_obj.GetFloat32("key")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -85,10 +85,10 @@ func TestCanParseFloat32MultiplePositiveLowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("error: key2 not found")
-	} else if !json_obj.IsFloat32("key2")  {
+	} else if !json_obj.IsFloat32("key2") {
 		t.Errorf("error: key2 is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key2") 
+		value, value_errors := json_obj.GetFloat32("key2")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -102,13 +102,13 @@ func TestCanParseFloat32MultiplePositiveLowBoundary(t *testing.T) {
 
 func TestCanParseFloat32MultipleNegativeLowBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":-0.123457,\"key2\":-0.223457}")
-	
+
 	if !json_obj.HasKey("key") {
 		t.Errorf("error: key not found")
 	} else if !json_obj.IsFloat32("key") {
 		t.Errorf("error: key is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key") 
+		value, value_errors := json_obj.GetFloat32("key")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -121,10 +121,10 @@ func TestCanParseFloat32MultipleNegativeLowBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key2") {
 		t.Errorf("error: key2 not found")
-	} else if !!json_obj.IsFloat32("ke2")  {
+	} else if !!json_obj.IsFloat32("ke2") {
 		t.Errorf("error: key2 is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key2") 
+		value, value_errors := json_obj.GetFloat32("key2")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -138,13 +138,13 @@ func TestCanParseFloat32MultipleNegativeLowBoundary(t *testing.T) {
 
 func TestCanParseFloat32MultipleLowBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":0.123457, \"key2\":-0.223457}")
-	
+
 	if !json_obj.HasKey("key") {
 		t.Errorf("error: key not found")
-	} else if !json_obj.IsFloat32("key")  {
+	} else if !json_obj.IsFloat32("key") {
 		t.Errorf("error: key is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key") 
+		value, value_errors := json_obj.GetFloat32("key")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat64 has errors")
@@ -160,7 +160,7 @@ func TestCanParseFloat32MultipleLowBoundary(t *testing.T) {
 	} else if !json_obj.IsFloat32("key2") {
 		t.Errorf("error: key2 is not a *float32: %s", json_obj.GetType("key2"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key2") 
+		value, value_errors := json_obj.GetFloat32("key2")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -177,10 +177,10 @@ func TestCanParseFloat32PositiveHighBoundary(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("error: key not found")
-	} else if !json_obj.IsFloat32("key") { 
+	} else if !json_obj.IsFloat32("key") {
 		t.Errorf("error: key is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key") 
+		value, value_errors := json_obj.GetFloat32("key")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -194,13 +194,13 @@ func TestCanParseFloat32PositiveHighBoundary(t *testing.T) {
 
 func TestCanParseFloat32NegativeHighBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":-340000000000000000000000000000000000000.00}")
-	
+
 	if !json_obj.HasKey("key") {
 		t.Errorf("error: key not found")
 	} else if !json_obj.IsFloat32("key") {
 		t.Errorf("error: key is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key") 
+		value, value_errors := json_obj.GetFloat32("key")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -214,13 +214,13 @@ func TestCanParseFloat32NegativeHighBoundary(t *testing.T) {
 
 func TestCanParseFloat32MultiplePositiveHighBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":340000000000000000000000000000000000000.00,\"key2\":339999999999999999999999999999999999999.99}")
-	
+
 	if !json_obj.HasKey("key") {
 		t.Errorf("error: key not found")
 	} else if !json_obj.IsFloat32("key") {
 		t.Errorf("error: key is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key") 
+		value, value_errors := json_obj.GetFloat32("key")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -236,7 +236,7 @@ func TestCanParseFloat32MultiplePositiveHighBoundary(t *testing.T) {
 	} else if !json_obj.IsFloat32("key") {
 		t.Errorf("error: key2 is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key2") 
+		value, value_errors := json_obj.GetFloat32("key2")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -250,13 +250,13 @@ func TestCanParseFloat32MultiplePositiveHighBoundary(t *testing.T) {
 
 func TestCanParseFloat32MultipleNegativeHighBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":-340000000000000000000000000000000000000.00,\"key2\":-339999999999999999999999999999999999999.99}")
-	
+
 	if !json_obj.HasKey("key") {
 		t.Errorf("error: key not found")
 	} else if !json_obj.IsFloat32("key") {
 		t.Errorf("error: key is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key") 
+		value, value_errors := json_obj.GetFloat32("key")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -272,7 +272,7 @@ func TestCanParseFloat32MultipleNegativeHighBoundary(t *testing.T) {
 	} else if !json_obj.IsFloat32("key2") {
 		t.Errorf("error: key2 is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key2") 
+		value, value_errors := json_obj.GetFloat32("key2")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -286,13 +286,13 @@ func TestCanParseFloat32MultipleNegativeHighBoundary(t *testing.T) {
 
 func TestCanParseFloat32MultipleHighBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":340000000000000000000000000000000000000.00, \"key2\":-339999999999999999999999999999999999999.99}")
-	
+
 	if !json_obj.HasKey("key") {
 		t.Errorf("error: key not found")
 	} else if !json_obj.IsFloat32("key") {
 		t.Errorf("error: key is not a *float32: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key") 
+		value, value_errors := json_obj.GetFloat32("key")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")
@@ -308,7 +308,7 @@ func TestCanParseFloat32MultipleHighBoundary(t *testing.T) {
 	} else if !json_obj.IsFloat32("key2") {
 		t.Errorf("key2 is not a *float32: %s", json_obj.GetType("key2"))
 	} else {
-		value, value_errors := json_obj.GetFloat32("key2") 
+		value, value_errors := json_obj.GetFloat32("key2")
 
 		if value_errors != nil {
 			t.Errorf("error: map GetFloat32 has errors")

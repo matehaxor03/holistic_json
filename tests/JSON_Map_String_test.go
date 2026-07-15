@@ -1,8 +1,8 @@
 package tests
- 
+
 import (
-    "testing"
 	"fmt"
+	"testing"
 )
 
 func TestCanParseEmptyMap(t *testing.T) {
@@ -10,10 +10,10 @@ func TestCanParseEmptyMap(t *testing.T) {
 
 	if !(json_obj.HasKey("key")) {
 		t.Errorf("key not found available keys are %s", json_obj.GetKeys()[0])
-	} else if! json_obj.IsMap("key") {
+	} else if !json_obj.IsMap("key") {
 		t.Errorf("key is not a *json.Map: %s", json_obj.GetType("key"))
-	} else {			
-		value, value_errors := json_obj.GetMap("key") 
+	} else {
+		value, value_errors := json_obj.GetMap("key")
 
 		if value_errors != nil {
 			t.Errorf("map GetMap has errors")
@@ -30,12 +30,13 @@ func TestCanParseNestedMapWithStringValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if! json_obj.IsMap("key") {
+	} else if !json_obj.IsMap("key") {
 		t.Errorf("key is not a *json.Map: %s", json_obj.GetType("key"))
-	} else {			
-		value, value_errors := json_obj.GetMap("key") 
+	} else {
+		value, value_errors := json_obj.GetMap("key")
 		if value_errors != nil {
-			t.Errorf(fmt.Sprintf("%s", value_errors))
+			error_message := fmt.Sprintf("%s", value_errors)
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetMap is nil")
 		} else if len((value.GetKeys())) != 1 {
@@ -43,7 +44,8 @@ func TestCanParseNestedMapWithStringValue(t *testing.T) {
 		} else {
 			inner_value, inner_value_errors := value.GetString("key1")
 			if inner_value_errors != nil {
-				t.Errorf(fmt.Sprintf("%s", inner_value_errors))
+				error_message := fmt.Sprintf("%s", inner_value_errors)
+				t.Errorf("%s", error_message)
 			} else if inner_value == nil {
 				t.Errorf("key1 has nil value")
 			} else if *inner_value != "value1" {
@@ -58,12 +60,13 @@ func TestCanParseNestedMapWithMultipleStringValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if! json_obj.IsMap("key") {
+	} else if !json_obj.IsMap("key") {
 		t.Errorf("key is not a *json.Map: %s", json_obj.GetType("key"))
-	} else {			
-		value, value_errors := json_obj.GetMap("key") 
+	} else {
+		value, value_errors := json_obj.GetMap("key")
 		if value_errors != nil {
-			t.Errorf(fmt.Sprintf("%s", value_errors))
+			error_message := fmt.Sprintf("%s", value_errors)
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetMap is nil")
 		} else if len((value.GetKeys())) != 2 {
@@ -71,7 +74,8 @@ func TestCanParseNestedMapWithMultipleStringValue(t *testing.T) {
 		} else {
 			inner_value, inner_value_errors := value.GetString("key1")
 			if inner_value_errors != nil {
-				t.Errorf(fmt.Sprintf("%s", inner_value_errors))
+				error_message := fmt.Sprintf("%s", inner_value_errors)
+				t.Errorf("%s", error_message)
 			} else if inner_value == nil {
 				t.Errorf("key1 has nil value")
 			} else if *inner_value != "value1" {
@@ -80,7 +84,8 @@ func TestCanParseNestedMapWithMultipleStringValue(t *testing.T) {
 
 			inner_value2, inner_value2_errors := value.GetString("key2")
 			if inner_value2_errors != nil {
-				t.Errorf(fmt.Sprintf("%s", inner_value2_errors))
+				error_message := fmt.Sprintf("%s", inner_value2_errors)
+				t.Errorf("%s", error_message)
 			} else if inner_value2 == nil {
 				t.Errorf("key2 has nil value")
 			} else if *inner_value2 != "value2" {
@@ -95,12 +100,13 @@ func TestCanParseDoubleNestedMapWithStringValue(t *testing.T) {
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
-	} else if! json_obj.IsMap("key") {
+	} else if !json_obj.IsMap("key") {
 		t.Errorf("key is not a *json.Map: %s", json_obj.GetType("key"))
-	} else {			
-		value, value_errors := json_obj.GetMap("key") 
+	} else {
+		value, value_errors := json_obj.GetMap("key")
 		if value_errors != nil {
-			t.Errorf(fmt.Sprintf("%s", value_errors))
+			error_message := fmt.Sprintf("%s", value_errors)
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetMap is nil")
 		} else if len((value.GetKeys())) != 1 {
@@ -108,7 +114,8 @@ func TestCanParseDoubleNestedMapWithStringValue(t *testing.T) {
 		} else {
 			inner_value, inner_value_errors := value.GetMap("key2")
 			if inner_value_errors != nil {
-				t.Errorf(fmt.Sprintf("%s", inner_value_errors))
+				error_message := fmt.Sprintf("%s", inner_value_errors)
+				t.Errorf("%s", error_message)
 			} else if inner_value == nil {
 				t.Errorf("key2 has nil value")
 			} else if !value.IsMap("key2") {
@@ -116,7 +123,8 @@ func TestCanParseDoubleNestedMapWithStringValue(t *testing.T) {
 			} else {
 				inner_value2, inner_value2_errors := inner_value.GetString("key3")
 				if inner_value2_errors != nil {
-					t.Errorf(fmt.Sprintf("%s", inner_value2_errors))
+					error_message := fmt.Sprintf("%s", inner_value2_errors)
+					t.Errorf("%s", error_message)
 				} else if inner_value2 == nil {
 					t.Errorf("key3 has nil value")
 				} else if *inner_value2 != "value3" {
@@ -134,10 +142,11 @@ func TestCanParseDoubleNestedMapWithStringValueAndStringValueAtRootLevelAfter(t 
 		t.Errorf("key not found")
 	} else if !json_obj.IsMap("key") {
 		t.Errorf("key is not a Map: %s", json_obj.GetType("key"))
-	} else {		
-		value, value_errors := json_obj.GetMap("key") 
+	} else {
+		value, value_errors := json_obj.GetMap("key")
 		if value_errors != nil {
-			t.Errorf(fmt.Sprintf("%s", value_errors))
+			error_message := fmt.Sprintf("%s", value_errors)
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetMap is nil")
 		} else if len((value.GetKeys())) != 1 {
@@ -145,7 +154,8 @@ func TestCanParseDoubleNestedMapWithStringValueAndStringValueAtRootLevelAfter(t 
 		} else {
 			inner_value, inner_value_errors := value.GetMap("key2")
 			if inner_value_errors != nil {
-				t.Errorf(fmt.Sprintf("%s", inner_value_errors))
+				error_message := fmt.Sprintf("%s", inner_value_errors)
+				t.Errorf("%s", error_message)
 			} else if inner_value == nil {
 				t.Errorf("key2 has nil value")
 			} else if !value.IsMap("key2") {
@@ -153,7 +163,8 @@ func TestCanParseDoubleNestedMapWithStringValueAndStringValueAtRootLevelAfter(t 
 			} else {
 				inner_value2, inner_value2_errors := inner_value.GetString("key3")
 				if inner_value2_errors != nil {
-					t.Errorf(fmt.Sprintf("%s", inner_value2_errors))
+					error_message := fmt.Sprintf("%s", inner_value2_errors)
+					t.Errorf("%s", error_message)
 				} else if inner_value2 == nil {
 					t.Errorf("key3 has nil value")
 				} else if *inner_value2 != "value3" {
@@ -164,7 +175,8 @@ func TestCanParseDoubleNestedMapWithStringValueAndStringValueAtRootLevelAfter(t 
 
 		value4, inner_value4_errors := json_obj.GetString("key4")
 		if inner_value4_errors != nil {
-			t.Errorf(fmt.Sprintf("%s", inner_value4_errors))
+			error_message := fmt.Sprintf("%s", inner_value4_errors)
+			t.Errorf("%s", error_message)
 		} else if value4 == nil {
 			t.Errorf("key4 has nil value")
 		} else if *value4 != "value4" {

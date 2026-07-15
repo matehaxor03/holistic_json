@@ -1,41 +1,43 @@
 package tests
- 
+
 import (
-    "testing"
+	"testing"
 )
 
 func TestCanParseUInt16LowBoundary(t *testing.T) {
-	json_obj := ParseJSONSuccessfully(t,"{\"key\":256}")
-
-	if !json_obj.HasKey("key") {
-		t.Errorf("key not found")
-	} else if!json_obj.IsUInt16("key") {
-		t.Errorf("key is not a *uint16: %s", json_obj.GetType("key"))
-	} else {
-		value, value_errors := json_obj.GetUInt16("key") 
-
-		if value_errors != nil {
-			t.Errorf("map GetUInt16 has errors: " + value_errors[0].Error())
-		} else if value == nil {
-			t.Errorf("GetUInt16 is nil")
-		} else if *value != 256 {
-			t.Errorf("expected: value actual: %d", *value)
-		}
-	}	
-}
-
-func TestCanParseUInt16HighBoundary(t *testing.T) {
-	json_obj := ParseJSONSuccessfully(t,"{\"key\":65535}")
+	json_obj := ParseJSONSuccessfully(t, "{\"key\":256}")
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
 	} else if !json_obj.IsUInt16("key") {
 		t.Errorf("key is not a *uint16: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetUInt16("key") 
+		value, value_errors := json_obj.GetUInt16("key")
 
 		if value_errors != nil {
-			t.Errorf("map GetUInt16 has errors: " + value_errors[0].Error())
+			error_message := "map GetUInt16 has errors: " + value_errors[0].Error()
+			t.Errorf("%s", error_message)
+		} else if value == nil {
+			t.Errorf("GetUInt16 is nil")
+		} else if *value != 256 {
+			t.Errorf("expected: value actual: %d", *value)
+		}
+	}
+}
+
+func TestCanParseUInt16HighBoundary(t *testing.T) {
+	json_obj := ParseJSONSuccessfully(t, "{\"key\":65535}")
+
+	if !json_obj.HasKey("key") {
+		t.Errorf("key not found")
+	} else if !json_obj.IsUInt16("key") {
+		t.Errorf("key is not a *uint16: %s", json_obj.GetType("key"))
+	} else {
+		value, value_errors := json_obj.GetUInt16("key")
+
+		if value_errors != nil {
+			error_message := "map GetUInt16 has errors: " + value_errors[0].Error()
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetUInt16 is nil")
 		} else if *value != 65535 {

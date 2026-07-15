@@ -1,7 +1,7 @@
 package tests
- 
+
 import (
-    "testing"
+	"testing"
 )
 
 func TestCanParseUInt8LowBoundary(t *testing.T) {
@@ -12,10 +12,11 @@ func TestCanParseUInt8LowBoundary(t *testing.T) {
 	} else if !json_obj.IsUInt8("key") {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetUInt8("key") 
+		value, value_errors := json_obj.GetUInt8("key")
 
 		if value_errors != nil {
-			t.Errorf("map GetUInt8 has errors: " + value_errors[0].Error())
+			error_message := "map GetUInt8 has errors: " + value_errors[0].Error()
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetUInt8 is nil")
 		} else if *value != 0 {
@@ -32,10 +33,11 @@ func TestCanParseUInt8LowBoundaryWithSpaceBeforeValue(t *testing.T) {
 	} else if !json_obj.IsUInt8("key") {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetUInt8("key") 
+		value, value_errors := json_obj.GetUInt8("key")
 
 		if value_errors != nil {
-			t.Errorf("map GetUInt8 has errors: " + value_errors[0].Error())
+			error_message := "map GetUInt8 has errors: " + value_errors[0].Error()
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetUInt8 is nil")
 		} else if *value != 0 {
@@ -52,16 +54,17 @@ func TestCanParseUInt8LowBoundaryWithSpaceAfterValue(t *testing.T) {
 	} else if !json_obj.IsUInt8("key") {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetUInt8("key") 
+		value, value_errors := json_obj.GetUInt8("key")
 
 		if value_errors != nil {
-			t.Errorf("map GetUInt8 has errors: " + value_errors[0].Error())
+			error_message := "map GetUInt8 has errors: " + value_errors[0].Error()
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetUInt8 is nil")
 		} else if *value != 0 {
 			t.Errorf("expected: value actual: %d", *value)
 		}
-	}	
+	}
 }
 
 func TestCanParseUInt8LowBoundaryWithNewlineBeforeValue(t *testing.T) {
@@ -72,10 +75,11 @@ func TestCanParseUInt8LowBoundaryWithNewlineBeforeValue(t *testing.T) {
 	} else if !json_obj.IsUInt8("key") {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetUInt8("key") 
+		value, value_errors := json_obj.GetUInt8("key")
 
 		if value_errors != nil {
-			t.Errorf("map GetUInt8 has errors: " + value_errors[0].Error())
+			error_message := "map GetUInt8 has errors: " + value_errors[0].Error()
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetUInt8 is nil")
 		} else if *value != 0 {
@@ -92,10 +96,11 @@ func TestCanParseUInt8LowBoundaryWithNewlineAfterValue(t *testing.T) {
 	} else if !json_obj.IsUInt8("key") {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetUInt8("key") 
+		value, value_errors := json_obj.GetUInt8("key")
 
 		if value_errors != nil {
-			t.Errorf("map GetUInt8 has errors: " + value_errors[0].Error())
+			error_message := "map GetUInt8 has errors: " + value_errors[0].Error()
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetUInt8 is nil")
 		} else if *value != 0 {
@@ -112,16 +117,17 @@ func TestCanParseUInt8LowBoundaryWithDosNewlineBeforeValue(t *testing.T) {
 	} else if !json_obj.IsUInt8("key") {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetUInt8("key") 
+		value, value_errors := json_obj.GetUInt8("key")
 
 		if value_errors != nil {
-			t.Errorf("map GetUInt8 has errors: " + value_errors[0].Error())
+			error_message := "map GetUInt8 has errors: " + value_errors[0].Error()
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetUInt8 is nil")
 		} else if *value != 0 {
 			t.Errorf("expected: value actual: %d", *value)
 		}
-	}	
+	}
 }
 
 func TestCanParseUInt8LowBoundaryWithDosNewlineAfterValue(t *testing.T) {
@@ -132,10 +138,11 @@ func TestCanParseUInt8LowBoundaryWithDosNewlineAfterValue(t *testing.T) {
 	} else if !json_obj.IsUInt8("key") {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetUInt8("key") 
+		value, value_errors := json_obj.GetUInt8("key")
 
 		if value_errors != nil {
-			t.Errorf("map GetUInt8 has errors: " + value_errors[0].Error())
+			error_message := "map GetUInt8 has errors: " + value_errors[0].Error()
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetUInt8 is nil")
 		} else if *value != 0 {
@@ -143,7 +150,6 @@ func TestCanParseUInt8LowBoundaryWithDosNewlineAfterValue(t *testing.T) {
 		}
 	}
 }
-
 
 func TestCanParseUInt8HighBoundary(t *testing.T) {
 	json_obj := ParseJSONSuccessfully(t, "{\"key\":255}")
@@ -153,10 +159,11 @@ func TestCanParseUInt8HighBoundary(t *testing.T) {
 	} else if !json_obj.IsUInt8("key") {
 		t.Errorf("key is not a *uint8: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetUInt8("key") 
+		value, value_errors := json_obj.GetUInt8("key")
 
 		if value_errors != nil {
-			t.Errorf("map GetUInt8 has errors: " + value_errors[0].Error())
+			error_message := "map GetUInt8 has errors: " + value_errors[0].Error()
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetUInt8 is nil")
 		} else if *value != 255 {

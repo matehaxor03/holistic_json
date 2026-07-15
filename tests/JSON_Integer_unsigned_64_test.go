@@ -1,23 +1,24 @@
 package tests
- 
+
 import (
-    "testing"
+	"testing"
+
 	json "github.com/matehaxor03/holistic_json/json"
 )
 
-
 func TestCanParseUInt64LowBoundary(t *testing.T) {
-	json_obj := ParseJSONSuccessfully(t,"{\"key\":4294967296}")
+	json_obj := ParseJSONSuccessfully(t, "{\"key\":4294967296}")
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
 	} else if !json_obj.IsUInt64("key") {
 		t.Errorf("key is not a *uint64: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetUInt64("key") 
+		value, value_errors := json_obj.GetUInt64("key")
 
 		if value_errors != nil {
-			t.Errorf("map GetUInt32 has errors: " + value_errors[0].Error())
+			error_message := "map GetUInt32 has errors: " + value_errors[0].Error()
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetUInt32 is nil")
 		} else if *value != 4294967296 {
@@ -27,17 +28,18 @@ func TestCanParseUInt64LowBoundary(t *testing.T) {
 }
 
 func TestCanParseUInt64HighBoundary(t *testing.T) {
-	json_obj := ParseJSONSuccessfully(t,"{\"key\":18446744073709551615}")
+	json_obj := ParseJSONSuccessfully(t, "{\"key\":18446744073709551615}")
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
 	} else if !json_obj.IsUInt64("key") {
 		t.Errorf("key is not a *uint64: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetUInt64("key") 
+		value, value_errors := json_obj.GetUInt64("key")
 
 		if value_errors != nil {
-			t.Errorf("map GetUInt32 has errors: " + value_errors[0].Error())
+			error_message := "map GetUInt32 has errors: " + value_errors[0].Error()
+			t.Errorf("%s", error_message)
 		} else if value == nil {
 			t.Errorf("GetUInt32 is nil")
 		} else if *value != 18446744073709551615 {
@@ -59,14 +61,14 @@ func TestCannotParseUInt64Overflow(t *testing.T) {
 }
 
 func TestCanParseUInt64PositiveMuitpleHighBondary(t *testing.T) {
-	json_obj := ParseJSONSuccessfully(t,"{\"key\":4294967296,\"key2\":4294967297}")
+	json_obj := ParseJSONSuccessfully(t, "{\"key\":4294967296,\"key2\":4294967297}")
 
 	if !json_obj.HasKey("key") {
 		t.Errorf("key not found")
 	} else if !json_obj.IsUInt64("key") {
 		t.Errorf("key is not a *uint64: %s", json_obj.GetType("key"))
 	} else {
-		value, value_errors := json_obj.GetUInt64("key") 
+		value, value_errors := json_obj.GetUInt64("key")
 
 		if value_errors != nil {
 			t.Errorf("map GetInt64 has errors %s", value_errors)
@@ -82,7 +84,7 @@ func TestCanParseUInt64PositiveMuitpleHighBondary(t *testing.T) {
 	} else if !json_obj.IsUInt64("key2") {
 		t.Errorf("key2 is not a *uint64: %s", json_obj.GetType("key2"))
 	} else {
-		value, value_errors := json_obj.GetUInt64("key2") 
+		value, value_errors := json_obj.GetUInt64("key2")
 
 		if value_errors != nil {
 			t.Errorf("map GetInt64 has errors %s", value_errors)
@@ -93,4 +95,3 @@ func TestCanParseUInt64PositiveMuitpleHighBondary(t *testing.T) {
 		}
 	}
 }
-	

@@ -1,10 +1,25 @@
-parse a string into a Map in GO 
+parse a string into a Map in GO.
 
 # example
-```GO
-json "github.com/matehaxor03/holistic_json/json"
+```go
+package example
 
-json, json_errors := json.Parse("{\"hello\":\"world\"}")
+import (
+  "fmt"
+  json "github.com/matehaxor03/holistic_json/json"
+)
 
-// your code goes here and 42 is the answer to everything
+func main() {
+
+  json, json_errors := json.Parse("{\"hello\":\"world\"}")
+
+  if json_errors != nil {
+      fmt.Println(fmt.Errorf("%s", json_errors))
+      return 1
+  }
+
+  // your code goes here, use the json Map
+
+  return 0 
+}
 ```

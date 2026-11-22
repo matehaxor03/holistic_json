@@ -11,14 +11,14 @@ import (
 
 func main() {
 
-  json, json_errors := json.Parse("{\"hello\":\"world\"}")
+  data, errors := json.Parse("{\"hello\":\"world\"}")
 
-  if json_errors != nil {
-      fmt.Println(fmt.Errorf("%s", json_errors))
+  if errors != nil {
+      fmt.Println(fmt.Errorf("%s", errors))
       return 1
   }
 
-  // your code goes here, use the json Map
+  // your code goes here, use the data Map
 
   return 0 
 }

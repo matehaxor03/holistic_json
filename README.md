@@ -6,6 +6,7 @@ package example
 
 import (
   "fmt"
+  "os"
   json "github.com/matehaxor03/holistic_json/json"
 )
 
@@ -15,11 +16,10 @@ func main() {
 
   if errors != nil {
       fmt.Println(fmt.Errorf("%s", errors))
-      return 1
+      os.Exit(1)
   }
 
   // your code goes here, use the data Map
-
-  return 0 
+  os.Exit(0)
 }
 ```
